@@ -1,5 +1,7 @@
 target/
-build/
+*/build/
+.idea/
+.gradle
 *.iml
 pom.xml.tag
 pom.xml.releaseBackup

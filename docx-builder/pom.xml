@@ -29,6 +29,11 @@
     </build>
     <dependencies>
         <dependency>
+            <groupId>com.alphasystem</groupId>
+            <artifactId>commons</artifactId>
+            <version>${commons.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.alphasystem.openxml</groupId>
             <artifactId>openxml-builder</artifactId>
             <version>${openxml-builder.version}</version>
@@ -38,7 +43,7 @@
             <artifactId>docbook-model</artifactId>
             <version>${docbook-model.version}</version>
         </dependency>
-        <dependency>
+        <!--dependency>
             <groupId>org.docx4j</groupId>
             <artifactId>docx4j-MOXy-JAXBContext</artifactId>
             <version>3.0.0</version>
@@ -47,7 +52,7 @@
             <groupId>org.eclipse.persistence</groupId>
             <artifactId>eclipselink</artifactId>
             <version>2.6.2</version>
-        </dependency>
+        </dependency-->
         <dependency>
             <groupId>org.asciidoctor</groupId>
             <artifactId>asciidoctorj</artifactId>

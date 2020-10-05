@@ -1,0 +1,7 @@
+<itemizedlist xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en">
+    <listitem>
+        <simpara>This is an example +
+            with line break.
+        </simpara>
+    </listitem>
+</itemizedlist>

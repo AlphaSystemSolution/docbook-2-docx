@@ -45,7 +45,7 @@ public abstract class AbstractTest {
         final Path path = get(TARGET_PATH);
         if (!Files.exists(path)) {
             try {
-                Files.createDirectory(path).toString();
+                Files.createDirectory(path);
             } catch (IOException e) {
                 fail(e.getMessage(), e);
             }
