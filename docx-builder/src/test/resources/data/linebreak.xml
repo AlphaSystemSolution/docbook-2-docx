@@ -1,7 +1,6 @@
 <itemizedlist xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en">
     <listitem>
-        <simpara>This is an example <?asciidoc-br?>
-            with line break.
-        </simpara>
+        <simpara>A list item with two</simpara>
+        <simpara>paragraphs</simpara>
     </listitem>
 </itemizedlist>
