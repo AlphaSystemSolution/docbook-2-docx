@@ -12,9 +12,9 @@ import java.util.List;
 
 public class MyUnmarshallerHandlerWrapper implements UnmarshallerHandler {
 
-    private List<ProcessingInstruction> processingInstructions;
+    private final List<ProcessingInstruction> processingInstructions;
 
-    private UnmarshallerHandler handle;
+    private final UnmarshallerHandler handle;
 
     public MyUnmarshallerHandlerWrapper(UnmarshallerHandler handle) {
         this.handle = handle;
@@ -26,8 +26,8 @@ public class MyUnmarshallerHandlerWrapper implements UnmarshallerHandler {
     }
 
     @Override
-    public void characters(char[] arg0, int arg1, int arg2) throws SAXException {
-        handle.characters(arg0, arg1, arg2);
+    public void characters(char[] ch, int start, int length) throws SAXException {
+        handle.characters(ch, start, length);
     }
 
     @Override
@@ -36,36 +36,35 @@ public class MyUnmarshallerHandlerWrapper implements UnmarshallerHandler {
     }
 
     @Override
-    public void endElement(String arg0, String arg1, String arg2)
+    public void endElement(String uri, String localName, String qName)
             throws SAXException {
-        handle.endElement(arg0, arg1, arg2);
+        handle.endElement(uri, localName, qName);
     }
 
     @Override
-    public void endPrefixMapping(String arg0) throws SAXException {
-        handle.endPrefixMapping(arg0);
+    public void endPrefixMapping(String prefix) throws SAXException {
+        handle.endPrefixMapping(prefix);
     }
 
     @Override
-    public void ignorableWhitespace(char[] arg0, int arg1, int arg2)
+    public void ignorableWhitespace(char[] ch, int start, int length)
             throws SAXException {
-        handle.ignorableWhitespace(arg0, arg1, arg2);
+        handle.ignorableWhitespace(ch, start, length);
     }
 
     @Override
-    public void processingInstruction(String target, String data)
-            throws SAXException {
+    public void processingInstruction(String target, String data) {
         processingInstructions.add(new ProcessingInstruction(target, data));
     }
 
     @Override
-    public void setDocumentLocator(Locator arg0) {
-        handle.setDocumentLocator(arg0);
+    public void setDocumentLocator(Locator locator) {
+        handle.setDocumentLocator(locator);
     }
 
     @Override
-    public void skippedEntity(String arg0) throws SAXException {
-        handle.skippedEntity(arg0);
+    public void skippedEntity(String name) throws SAXException {
+        handle.skippedEntity(name);
     }
 
     @Override
@@ -80,9 +79,9 @@ public class MyUnmarshallerHandlerWrapper implements UnmarshallerHandler {
     }
 
     @Override
-    public void startPrefixMapping(String arg0, String arg1)
+    public void startPrefixMapping(String prefix, String uri)
             throws SAXException {
-        handle.startPrefixMapping(arg0, arg1);
+        handle.startPrefixMapping(prefix, uri);
     }
 
     @Override
