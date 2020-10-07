@@ -1,16 +1,18 @@
 package com.alphasystem.asciidoc.model;
 
-import org.asciidoctor.AttributesBuilder;
-import org.asciidoctor.OptionsBuilder;
-import org.asciidoctor.Placement;
-
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Map;
 
+import org.asciidoctor.AttributesBuilder;
+import org.asciidoctor.OptionsBuilder;
+import org.asciidoctor.Placement;
+
 import static com.alphasystem.util.AppUtil.USER_HOME_DIR;
 import static com.alphasystem.util.AppUtil.toRelativePath;
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.stripToNull;
 import static org.asciidoctor.SafeMode.SAFE;
 
 /**
@@ -36,12 +38,14 @@ public class AsciiDocumentInfo {
     private File customStyleSheetFile;
     private boolean linkCss;
     private String includeDir;
+    private String docInfoDir;
     private String imagesDir;
     private String iconsDir;
     private String icons;
     private String iconFontName;
     private String idPrefix;
     private String idSeparator;
+    private String docInfo;
     private boolean docInfo2;
     private String sourceLanguage;
     private String lastUpdateLabel;
@@ -67,7 +71,6 @@ public class AsciiDocumentInfo {
     private boolean sectionNumbers;
     private boolean hideUriSchema;
     private File srcFile;
-    private File previewFile;
 
     public AsciiDocumentInfo() {
         attributesBuilder = AttributesBuilder.attributes();
@@ -76,7 +79,7 @@ public class AsciiDocumentInfo {
         setBackend(null);
         setStylesDir(null);
         setIcons(null);
-        setLinkCss(true);
+        setLinkCss(false);
         setOmitLastUpdatedTimeStamp(true);
         setCompact(true);
         optionsBuilder.safe(SAFE);
@@ -98,13 +101,14 @@ public class AsciiDocumentInfo {
         setDocumentTitle(src.getDocumentTitle());
         setDocInfo2(src.isDocInfo2());
         setIncludeDir(src.getIncludeDir());
+        setDocInfoDir(src.getDocInfoDir());
+        setDocInfo(src.getDocInfo());
         setImagesDir(src.getImagesDir());
         setIconsDir(src.getIconsDir());
         setIcons(src.getIcons());
         setIconFontName(src.getIconFontName());
         setLinkCss(src.isLinkCss());
         setSrcFile(src.getSrcFile());
-        setPreviewFile(src.getPreviewFile());
         setStylesDir(src.getStylesDir());
         setCustomStyleSheetFile(src.getCustomStyleSheetFile());
         setSourceLanguage(src.getSourceLanguage());
@@ -135,6 +139,10 @@ public class AsciiDocumentInfo {
 
     public OptionsBuilder getOptionsBuilder() {
         return optionsBuilder;
+    }
+
+    public String getBaseDir() {
+        return (srcFile == null) ? null : srcFile.getParent();
     }
 
     public String getDocumentType() {
@@ -176,9 +184,11 @@ public class AsciiDocumentInfo {
     }
 
     public void setStylesDir(String stylesDir) {
-        this.stylesDir = isBlank(stylesDir) ? "css" : stylesDir;
+        this.stylesDir = stylesDir;
         if (linkCss) {
             attributesBuilder.stylesDir(this.stylesDir);
+        } else {
+            attributesBuilder.stylesDir(null);
         }
     }
 
@@ -202,6 +212,8 @@ public class AsciiDocumentInfo {
         this.linkCss = linkCss;
         if (this.linkCss) {
             attributesBuilder.linkCss(isLinkCss()).stylesDir(stylesDir);
+        } else {
+            attributesBuilder.stylesDir(null);
         }
     }
 
@@ -211,6 +223,14 @@ public class AsciiDocumentInfo {
 
     public void setIncludeDir(String includeDir) {
         this.includeDir = includeDir;
+    }
+
+    public String getDocInfoDir() {
+        return docInfoDir;
+    }
+
+    public void setDocInfoDir(String docInfoDir) {
+        this.docInfoDir = docInfoDir;
     }
 
     public String getImagesDir() {
@@ -264,6 +284,14 @@ public class AsciiDocumentInfo {
 
     public void setIdSeparator(String idSeparator) {
         this.idSeparator = idSeparator;
+    }
+
+    public String getDocInfo() {
+        return docInfo;
+    }
+
+    public void setDocInfo(String docInfo) {
+        this.docInfo = docInfo;
     }
 
     public boolean isDocInfo2() {
@@ -473,16 +501,6 @@ public class AsciiDocumentInfo {
     public void setSrcFile(File srcFile) {
         this.srcFile = (srcFile == null) ? USER_HOME_DIR : srcFile;
         optionsBuilder.baseDir(this.srcFile.getParentFile());
-        setPreview(this.srcFile, previewFile);
-    }
-
-    public File getPreviewFile() {
-        return previewFile;
-    }
-
-    public void setPreviewFile(File previewFile) {
-        this.previewFile = previewFile;
-        setPreview(srcFile, this.previewFile);
     }
 
     public void populateAttributes(Map<String, Object> attributes) {
