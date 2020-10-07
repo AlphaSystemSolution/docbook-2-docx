@@ -1,0 +1,33 @@
+ext {
+    commonsVersion = '3.0.0-SNAPSHOT'
+    openxmlBuilderVersion = '3.0.0-SNAPSHOT'
+    asciidoctorjVersion = '1.6.0-alpha.4'
+}
+dependencies {
+    compile project(":docbook-model")
+    compile group: 'com.alphasystem', name: 'commons', version:"${commonsVersion}"
+    compile group: 'com.alphasystem.openxml', name: 'openxml-builder', version: "${openxmlBuilderVersion}"
+    compile group: 'org.asciidoctor', name: 'asciidoctorj', version: "${asciidoctorjVersion}"
+    testCompile group: 'org.testng', name: 'testng', version: '7.1.0'
+    testCompile group: 'com.google.inject', name: 'guice', version: '4.2.3'
+    testCompile group: 'org.uncommons', name: 'reportng', version: '1.1.4'
+}
+
+tasks.withType(Test) {
+    systemProperty 'template', '../conf/default.dotx'
+    systemProperty 'styles', '../conf/styles.xml,META-INF/custom-styles.xml'
+    systemProperty 'conf.path', '.'
+    systemProperty 'target.path', 'build/docs'
+    systemProperty 'data.path', "${projectDir}/src/test/resources/data"
+    systemProperty 'org.apache.commons.logging.Log', 'org.apache.commons.logging.impl.SimpleLog'
+}
+
+test {
+    useTestNG() {
+        suites "testng/testng.xml"
+    }
+    options {
+        listeners << 'org.uncommons.reportng.HTMLReporter'
+        listeners << 'org.uncommons.reportng.JUnitXMLReporter'
+    }
+}

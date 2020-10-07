@@ -192,7 +192,7 @@ public class DocumentBuilder {
         return docBookContent;
     }
 
-    private static String convertToDocBook(String content, AsciiDocumentInfo asciiDocumentInfo) throws SystemException {
+    private static String convertToDocBook(String content, AsciiDocumentInfo asciiDocumentInfo) {
         final OptionsBuilder optionsBuilder = asciiDocumentInfo.getOptionsBuilder();
         optionsBuilder.toFile(false).inPlace(false).backend(DOC_BOOK.getValue()).headerFooter(true);
         return asciiDoctor.convert(content, optionsBuilder);

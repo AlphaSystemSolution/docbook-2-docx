@@ -36,7 +36,7 @@ public class UnmarshallerTool {
         }
     }
 
-    private static ConfigurationUtils configurationUtils = ConfigurationUtils.getInstance();
+    private static final ConfigurationUtils configurationUtils = ConfigurationUtils.getInstance();
 
     private final AsciiDocumentInfo documentInfo;
 
