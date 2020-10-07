@@ -15,11 +15,13 @@ subprojects {
         mavenLocal()
         mavenCentral()
         maven {
-            url = uri('http://download.java.net/maven/2/')
+            url = uri('https://download.java.net/maven/2/')
         }
-
         maven {
-            url = uri('http://repo.maven.apache.org/maven2')
+            url = uri('https://repo.maven.apache.org/maven2')
+        }
+        maven {
+            url = uri("https://repository.jboss.org/nexus/content/repositories/thirdparty-releases/")
         }
     }
 
