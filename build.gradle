@@ -3,7 +3,7 @@
  */
 
 allprojects {
-    group = 'com.alphasystem.doc'
+    group = 'com.alphasystem.docx'
     version = '3.0.0-SNAPSHOT'
 }
 
