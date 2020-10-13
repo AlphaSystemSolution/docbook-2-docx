@@ -1,7 +1,11 @@
 package com.alphasystem.docbook;
 
+import org.asciidoctor.Asciidoctor;
+import org.asciidoctor.Options;
+
 import java.awt.*;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static java.nio.file.Paths.get;
 
@@ -12,9 +16,13 @@ public class DocBookTest {
 
     public static void main(String[] args) {
 
-        String path = "C:\\Users\\sali\\ascii_doc\\test2.adoc";
-        // path = "C:\\Users\\sali\\Arabic\\documents\\Lesson-001-01.adoc";
-        path = "C:\\tools\\asciidoc-8.6.9\\asciidoctor.org-master\\docs\\asciidoc-writers-guide.adoc";
+        String path = "/Users/sfali/development/Lightbend/docs/ClusterFundamentals/course.adoc";
+
+        final Asciidoctor asciidoctor = Asciidoctor.Factory.create();
+
+        Options options = new Options();
+        options.setBackend("docbook");
+        asciidoctor.convertFile(Paths.get(path).toFile(), options);
 
         try {
             final Path destPath = DocumentBuilder.buildDocument(get(path));
