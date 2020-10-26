@@ -25,7 +25,7 @@ import static org.apache.commons.lang3.ArrayUtils.isEmpty;
  */
 public abstract class InlineBuilder<T> extends AbstractBuilder<T> {
 
-    protected String styles[];
+    protected String[] styles;
     protected InlineHandlerFactory handlerFactory = InlineHandlerFactory.getInstance();
 
     protected InlineBuilder(Builder parent, T obj, int indexInParent) {
