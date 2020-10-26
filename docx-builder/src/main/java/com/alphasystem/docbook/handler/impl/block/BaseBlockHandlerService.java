@@ -22,5 +22,6 @@ public class BaseBlockHandlerService extends BlockHandlerService {
         instance.registerHandler(EXAMPLE_KEY, new ExampleHandler());
         instance.registerHandler(INFORMAL_EXAMPLE_KEY, new InformalExampleHandler());
         instance.registerHandler(SIDE_BAR_KEY, new SideBarHandler());
+        instance.registerHandler(SCREEN_KEY, new ScreenHandler());
     }
 }

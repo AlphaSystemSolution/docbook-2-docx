@@ -113,9 +113,13 @@ public abstract class AbstractTest {
             log("**************************************************************************", true);
             for (Object o : objects) {
                 final Builder builder = builderFactory.getBuilder(parent, o, indexInParent);
+                if(builder == null) {
+                    log(format("No builder found for type: %s", o), true);
+                    continue;
+                }
                 final List c = builder.buildContent();
                 log(format("Getting builder \"%s\" for \"%s\", number of child content are \"%s\".", builder.getClass().getName(),
-                        o.getClass().getName(), c.size()));
+                        o.getClass().getName(), c.size()), true);
                 content.addAll(c);
             }
             log("**************************************************************************", true);

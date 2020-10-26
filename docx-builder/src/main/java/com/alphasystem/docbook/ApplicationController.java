@@ -83,6 +83,10 @@ public final class ApplicationController {
         return (Tbl) blockHandlerFactory.getHandler(SIDE_BAR_KEY).handleBlock();
     }
 
+    public Tbl getScreenTable() {
+        return (Tbl) blockHandlerFactory.getHandler(SCREEN_KEY).handleBlock();
+    }
+
     public Tbl getAdmonitionTable(Admonition admonition) {
         return (Tbl) blockHandlerFactory.getHandler(admonition.name()).handleBlock();
     }
