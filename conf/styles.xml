@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:styles xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
           xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-          mc:Ignorable="w14 w15">
-    <w:style w:type="paragraph" w:customStyle="1" w:styleId="SideBarTitle">
+          mc:Ignorable="w14 w15 w16se w16cid w16 w16cex">
+    <w:style w:type="paragraph" w:customStyle="true" w:styleId="SideBarTitle">
         <w:name w:val="SideBar Title"/>
         <w:basedOn w:val="Normal"/>
         <w:link w:val="SideBarTitleChar"/>
@@ -21,7 +21,7 @@
             <w:szCs w:val="32"/>
         </w:rPr>
     </w:style>
-    <w:style w:type="character" w:customStyle="1" w:styleId="SideBarTitleChar">
+    <w:style w:type="character" w:customStyle="true" w:styleId="SideBarTitleChar">
         <w:name w:val="SideBar Title Char"/>
         <w:basedOn w:val="DefaultParagraphFont"/>
         <w:link w:val="SideBarTitle0"/>
@@ -35,7 +35,7 @@
             <w:szCs w:val="32"/>
         </w:rPr>
     </w:style>
-    <w:style w:type="paragraph" w:customStyle="1" w:styleId="ExampleTitle">
+    <w:style w:type="paragraph" w:customStyle="true" w:styleId="ExampleTitle">
         <w:name w:val="ExampleTitle"/>
         <w:basedOn w:val="Normal"/>
         <w:next w:val="Normal"/>
@@ -56,7 +56,7 @@
             <w:szCs w:val="24"/>
         </w:rPr>
     </w:style>
-    <w:style w:type="character" w:customStyle="1" w:styleId="ExampleTitleChar">
+    <w:style w:type="character" w:customStyle="true" w:styleId="ExampleTitleChar">
         <w:name w:val="Example Title Char"/>
         <w:basedOn w:val="DefaultParagraphFont"/>
         <w:link w:val="ExampleTitle"/>
@@ -69,7 +69,7 @@
             <w:szCs w:val="24"/>
         </w:rPr>
     </w:style>
-    <w:style w:type="paragraph" w:customStyle="1" w:styleId="TableTitle">
+    <w:style w:type="paragraph" w:customStyle="true" w:styleId="TableTitle">
         <w:name w:val="Table Title"/>
         <w:basedOn w:val="Normal"/>
         <w:next w:val="Normal"/>
@@ -90,7 +90,7 @@
             <w:szCs w:val="24"/>
         </w:rPr>
     </w:style>
-    <w:style w:type="character" w:customStyle="1" w:styleId="TableTitleChar">
+    <w:style w:type="character" w:customStyle="true" w:styleId="TableTitleChar">
         <w:name w:val="Table Title Char"/>
         <w:basedOn w:val="DefaultParagraphFont"/>
         <w:link w:val="ExampleTitle"/>
@@ -273,5 +273,21 @@
                 <w:vAlign w:val="center"/>
             </w:tcPr>
         </w:tblStylePr>
+    </w:style>
+    <w:style w:type="table" w:styleId="SourceCode" w:customStyle="true">
+        <w:name w:val="SourceCode"/>
+        <w:basedOn w:val="TableNormal"/>
+        <w:uiPriority w:val="99"/>
+        <w:rsid w:val="0072091B"/>
+        <w:pPr>
+            <w:spacing w:before="0" w:after="0" w:line="240" w:lineRule="auto"/>
+        </w:pPr>
+        <w:rPr>
+            <w:rFonts w:ascii="Courier New" w:hAnsi="Courier New"/>
+        </w:rPr>
+        <w:tblPr/>
+        <w:tcPr>
+            <w:shd w:val="clear" w:color="auto" w:fill="F2F2F2" w:themeFill="background1" w:themeFillShade="F2"/>
+        </w:tcPr>
     </w:style>
 </w:styles>

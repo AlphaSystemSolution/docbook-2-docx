@@ -20,12 +20,7 @@ import org.docx4j.openpackaging.parts.WordprocessingML.StyleDefinitionsPart;
 import org.docx4j.wml.Style;
 import org.docx4j.wml.Styles;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringWriter;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -115,12 +110,13 @@ public class DocumentBuilder {
 
     public static WordprocessingMLPackage buildDocument(final DocumentContext documentContext) throws SystemException {
         ApplicationController.startContext(documentContext);
-        WordprocessingMLPackage wordprocessingMLPackage = null;
+        WordprocessingMLPackage wordprocessingMLPackage;
         try {
             WmlPackageBuilder wmlPackageBuilder = WmlPackageBuilder.createPackage(configurationUtils.getTemplate())
                     .styles(configurationUtils.getStyles());
             wordprocessingMLPackage = wmlPackageBuilder.getPackage();
             MainDocumentPart mainDocumentPart = wordprocessingMLPackage.getMainDocumentPart();
+
             final StyleDefinitionsPart styleDefinitionsPart = mainDocumentPart.getStyleDefinitionsPart();
             final Styles styles = styleDefinitionsPart.getContents();
             final List<Style> list = styles.getStyle();

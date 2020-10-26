@@ -2,10 +2,13 @@ package com.alphasystem.docbook;
 
 import com.alphasystem.asciidoc.model.AsciiDocumentInfo;
 import org.docbook.model.Article;
+import org.docx4j.jaxb.Context;
+import org.docx4j.openpackaging.parts.WordprocessingML.DocumentSettingsPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.NumberingDefinitionsPart;
 import org.docx4j.relationships.ObjectFactory;
 import org.docx4j.relationships.Relationship;
+import org.docx4j.wml.CTCompat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +67,7 @@ public final class DocumentContext {
     public void setMainDocumentPart(MainDocumentPart mainDocumentPart) {
         this.mainDocumentPart = mainDocumentPart;
         this.numberingDefinitionsPart = getMainDocumentPart().getNumberingDefinitionsPart();
+        updateDocumentCompatibility();
     }
 
     public String addHyperlink(String url) {
@@ -76,7 +80,7 @@ public final class DocumentContext {
     }
 
     public long getListNumber(long numberId, long level) {
-        if(numberId < 0 || level < 0){
+        if (numberId < 0 || level < 0) {
             return -1;
         }
         final Object o = listNumbersMap.get(numberId);
@@ -86,6 +90,18 @@ public final class DocumentContext {
             numberId = numberingDefinitionsPart.restart(numberId, level, 1);
         }
         return numberId;
+    }
+
+    private void updateDocumentCompatibility() {
+        try {
+            final DocumentSettingsPart dsp = mainDocumentPart.getDocumentSettingsPart(true);
+            final CTCompat compat = Context.getWmlObjectFactory().createCTCompat();
+            compat.setCompatSetting("compatibilityMode", "http://schemas.microsoft.com/office/word", "15");
+            dsp.getContents().setCompat(compat);
+        }catch (Exception ex) {
+            // ignore
+            LOGGER.warn("Unable to update document compatibility.", ex);
+        }
     }
 
 }

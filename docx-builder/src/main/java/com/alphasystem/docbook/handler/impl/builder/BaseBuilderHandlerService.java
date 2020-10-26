@@ -51,6 +51,7 @@ public class BaseBuilderHandlerService extends BuilderHandlerService {
         registerHandler(instance, new VariableListEntryHandler());
         registerHandler(instance, new VariableListHandler());
         registerHandler(instance, new WarningHandler());
+        registerHandler(instance, new ScreenHandler());
         registerHandler(instance, BlockBuilder.class, new BlockTitleHandler());
         registerHandler(instance, InlineBuilder.class, new InlineTitleHandler());
     }

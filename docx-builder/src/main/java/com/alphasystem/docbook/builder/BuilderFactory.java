@@ -9,6 +9,8 @@ import com.alphasystem.docbook.handler.BuilderHandler;
 import com.alphasystem.docbook.handler.BuilderHandlerFactory;
 import org.docbook.model.Article;
 import org.docbook.model.Title;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -25,6 +27,8 @@ import static java.lang.String.format;
 public class BuilderFactory {
 
     private static BuilderFactory instance;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BuilderFactory.class);
 
     public static synchronized BuilderFactory getInstance() {
         if (instance == null) {
@@ -64,6 +68,7 @@ public class BuilderFactory {
         } catch (NoSuchMethodException | IllegalAccessException |
                 InstantiationException | InvocationTargetException e) {
             // ignore
+            LOGGER.error("unable to load builder", e);
         }
         return builder;
     }
