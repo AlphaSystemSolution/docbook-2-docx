@@ -5,6 +5,7 @@ import com.alphasystem.asciidoc.model.AsciiDocumentInfo;
 import com.alphasystem.docbook.builder.BuilderFactory;
 import com.alphasystem.docbook.util.ConfigurationUtils;
 import com.alphasystem.docbook.util.FileUtil;
+import com.alphasystem.openxml.builder.wml.TocGenerator;
 import com.alphasystem.openxml.builder.wml.WmlPackageBuilder;
 import com.alphasystem.util.nio.NIOFileUtils;
 import com.alphasystem.xml.UnmarshallerTool;
@@ -29,7 +30,6 @@ import java.util.List;
 import static com.alphasystem.asciidoc.model.Backend.DOC_BOOK;
 import static com.alphasystem.docbook.builder.model.DocumentCaption.EXAMPLE;
 import static com.alphasystem.docbook.builder.model.DocumentCaption.TABLE;
-import static com.alphasystem.openxml.builder.wml.WmlAdapter.addTableOfContent;
 import static com.alphasystem.openxml.builder.wml.WmlAdapter.save;
 import static java.nio.file.Files.exists;
 import static org.apache.commons.io.FilenameUtils.getExtension;
@@ -68,7 +68,7 @@ public class DocumentBuilder {
     }
 
     public static Path buildDocument(Path srcPath) throws SystemException {
-        return buildDocument(srcPath,  FileUtil.getDocxFile(srcPath));
+        return buildDocument(srcPath, FileUtil.getDocxFile(srcPath));
     }
 
     public static DocumentContext createContext(Path srcPath) throws SystemException {
@@ -143,7 +143,8 @@ public class DocumentBuilder {
             content.forEach(mainDocumentPart::addObject);
 
             if (documentInfo.isToc()) {
-                addTableOfContent(mainDocumentPart, documentInfo.getTocTitle(), 5);
+                new TocGenerator().level(5).tocHeading(documentInfo.getTocTitle()).level(5)
+                        .mainDocumentPart(mainDocumentPart).generateToc();
             }
         } catch (Docx4JException e) {
             throw new SystemException(e.getMessage(), e);

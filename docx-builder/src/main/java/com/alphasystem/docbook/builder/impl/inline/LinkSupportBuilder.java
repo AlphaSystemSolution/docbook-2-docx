@@ -3,6 +3,7 @@ package com.alphasystem.docbook.builder.impl.inline;
 import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.builder.impl.InlineBuilder;
 import com.alphasystem.openxml.builder.wml.PHyperlinkBuilder;
+import com.alphasystem.openxml.builder.wml.WmlAdapter;
 
 import java.util.List;
 
@@ -35,7 +36,7 @@ public class LinkSupportBuilder<T> extends InlineBuilder<T> {
         final PHyperlinkBuilder hyperlinkBuilder = getPHyperlinkBuilder().withHistory(true).addContent(processContent().toArray());
 
         if (external) {
-            hyperlinkBuilder.withId(getContext().addHyperlink(href));
+            hyperlinkBuilder.withId(WmlAdapter.addExternalHyperlinkRelationship(href, getContext().getMainDocumentPart()));
         } else {
             hyperlinkBuilder.withAnchor(href);
         }

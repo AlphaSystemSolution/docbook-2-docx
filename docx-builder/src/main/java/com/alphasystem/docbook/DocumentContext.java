@@ -6,8 +6,6 @@ import org.docx4j.jaxb.Context;
 import org.docx4j.openpackaging.parts.WordprocessingML.DocumentSettingsPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.NumberingDefinitionsPart;
-import org.docx4j.relationships.ObjectFactory;
-import org.docx4j.relationships.Relationship;
 import org.docx4j.wml.CTCompat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,14 +16,12 @@ import java.util.List;
 import java.util.Map;
 
 import static com.alphasystem.util.AppUtil.isInstanceOf;
-import static org.docx4j.openpackaging.parts.relationships.Namespaces.HYPERLINK;
 
 /**
  * @author sali
  */
 public final class DocumentContext {
 
-    private static final ObjectFactory RELATIONSHIP_OBJECT_FACTORY = new ObjectFactory();
     private static final Logger LOGGER = LoggerFactory.getLogger(DocumentContext.class);
     private static final Object DUMMY = new Object();
 
@@ -70,15 +66,6 @@ public final class DocumentContext {
         updateDocumentCompatibility();
     }
 
-    public String addHyperlink(String url) {
-        final Relationship relationship = RELATIONSHIP_OBJECT_FACTORY.createRelationship();
-        relationship.setType(HYPERLINK);
-        relationship.setTarget(url);
-        relationship.setTargetMode("External");
-        mainDocumentPart.getRelationshipsPart().addRelationship(relationship);
-        return relationship.getId();
-    }
-
     public long getListNumber(long numberId, long level) {
         if (numberId < 0 || level < 0) {
             return -1;
@@ -98,7 +85,7 @@ public final class DocumentContext {
             final CTCompat compat = Context.getWmlObjectFactory().createCTCompat();
             compat.setCompatSetting("compatibilityMode", "http://schemas.microsoft.com/office/word", "15");
             dsp.getContents().setCompat(compat);
-        }catch (Exception ex) {
+        } catch (Exception ex) {
             // ignore
             LOGGER.warn("Unable to update document compatibility.", ex);
         }
