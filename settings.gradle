@@ -6,3 +6,4 @@ rootProject.name = 'docbook-2-docx-parent'
 
 include ':docbook-model'
 include ':docx-builder'
+include ':arabic-handler'
