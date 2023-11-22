@@ -4,7 +4,8 @@ dependencies {
     api("jakarta.xml.bind:jakarta.xml.bind-api:${bindApiVersion}")
     api("com.alphasystem:commons:${commonsVersion}")
     api("com.alphasystem.openxml:openxml-builder:${openxmlBuilderVersion}")
-    api group: 'org.asciidoctor', name: 'asciidoctorj', version: "${asciidoctorjVersion}"
+    api "org.asciidoctor:asciidoctorj:${asciidoctorjVersion}"
+    api "org.asciidoctor:asciidoctorj-api:${asciidoctorjVersion}"
     testImplementation group: 'org.testng', name: 'testng', version: '7.7.0'
     testImplementation group: 'com.google.inject', name: 'guice', version: '7.0.0'
     testImplementation group: 'org.uncommons', name: 'reportng', version: '1.1.4'
