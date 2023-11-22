@@ -11,7 +11,7 @@ import static com.alphasystem.util.AppUtil.toRelativePath;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.stripToNull;
-import static org.asciidoctor.SafeMode.SAFE;
+import static org.asciidoctor.SafeMode.UNSAFE;
 
 /**
  * @author sali
@@ -80,7 +80,7 @@ public class AsciiDocumentInfo {
         setLinkCss(false);
         setOmitLastUpdatedTimeStamp(true);
         setCompact(true);
-        optionsBuilder.safe(SAFE);
+        optionsBuilder.safe(UNSAFE);
     }
 
     /**
