@@ -1,16 +1,13 @@
-ext {
-    commonsVersion = '3.0.0-SNAPSHOT'
-    openxmlBuilderVersion = '3.0.0-SNAPSHOT'
-    asciidoctorjVersion = '1.6.0-alpha.4'
-}
 dependencies {
-    compile project(":docbook-model")
-    compile group: 'com.alphasystem', name: 'commons', version:"${commonsVersion}"
-    compile group: 'com.alphasystem.openxml', name: 'openxml-builder', version: "${openxmlBuilderVersion}"
-    compile group: 'org.asciidoctor', name: 'asciidoctorj', version: "${asciidoctorjVersion}"
-    testCompile group: 'org.testng', name: 'testng', version: '7.1.0'
-    testCompile group: 'com.google.inject', name: 'guice', version: '4.2.3'
-    testCompile group: 'org.uncommons', name: 'reportng', version: '1.1.4'
+    api project(":docbook-model")
+    api("org.glassfish.jaxb:jaxb-runtime:${jaxbRuntimeVersion}")
+    api("jakarta.xml.bind:jakarta.xml.bind-api:${bindApiVersion}")
+    api("com.alphasystem:commons:${commonsVersion}")
+    api("com.alphasystem.openxml:openxml-builder:${openxmlBuilderVersion}")
+    api group: 'org.asciidoctor', name: 'asciidoctorj', version: "${asciidoctorjVersion}"
+    testImplementation group: 'org.testng', name: 'testng', version: '7.7.0'
+    testImplementation group: 'com.google.inject', name: 'guice', version: '7.0.0'
+    testImplementation group: 'org.uncommons', name: 'reportng', version: '1.1.4'
 }
 
 tasks.withType(Test) {
