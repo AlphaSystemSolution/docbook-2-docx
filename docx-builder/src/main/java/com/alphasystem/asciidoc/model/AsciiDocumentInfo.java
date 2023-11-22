@@ -4,9 +4,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.Map;
 
-import org.asciidoctor.AttributesBuilder;
-import org.asciidoctor.OptionsBuilder;
-import org.asciidoctor.Placement;
+import org.asciidoctor.*;
 
 import static com.alphasystem.util.AppUtil.USER_HOME_DIR;
 import static com.alphasystem.util.AppUtil.toRelativePath;
@@ -28,7 +26,7 @@ public class AsciiDocumentInfo {
         return attributes.get(key) != null;
     }
 
-    private final AttributesBuilder attributesBuilder;
+    private final Attributes attributes;
     private final OptionsBuilder optionsBuilder;
     private String documentType;
     private String documentName;
@@ -73,8 +71,8 @@ public class AsciiDocumentInfo {
     private File srcFile;
 
     public AsciiDocumentInfo() {
-        attributesBuilder = AttributesBuilder.attributes();
-        optionsBuilder = OptionsBuilder.options().attributes(attributesBuilder);
+        attributes = Attributes.builder().build();
+        optionsBuilder = Options.builder().attributes(attributes);
         setDocumentType(null);
         setBackend(null);
         setStylesDir(null);
@@ -89,7 +87,7 @@ public class AsciiDocumentInfo {
      * Copy Constructor
      *
      * @param src source object, cannot be null.
-     * @throws IllegalArgumentException
+     * @throws IllegalArgumentException if src is null
      */
     public AsciiDocumentInfo(AsciiDocumentInfo src) throws IllegalArgumentException {
         this();
@@ -135,6 +133,9 @@ public class AsciiDocumentInfo {
         setUntitledLabel(src.getUntitledLabel());
         setVersionLabel(src.getVersionLabel());
         setWarningCaption(src.getWarningCaption());
+        setBackend(src.getBackend());
+        setTocPosition(src.getTocPosition());
+        setHideUriSchema(src.isHideUriSchema());
     }
 
     public OptionsBuilder getOptionsBuilder() {
@@ -151,7 +152,7 @@ public class AsciiDocumentInfo {
 
     public void setDocumentType(String documentType) {
         this.documentType = isBlank(documentType) ? "article" : documentType;
-        attributesBuilder.docType(this.documentType);
+        attributes.setDocType(this.documentType);
     }
 
     public String getDocumentName() {
@@ -186,9 +187,9 @@ public class AsciiDocumentInfo {
     public void setStylesDir(String stylesDir) {
         this.stylesDir = stylesDir;
         if (linkCss) {
-            attributesBuilder.stylesDir(this.stylesDir);
+            attributes.setStylesDir(this.stylesDir);
         } else {
-            attributesBuilder.stylesDir(null);
+            attributes.setStylesDir(null);
         }
     }
 
@@ -200,7 +201,7 @@ public class AsciiDocumentInfo {
         this.customStyleSheetFile = customStyleSheetFile;
         if (this.customStyleSheetFile != null) {
             String styleSheetName = this.customStyleSheetFile.getName();
-            attributesBuilder.styleSheetName(styleSheetName);
+            attributes.setStyleSheetName(styleSheetName);
         }
     }
 
@@ -211,9 +212,10 @@ public class AsciiDocumentInfo {
     public void setLinkCss(boolean linkCss) {
         this.linkCss = linkCss;
         if (this.linkCss) {
-            attributesBuilder.linkCss(isLinkCss()).stylesDir(stylesDir);
+            attributes.setLinkCss(isLinkCss());
+            attributes.setStylesDir(stylesDir);
         } else {
-            attributesBuilder.stylesDir(null);
+            attributes.setStylesDir(null);
         }
     }
 
@@ -239,7 +241,7 @@ public class AsciiDocumentInfo {
 
     public void setImagesDir(String imagesDir) {
         this.imagesDir = imagesDir;
-        attributesBuilder.imagesDir(getImagesDir());
+        attributes.setImagesDir(getImagesDir());
     }
 
     public String getIconsDir() {
@@ -248,7 +250,7 @@ public class AsciiDocumentInfo {
 
     public void setIconsDir(String iconsDir) {
         this.iconsDir = iconsDir;
-        attributesBuilder.iconsDir(getIconsDir());
+        attributes.setIconsDir(getIconsDir());
     }
 
     public String getIcons() {
@@ -257,7 +259,7 @@ public class AsciiDocumentInfo {
 
     public void setIcons(String icons) {
         this.icons = icons;
-        attributesBuilder.icons(getIcons());
+        attributes.setIcons(getIcons());
     }
 
     public String getIconFontName() {
@@ -267,7 +269,8 @@ public class AsciiDocumentInfo {
     public void setIconFontName(String iconFontName) {
         this.iconFontName = iconFontName;
         boolean localFontName = isNotBlank(iconFontName);
-        attributesBuilder.iconFontName(this.iconFontName).iconFontRemote(!localFontName);
+        attributes.setIconFontName(this.iconFontName);
+        attributes.setIconFontRemote(!localFontName);
     }
 
     public String getIdPrefix() {
@@ -308,7 +311,7 @@ public class AsciiDocumentInfo {
 
     public void setSourceLanguage(String sourceLanguage) {
         this.sourceLanguage = sourceLanguage;
-        attributesBuilder.sourceLanguage(this.sourceLanguage);
+        attributes.setSourceLanguage(this.sourceLanguage);
     }
 
     public String getLastUpdateLabel() {
@@ -342,7 +345,7 @@ public class AsciiDocumentInfo {
 
     public void setExperimental(boolean experimental) {
         this.experimental = experimental;
-        attributesBuilder.experimental(this.experimental);
+        attributes.setExperimental(this.experimental);
     }
 
     public boolean isSectionNumbers() {
@@ -351,7 +354,7 @@ public class AsciiDocumentInfo {
 
     public void setSectionNumbers(boolean sectionNumbers) {
         this.sectionNumbers = sectionNumbers;
-        attributesBuilder.sectionNumbers(isSectionNumbers());
+        attributes.setSectionNumbers(isSectionNumbers());
     }
 
     public boolean isToc() {
@@ -360,7 +363,7 @@ public class AsciiDocumentInfo {
 
     public void setToc(boolean toc) {
         this.toc = toc;
-        attributesBuilder.tableOfContents(isToc());
+        attributes.setTableOfContents(isToc());
     }
 
     public String getTocClass() {
@@ -377,7 +380,7 @@ public class AsciiDocumentInfo {
 
     public void setTocPlacement(String tocPlacement) {
         this.tocPlacement = tocPlacement;
-        attributesBuilder.tableOfContents((isBlank(tocPlacement) || tocPlacement.equals("auto")) ? Placement.LEFT :
+        attributes.setTableOfContents((isBlank(tocPlacement) || tocPlacement.equals("auto")) ? Placement.LEFT :
                 Placement.valueOf(tocPlacement.toUpperCase()));
     }
 
@@ -403,7 +406,7 @@ public class AsciiDocumentInfo {
 
     public void setUntitledLabel(String untitledLabel) {
         this.untitledLabel = untitledLabel;
-        attributesBuilder.untitledLabel(getUntitledLabel());
+        attributes.setUntitledLabel(getUntitledLabel());
     }
 
     public String getAppendixCaption() {
@@ -637,5 +640,54 @@ public class AsciiDocumentInfo {
         File destFolder = new File(baseDir, relativePath.toFile().getPath());
         File destFile = new File(destFolder, previewFile.getName());
         optionsBuilder.toDir(destFolder).toFile(destFile).inPlace(baseDir.equals(destFolder));
+    }
+
+    @Override
+    public String toString() {
+        return "AsciiDocumentInfo{" +
+                "attributesBuilder=" + attributes +
+                ", optionsBuilder=" + optionsBuilder +
+                ", documentType='" + documentType + '\'' +
+                ", documentName='" + documentName + '\'' +
+                ", documentTitle='" + documentTitle + '\'' +
+                ", backend='" + backend + '\'' +
+                ", stylesDir='" + stylesDir + '\'' +
+                ", customStyleSheetFile=" + customStyleSheetFile +
+                ", linkCss=" + linkCss +
+                ", includeDir='" + includeDir + '\'' +
+                ", docInfoDir='" + docInfoDir + '\'' +
+                ", imagesDir='" + imagesDir + '\'' +
+                ", iconsDir='" + iconsDir + '\'' +
+                ", icons='" + icons + '\'' +
+                ", iconFontName='" + iconFontName + '\'' +
+                ", idPrefix='" + idPrefix + '\'' +
+                ", idSeparator='" + idSeparator + '\'' +
+                ", docInfo='" + docInfo + '\'' +
+                ", docInfo2=" + docInfo2 +
+                ", sourceLanguage='" + sourceLanguage + '\'' +
+                ", lastUpdateLabel='" + lastUpdateLabel + '\'' +
+                ", omitLastUpdatedTimeStamp=" + omitLastUpdatedTimeStamp +
+                ", compact=" + compact +
+                ", experimental=" + experimental +
+                ", toc=" + toc +
+                ", tocClass='" + tocClass + '\'' +
+                ", tocPlacement='" + tocPlacement + '\'' +
+                ", tocPosition='" + tocPosition + '\'' +
+                ", tocTitle='" + tocTitle + '\'' +
+                ", appendixCaption='" + appendixCaption + '\'' +
+                ", cautionCaption='" + cautionCaption + '\'' +
+                ", exampleCaption='" + exampleCaption + '\'' +
+                ", figureCaption='" + figureCaption + '\'' +
+                ", importantCaption='" + importantCaption + '\'' +
+                ", noteCaption='" + noteCaption + '\'' +
+                ", tableCaption='" + tableCaption + '\'' +
+                ", tipCaption='" + tipCaption + '\'' +
+                ", untitledLabel='" + untitledLabel + '\'' +
+                ", versionLabel='" + versionLabel + '\'' +
+                ", warningCaption='" + warningCaption + '\'' +
+                ", sectionNumbers=" + sectionNumbers +
+                ", hideUriSchema=" + hideUriSchema +
+                ", srcFile=" + srcFile +
+                '}';
     }
 }
