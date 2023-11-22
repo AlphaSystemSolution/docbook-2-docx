@@ -7,8 +7,6 @@ import java.awt.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static java.nio.file.Paths.get;
-
 /**
  * @author sali
  */
@@ -16,19 +14,20 @@ public class DocBookTest {
 
     public static void main(String[] args) {
 
-        String path = "/Users/sfali/development/Lightbend/docs/ClusterFundamentals/course.adoc";
+        String path = "/Users/sfali/Documents/Arabic/GrammarLessons/Noun/noun.adoc";
 
         final Asciidoctor asciidoctor = Asciidoctor.Factory.create();
 
-        Options options = new Options();
-        options.setBackend("docbook");
+        Options options = Options.builder().backend("docbook").build();
         asciidoctor.convertFile(Paths.get(path).toFile(), options);
 
         try {
-            final Path destPath = DocumentBuilder.buildDocument(get(path));
+            final Path destPath = DocumentBuilder.buildDocument(Paths.get(path));
             Desktop.getDesktop().open(destPath.toFile());
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
+        } finally {
+            asciidoctor.close();
         }
     }
 
