@@ -507,7 +507,6 @@ public class AsciiDocumentInfo {
     }
 
     public void populateAttributes(Map<String, Object> attributes) {
-        // attributes.entrySet().forEach(entry -> System.out.println(entry.getKey() + " : " + entry.getValue()));
         String s;
         s = getFailSafeString(attributes, "doctype");
         if (s != null) {
