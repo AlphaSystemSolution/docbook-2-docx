@@ -12,7 +12,7 @@ import java.util.Map;
  */
 public abstract class HandlerFactory<H extends Handler> {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     Map<String, H> handlers = Collections.synchronizedMap(new HashMap<>());
 
     public void registerHandler(String key, H handler) {

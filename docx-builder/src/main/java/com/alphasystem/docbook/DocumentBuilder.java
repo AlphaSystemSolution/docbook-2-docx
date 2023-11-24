@@ -10,8 +10,9 @@ import com.alphasystem.openxml.builder.wml.WmlPackageBuilder;
 import com.alphasystem.util.nio.NIOFileUtils;
 import com.alphasystem.xml.UnmarshallerTool;
 import org.asciidoctor.Asciidoctor;
+import org.asciidoctor.Options;
 import org.asciidoctor.OptionsBuilder;
-import org.asciidoctor.ast.StructuredDocument;
+import org.asciidoctor.ast.Document;
 import org.docbook.model.Article;
 import org.docbook.model.Book;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
@@ -24,7 +25,6 @@ import org.docx4j.wml.Styles;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.List;
 
 import static com.alphasystem.asciidoc.model.Backend.DOC_BOOK;
@@ -85,15 +85,15 @@ public class DocumentBuilder {
             // load ascii document info
             documentInfo = new AsciiDocumentInfo();
             documentInfo.setSrcFile(srcFile);
-            StructuredDocument structuredDocument = asciiDoctor.readDocumentStructure(srcFile, new HashMap<>());
-            documentInfo.populateAttributes(structuredDocument.getHeader().getAttributes());
+            Document document = asciiDoctor.loadFile(srcFile, Options.builder().build());
+            documentInfo.populateAttributes(document.getAttributes());
             docBookContent = convertToDocBook(documentInfo);
         } else if ("xml".endsWith(extension)) {
             try {
                 try (InputStream inputStream = Files.newInputStream(srcPath);
                      ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
                     NIOFileUtils.fastCopy(inputStream, outputStream);
-                    docBookContent = new String(outputStream.toByteArray());
+                    docBookContent = outputStream.toString();
                 }
             } catch (IOException e) {
                 throw new SystemException(e.getMessage(), e);

@@ -3,6 +3,9 @@ plugins {
 }
 
 dependencies {
+    api ("com.sun.xml.bind:jaxb-core:${jaxbCoreVersion}")
+    api("com.sun.xml.bind:jaxb-impl:${jaxbImplVersion}")
+    api("javax.xml.bind:jaxb-api:${jaxbApiVersion}")
     xjcPlugins("com.github.jaxb-xew-plugin:jaxb-xew-plugin:1.8")
     xjcPlugins("org.apache.cxf.xjcplugins:cxf-xjc-dv:3.0.5")
     xjcPlugins("org.jvnet.jaxb2_commons:jaxb2-basics:1.11.1")
