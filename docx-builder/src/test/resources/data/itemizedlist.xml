@@ -8,4 +8,19 @@
     <listitem>
         <simpara>Bill Bryson</simpara>
     </listitem>
+    <listitem>
+        <simpara>Table within list item</simpara>
+        <informaltable frame="all" rowsep="1" colsep="1">
+            <tgroup cols="1">
+                <colspec colname="col_1" colwidth="100*"/>
+                <tbody>
+                    <row>
+                        <entry align="center" valign="top">
+                            <simpara>Row 1</simpara>
+                        </entry>
+                    </row>
+                </tbody>
+            </tgroup>
+        </informaltable>
+    </listitem>
 </itemizedlist>
