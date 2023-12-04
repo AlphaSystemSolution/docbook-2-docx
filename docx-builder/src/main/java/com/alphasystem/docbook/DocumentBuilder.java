@@ -88,6 +88,7 @@ public class DocumentBuilder {
             Document document = asciiDoctor.loadFile(srcFile, Options.builder().build());
             documentInfo.populateAttributes(document.getAttributes());
             docBookContent = convertToDocBook(documentInfo);
+            System.out.println(docBookContent);
         } else if ("xml".endsWith(extension)) {
             try {
                 try (InputStream inputStream = Files.newInputStream(srcPath);

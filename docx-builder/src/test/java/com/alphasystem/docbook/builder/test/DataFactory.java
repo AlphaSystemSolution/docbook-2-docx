@@ -12,7 +12,7 @@ import static java.lang.String.format;
  */
 public final class DataFactory {
 
-    private static ObjectFactory objectFactory = new ObjectFactory();
+    private static final ObjectFactory objectFactory = new ObjectFactory();
 
     public static Emphasis createBold(Object... content) {
         return createEmphasis("strong", content);
@@ -52,6 +52,10 @@ public final class DataFactory {
 
     public static Emphasis createItalic(Object... content) {
         return createEmphasis(null, content);
+    }
+
+    public static SimplePara createHighlight(String id, String text) {
+        return createSimplePara(id, "There is a ", createEmphasis("marked", text), " in this para.");
     }
 
     public static ItemizedList createItemizedList(String id, Object... content) {
