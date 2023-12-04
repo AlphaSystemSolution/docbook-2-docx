@@ -1,56 +1,27 @@
 package com.alphasystem.docbook.util;
 
-import com.alphasystem.docbook.model.ColumnInfo;
-import com.alphasystem.openxml.builder.wml.TblBuilder;
-import com.alphasystem.openxml.builder.wml.TblGridBuilder;
-import com.alphasystem.openxml.builder.wml.TblPrBuilder;
 import com.alphasystem.openxml.builder.wml.TcPrBuilder;
-import org.docx4j.wml.*;
+import com.alphasystem.openxml.builder.wml.table.ColumnInfo;
+import com.alphasystem.openxml.builder.wml.table.TableType;
+import org.docx4j.wml.TblWidth;
+import org.docx4j.wml.TcPr;
+import org.docx4j.wml.TcPrInner;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-import static com.alphasystem.openxml.builder.wml.WmlBuilderFactory.*;
+import static com.alphasystem.openxml.builder.wml.WmlBuilderFactory.getTblWidthBuilder;
+import static com.alphasystem.openxml.builder.wml.WmlBuilderFactory.getTcPrBuilder;
 import static java.lang.String.format;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.docx4j.sharedtypes.STOnOff.ONE;
-import static org.docx4j.wml.TblWidth.TYPE_DXA;
 
 /**
  * @author sali
  */
 public final class TableAdapter {
 
-    private static final String TYPE_PCT = "pct";
-    private static final int DEFAULT_INDENT_VALUE = 720;
+    private static final String TYPE_PCT = TableType.PCT.getTableType();
 
     private TableAdapter() {
-    }
-
-    public static Tbl getTable(ColumnSpecAdapter columnSpecAdapter, String tableStyle, int indentLevel, TblPr tableProperties) {
-        TblBuilder tblBuilder = getTblBuilder();
-
-        TblGridBuilder tblGridBuilder = getTblGridBuilder();
-        columnSpecAdapter.getColumnInfos().forEach(columnInfo -> {
-            final TblGridCol tblGridCol = getTblGridColBuilder().withW((long) columnInfo.getGridWidth()).getObject();
-            tblGridBuilder.addGridCol(tblGridCol);
-        });
-
-        TblWidth tblWidth = getTblWidthBuilder().withType(TYPE_PCT).withW(columnSpecAdapter.getTotalTableWidth().toString()).getObject();
-
-        CTTblLook cTTblLook = getCTTblLookBuilder().withFirstRow(ONE).withLastRow(ONE).withFirstColumn(ONE)
-                .withLastColumn(ONE).withNoVBand(ONE).withNoHBand(ONE).getObject();
-
-        tableStyle = isBlank(tableStyle) ? "TableGrid" : tableStyle;
-        TblWidth tblIndent = null;
-        if (indentLevel >= 0) {
-            long indentValue = DEFAULT_INDENT_VALUE + (indentLevel * DEFAULT_INDENT_VALUE);
-            tblIndent = getTblWidthBuilder().withType(TYPE_DXA).withW(indentValue).getObject();
-        }
-        TblPr tblPr = getTblPrBuilder().withTblStyle(tableStyle).withTblW(tblWidth).withTblInd(tblIndent).withTblLook(cTTblLook).getObject();
-        TblPrBuilder tblPrBuilder = new TblPrBuilder(tblPr, tableProperties);
-
-        return tblBuilder.withTblGrid(tblGridBuilder.getObject()).withTblPr(tblPrBuilder.getObject()).getObject();
     }
 
     public static TcPr getColumnProperties(ColumnSpecAdapter columnSpecAdapter, Integer columnIndex, Integer gridSpanValue,

@@ -2,10 +2,11 @@ package com.alphasystem.docbook.builder.impl.block;
 
 import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.builder.impl.BlockBuilder;
-import com.alphasystem.docbook.model.ColumnInfo;
 import com.alphasystem.docbook.util.ColumnSpecAdapter;
-import com.alphasystem.docbook.util.TableAdapter;
 import com.alphasystem.openxml.builder.wml.TblPrBuilder;
+import com.alphasystem.openxml.builder.wml.table.ColumnInfo;
+import com.alphasystem.openxml.builder.wml.table.TableAdapter;
+import com.alphasystem.openxml.builder.wml.table.TableType;
 import org.docbook.model.*;
 import org.docx4j.wml.CTBorder;
 import org.docx4j.wml.Tbl;
@@ -68,13 +69,18 @@ public abstract class AbstractTableBuilder<T> extends BlockBuilder<T> {
         if (listItemBuilder != null) {
             level = (int) listItemBuilder.getLevel();
         }
-        table = TableAdapter.getTable(columnSpecAdapter, getTableStyle(tableGroup, styleName), level, tblPrBuilder.getObject());
+
+        var tableType = level <= -1 ? TableType.AUTO : TableType.PCT;
+        var tableStyle = getTableStyle(tableGroup, styleName);
+        var tblPr = tblPrBuilder.getObject();
+        table = new TableAdapter(tableType).
+                startTable(columnSpecAdapter.getColumnAdapter(), tableStyle, level, tblPr)
+                .getTable();
     }
 
     @Override
     protected List<Object> postProcess(List<Object> processedTitleContent, List<Object> processedChildContent) {
-        List<Object> result = new ArrayList<>();
-        processedTitleContent.forEach(result::add);
+        List<Object> result = new ArrayList<>(processedTitleContent);
         processedChildContent.forEach(o -> table.getContent().add(o));
         result.add(table);
         return result;

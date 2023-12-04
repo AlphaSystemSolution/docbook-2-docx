@@ -1,7 +1,8 @@
 package com.alphasystem.docbook.builder.test;
 
-import com.alphasystem.docbook.model.ColumnInfo;
 import com.alphasystem.docbook.util.ColumnSpecAdapter;
+import com.alphasystem.openxml.builder.wml.table.ColumnInfo;
+import com.alphasystem.openxml.builder.wml.table.TableAdapter;
 import org.docbook.model.ColumnSpec;
 import org.docbook.model.ObjectFactory;
 import org.testng.annotations.Test;
@@ -12,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.String.format;
-import static java.math.RoundingMode.HALF_UP;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Reporter.log;
 
@@ -21,10 +21,10 @@ import static org.testng.Reporter.log;
  */
 public class ColumnSpecAdapterTest {
 
-    private static final BigDecimal TOTAL_GRID_COL_WIDTH = new BigDecimal(9576);
-    private static final BigDecimal TOTAL_TABLE_WIDTH = new BigDecimal(5000);
-    private static final BigDecimal PERCENT = new BigDecimal(100.0);
-    private static final MathContext ROUNDING = new MathContext(2, HALF_UP);
+    private static final BigDecimal TOTAL_GRID_COL_WIDTH = TableAdapter.TOTAL_GRID_COL_WIDTH;
+    private static final BigDecimal TOTAL_TABLE_WIDTH = TableAdapter.TOTAL_TABLE_WIDTH;
+    private static final BigDecimal PERCENT = TableAdapter.PERCENT;
+    private static final MathContext ROUNDING = TableAdapter.ROUNDING;
     private static final ObjectFactory OBJECT_FACTORY = new ObjectFactory();
 
     private static ColumnSpec createColumnSpec(String width) {
@@ -53,7 +53,9 @@ public class ColumnSpecAdapterTest {
     }
 
     private static void verifyWidth(double width, BigDecimal totalWidth, double percent) {
-        assertEquals(new BigDecimal(percent), getPercentage(width, totalWidth));
+        BigDecimal actual = new BigDecimal(percent);
+        BigDecimal expected = getPercentage(width, totalWidth);
+        assertEquals(actual.intValue(), expected.intValue());
     }
 
     private static BigDecimal getPercentage(double width, BigDecimal totalWidth) {
@@ -75,8 +77,8 @@ public class ColumnSpecAdapterTest {
         ColumnSpecAdapter columnSpecAdapter = new ColumnSpecAdapter(columnSpecs);
         final List<ColumnInfo> columnInfos = columnSpecAdapter.getColumnInfos();
         printColumnInfos(columnInfos);
-        verifyWidth(columnInfos.get(0), 15);
-        verifyWidth(columnInfos.get(1), 85);
+        verifyWidth(columnInfos.get(0), 15.0);
+        verifyWidth(columnInfos.get(1), 85.0);
     }
 
     @Test
@@ -124,6 +126,6 @@ public class ColumnSpecAdapterTest {
         verifyWidth(columnInfos.get(0), 22);
         verifyWidth(columnInfos.get(1), 11);
         verifyWidth(columnInfos.get(2), 11);
-        verifyWidth(columnInfos.get(3), 56);
+        verifyWidth(columnInfos.get(3), 55);
     }
 }

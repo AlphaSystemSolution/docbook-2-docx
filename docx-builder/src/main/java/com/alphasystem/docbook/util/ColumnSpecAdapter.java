@@ -1,40 +1,40 @@
 package com.alphasystem.docbook.util;
 
-import com.alphasystem.docbook.model.ColumnInfo;
+import com.alphasystem.openxml.builder.wml.table.ColumnAdapter;
+import com.alphasystem.openxml.builder.wml.table.ColumnInfo;
+import com.alphasystem.openxml.builder.wml.table.TableAdapter;
 import org.docbook.model.ColumnSpec;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.List;
-
-import static java.math.RoundingMode.HALF_UP;
+import java.util.stream.Collectors;
 
 /**
  * @author sali
  */
 public final class ColumnSpecAdapter {
 
-    private static final BigDecimal TOTAL_GRID_COL_WIDTH = new BigDecimal(9576);
-    private static final BigDecimal TOTAL_TABLE_WIDTH = new BigDecimal(5000);
-    private static final BigDecimal PERCENT = new BigDecimal(100.0);
-    private static final MathContext ROUNDING = new MathContext(2, HALF_UP);
+    private static final BigDecimal TOTAL_GRID_COL_WIDTH = TableAdapter.TOTAL_GRID_COL_WIDTH;
+    private static final BigDecimal TOTAL_TABLE_WIDTH = TableAdapter.TOTAL_TABLE_WIDTH;
+    private static final BigDecimal PERCENT = TableAdapter.PERCENT;
+    private static final MathContext ROUNDING = TableAdapter.ROUNDING;
 
-    private final List<ColumnInfo> columnInfos;
-    private final BigDecimal totalTableWidth;
+    private final ColumnAdapter columnAdapter;
 
     public ColumnSpecAdapter(List<ColumnSpec> columnSpecs) {
         this(PERCENT.doubleValue(), columnSpecs);
     }
 
     public ColumnSpecAdapter(double tableWidthInPercent, List<ColumnSpec> columnSpecs) {
-        BigDecimal _w = new BigDecimal((tableWidthInPercent <= 0.0) ? PERCENT.doubleValue() : tableWidthInPercent);
-        BigDecimal totalGridWidth = TOTAL_GRID_COL_WIDTH.multiply(_w).divide(PERCENT);
-        totalTableWidth = TOTAL_TABLE_WIDTH.multiply(_w).divide(PERCENT);
-        columnInfos = new ArrayList<>(columnSpecs.size());
+        BigDecimal _w = BigDecimal.valueOf((tableWidthInPercent <= 0.0) ? PERCENT.doubleValue() : tableWidthInPercent);
+        BigDecimal totalGridWidth = TOTAL_GRID_COL_WIDTH.multiply(_w).divide(PERCENT, ROUNDING);
+        BigDecimal totalTableWidth = TOTAL_TABLE_WIDTH.multiply(_w).divide(PERCENT, ROUNDING);
+        List<ColumnInfo> columnInfos = new ArrayList<>(columnSpecs.size());
         final int length = columnSpecs.size();
         BigDecimal[] widths = new BigDecimal[length];
-        BigDecimal totalWidth = new BigDecimal(0.0);
+        BigDecimal totalWidth = BigDecimal.ZERO;
         for (int i = 0; i < length; i++) {
             final ColumnSpec columnSpec = columnSpecs.get(i);
             String columnWidth = columnSpec.getColumnWidth();
@@ -49,22 +49,33 @@ public final class ColumnSpecAdapter {
         for (int i = 0; i < length; i++) {
             final ColumnSpec columnSpec = columnSpecs.get(i);
             BigDecimal columnWidthInPercent = widths[i].multiply(PERCENT).divide(totalWidth, ROUNDING);
-            final double columnWidth = totalTableWidth.multiply(columnWidthInPercent).divide(PERCENT).doubleValue();
-            final double gridWidth = totalGridWidth.multiply(columnWidthInPercent).divide(PERCENT).doubleValue();
+            final double columnWidth = totalTableWidth.multiply(columnWidthInPercent).divide(PERCENT, ROUNDING).doubleValue();
+            final double gridWidth = totalGridWidth.multiply(columnWidthInPercent).divide(PERCENT, ROUNDING).doubleValue();
             columnInfos.add(new ColumnInfo(i, columnSpec.getColumnName(), columnWidth, gridWidth));
         }
+
+        columnAdapter = new ColumnAdapter(totalTableWidth, columnInfos);
     }
 
     public List<ColumnInfo> getColumnInfos() {
-        return columnInfos;
+        return columnAdapter.getColumns();
     }
 
     public BigDecimal getTotalTableWidth() {
-        return totalTableWidth;
+        return columnAdapter.getTotalTableWidth();
+    }
+
+    public ColumnAdapter getColumnAdapter() {
+        return columnAdapter;
     }
 
     public ColumnInfo getColumnInfo(String name) {
-        final int i = columnInfos.indexOf(new ColumnInfo(name));
-        return columnInfos.get(i);
+        var columnInfos = getColumnInfos().stream().filter(columnInfo -> columnInfo.getColumnName().equals(name))
+                .collect(Collectors.toList());
+        if (columnInfos.isEmpty()) {
+            return null;
+        } else {
+            return columnInfos.get(0);
+        }
     }
 }
