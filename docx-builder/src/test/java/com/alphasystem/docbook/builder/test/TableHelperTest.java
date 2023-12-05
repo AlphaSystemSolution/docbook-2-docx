@@ -1,8 +1,9 @@
 package com.alphasystem.docbook.builder.test;
 
-import com.alphasystem.docbook.util.ColumnSpecAdapter;
+import com.alphasystem.docbook.util.TableHelper;
 import com.alphasystem.openxml.builder.wml.table.ColumnInfo;
 import com.alphasystem.openxml.builder.wml.table.TableAdapter;
+import com.alphasystem.openxml.builder.wml.table.TableType;
 import org.docbook.model.ColumnSpec;
 import org.docbook.model.ObjectFactory;
 import org.testng.annotations.Test;
@@ -19,7 +20,7 @@ import static org.testng.Reporter.log;
 /**
  * @author sali
  */
-public class ColumnSpecAdapterTest {
+public class TableHelperTest {
 
     private static final BigDecimal TOTAL_GRID_COL_WIDTH = TableAdapter.TOTAL_GRID_COL_WIDTH;
     private static final BigDecimal TOTAL_TABLE_WIDTH = TableAdapter.TOTAL_TABLE_WIDTH;
@@ -37,7 +38,7 @@ public class ColumnSpecAdapterTest {
 
     private static void printColumnInfos(List<ColumnInfo> columnInfos) {
         log("#####################################################", true);
-        columnInfos.forEach(ColumnSpecAdapterTest::printColumnInfo);
+        columnInfos.forEach(TableHelperTest::printColumnInfo);
         log("#####################################################", true);
     }
 
@@ -74,8 +75,8 @@ public class ColumnSpecAdapterTest {
         columnSpecs.add(createColumnSpec("15*"));
         columnSpecs.add(createColumnSpec("85*"));
 
-        ColumnSpecAdapter columnSpecAdapter = new ColumnSpecAdapter(columnSpecs);
-        final List<ColumnInfo> columnInfos = columnSpecAdapter.getColumnInfos();
+        final var columnAdapter = TableHelper.buildColumns(TableType.PCT, 0, columnSpecs);
+        final var columnInfos = columnAdapter.getColumns();
         printColumnInfos(columnInfos);
         verifyWidth(columnInfos.get(0), 15.0);
         verifyWidth(columnInfos.get(1), 85.0);
@@ -85,26 +86,28 @@ public class ColumnSpecAdapterTest {
     public void test2() {
         List<ColumnSpec> columnSpecs = new ArrayList<>();
 
-        columnSpecs.add(createColumnSpec("col_1", "192*"));
-        columnSpecs.add(createColumnSpec("col_2", "192*"));
+        columnSpecs.add(createColumnSpec("col_1", "22.2222*"));
+        columnSpecs.add(createColumnSpec("col_2", "33.3333*"));
+        columnSpecs.add(createColumnSpec("col_3", "44.4445*"));
 
-        ColumnSpecAdapter columnSpecAdapter = new ColumnSpecAdapter(columnSpecs);
-        final List<ColumnInfo> columnInfos = columnSpecAdapter.getColumnInfos();
+        final var columnAdapter = TableHelper.buildColumns(TableType.PCT, 0, columnSpecs);
+        final var columnInfos = columnAdapter.getColumns();
         printColumnInfos(columnInfos);
-        verifyWidth(columnInfos.get(0), 50);
-        verifyWidth(columnInfos.get(1), 50);
+        verifyWidth(columnInfos.get(0), 22);
+        verifyWidth(columnInfos.get(1), 33);
+        verifyWidth(columnInfos.get(2), 44);
     }
 
     @Test
     public void test3() {
         List<ColumnSpec> columnSpecs = new ArrayList<>();
 
-        columnSpecs.add(createColumnSpec("col_1", "126*"));
-        columnSpecs.add(createColumnSpec("col_2", "126*"));
-        columnSpecs.add(createColumnSpec("col_3", "126*"));
+        columnSpecs.add(createColumnSpec("col_1", "33.3333*"));
+        columnSpecs.add(createColumnSpec("col_2", "33.3333*"));
+        columnSpecs.add(createColumnSpec("col_3", "33.3333*"));
 
-        ColumnSpecAdapter columnSpecAdapter = new ColumnSpecAdapter(columnSpecs);
-        final List<ColumnInfo> columnInfos = columnSpecAdapter.getColumnInfos();
+        final var columnAdapter = TableHelper.buildColumns(TableType.PCT, 0, columnSpecs);
+        final var columnInfos = columnAdapter.getColumns();
         printColumnInfos(columnInfos);
         verifyWidth(columnInfos.get(0), 33);
         verifyWidth(columnInfos.get(1), 33);
@@ -118,14 +121,14 @@ public class ColumnSpecAdapterTest {
         columnSpecs.add(createColumnSpec("col_1", "22*"));
         columnSpecs.add(createColumnSpec("col_2", "11*"));
         columnSpecs.add(createColumnSpec("col_3", "11*"));
-        columnSpecs.add(createColumnSpec("col_4", "55*"));
+        columnSpecs.add(createColumnSpec("col_4", "56*"));
 
-        ColumnSpecAdapter columnSpecAdapter = new ColumnSpecAdapter(columnSpecs);
-        final List<ColumnInfo> columnInfos = columnSpecAdapter.getColumnInfos();
+        final var columnAdapter = TableHelper.buildColumns(TableType.PCT, 0, columnSpecs);
+        final var columnInfos = columnAdapter.getColumns();
         printColumnInfos(columnInfos);
         verifyWidth(columnInfos.get(0), 22);
         verifyWidth(columnInfos.get(1), 11);
         verifyWidth(columnInfos.get(2), 11);
-        verifyWidth(columnInfos.get(3), 55);
+        verifyWidth(columnInfos.get(3), 56);
     }
 }
