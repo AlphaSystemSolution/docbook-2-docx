@@ -2,12 +2,8 @@ package com.alphasystem.docbook.builder.impl.block;
 
 import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.builder.impl.BlockBuilder;
-import com.alphasystem.docbook.util.TableHelper;
 import com.alphasystem.openxml.builder.wml.TblPrBuilder;
-import com.alphasystem.openxml.builder.wml.table.ColumnAdapter;
-import com.alphasystem.openxml.builder.wml.table.ColumnInfo;
-import com.alphasystem.openxml.builder.wml.table.TableAdapter;
-import com.alphasystem.openxml.builder.wml.table.TableType;
+import com.alphasystem.openxml.builder.wml.table.*;
 import org.docbook.model.*;
 import org.docx4j.wml.CTBorder;
 import org.docx4j.wml.Tbl;
@@ -83,7 +79,7 @@ public abstract class AbstractTableBuilder<T> extends BlockBuilder<T> {
                 .withTableStyle(tableStyle)
                 .withIndentLevel(level)
                 .withTableProperties(tblPr)
-                .withColumnInputs(TableHelper.buildColumns(colSpec))
+                .withColumnInputs(buildColumns(colSpec))
                 .startTable();
         columnAdapter = tableAdapter.getColumnAdapter();
         table = tableAdapter
@@ -216,5 +212,23 @@ public abstract class AbstractTableBuilder<T> extends BlockBuilder<T> {
         } else {
             return columnInfos.get(0);
         }
+    }
+
+    private static ColumnInput[] buildColumns(List<ColumnSpec> columnSpecs) {
+        if (columnSpecs == null || columnSpecs.isEmpty()) {
+            throw new IllegalArgumentException("Invalid column spec");
+        }
+        final var numOfColumns = columnSpecs.size();
+
+        var columnInputs = new ColumnInput[numOfColumns];
+        for (int i = 0; i < numOfColumns; i++) {
+            final var columnSpec = columnSpecs.get(i);
+            var columnWidth = columnSpec.getColumnWidth();
+            if (columnWidth.endsWith("*")) {
+                columnWidth = columnWidth.substring(0, columnWidth.length() - 1);
+            }
+            columnInputs[i] = new ColumnInput(columnSpec.getColumnName(),  Double.parseDouble(columnWidth));
+        }
+        return columnInputs;
     }
 }

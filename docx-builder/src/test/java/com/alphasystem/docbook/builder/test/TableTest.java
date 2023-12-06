@@ -31,7 +31,7 @@ public class TableTest extends AbstractTest {
         final Row row3 = createRow(entry1, entry2);
 
         final TableBody tableBody = createTableBody(null, null, row1, row2, row3);
-        final TableGroup tableGroup = createTableGroup(null, tableBody, null, 192, 192);
+        final TableGroup tableGroup = createTableGroup(null, tableBody, null, 50, 50);
         final Table table = createTable(null, Frame.ALL, Choice.ONE, Choice.ONE, createTitle("Result: Rendered simple table"), tableGroup);
 
         addResult(null, 0, 2, "Simple Table Test", table);
@@ -43,7 +43,7 @@ public class TableTest extends AbstractTest {
         final BasicVerticalAlign verticalAlign = MIDDLE;
         final TableBody tableBody = createTableBody(null, null, _createRow(numOfColumns, 1, verticalAlign),
                 _createRow(numOfColumns, 2, verticalAlign));
-        final TableGroup tableGroup = createTableGroup(null, tableBody, null, 192, 192);
+        final TableGroup tableGroup = createTableGroup(null, tableBody, null, 50, 50);
         final Table table = createTable(null, Frame.ALL, Choice.ONE, Choice.ONE, null, tableGroup);
 
         addResult(null, 0, 1, "Table Test With Vertical Align Middle", table);
@@ -55,7 +55,7 @@ public class TableTest extends AbstractTest {
         final BasicVerticalAlign verticalAlign = BasicVerticalAlign.BOTTOM;
         final TableBody tableBody = createTableBody(null, null, _createRow(numOfColumns, 1, verticalAlign),
                 _createRow(numOfColumns, 2, verticalAlign));
-        final TableGroup tableGroup = createTableGroup(null, tableBody, null, 192, 192);
+        final TableGroup tableGroup = createTableGroup(null, tableBody, null, 50, 50);
         final Table table = createTable(null, Frame.ALL, Choice.ONE, Choice.ONE, null, tableGroup);
         addResult(null, 0, 1, "Table Test With Vertical Align Bottom", table);
     }

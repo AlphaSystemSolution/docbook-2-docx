@@ -2,9 +2,9 @@ package com.alphasystem.docbook.builder.impl.block;
 
 import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.builder.impl.BlockBuilder;
-import com.alphasystem.docbook.util.TableHelper;
 import com.alphasystem.openxml.builder.wml.PPrBuilder;
 import com.alphasystem.openxml.builder.wml.TcBuilder;
+import com.alphasystem.openxml.builder.wml.table.TableAdapter;
 import org.docbook.model.Align;
 import org.docbook.model.BasicVerticalAlign;
 import org.docbook.model.Entry;
@@ -13,9 +13,9 @@ import org.docx4j.wml.*;
 
 import java.util.List;
 
-import static com.alphasystem.docbook.util.TableHelper.VerticalMergeType.CONTINUE;
+/*import static com.alphasystem.docbook.util.TableHelper.VerticalMergeType.CONTINUE;
 import static com.alphasystem.docbook.util.TableHelper.VerticalMergeType.RESTART;
-import static com.alphasystem.docbook.util.TableHelper.getColumnProperties;
+import static com.alphasystem.docbook.util.TableHelper.getColumnProperties;*/
 import static com.alphasystem.openxml.builder.wml.WmlAdapter.getEmptyPara;
 import static com.alphasystem.openxml.builder.wml.WmlBuilderFactory.*;
 import static com.alphasystem.util.AppUtil.isInstanceOf;
@@ -48,11 +48,12 @@ public class EntryBuilder extends BlockBuilder<Entry> {
         ((RowBuilder) getParent()).updateNextColumnIndex(gridSpan);
 
         final String moreRows = source.getMoreRows();
-        TableHelper.VerticalMergeType vMergeType = null;
+        TableAdapter.VerticalMergeType vMergeType = null;
         if (moreRows != null) {
-            vMergeType = moreRows.endsWith("*") ? CONTINUE : RESTART;
+            vMergeType = moreRows.endsWith("*") ? TableAdapter.VerticalMergeType.CONTINUE : TableAdapter.VerticalMergeType.RESTART;
         }
-        tcPr = getColumnProperties(tableBuilder.getTableType(), columnIndex, gridSpan, vMergeType, tcPr, tableBuilder.getColumnInfos());
+        tcPr = TableAdapter.getColumnProperties(tableBuilder.getTableType(), columnIndex, gridSpan, vMergeType, tcPr,
+                tableBuilder.getColumnInfos());
         TcBuilder tcBuilder = getTcBuilder().withTcPr(tcPr);
         column = tcBuilder.getObject();
     }
