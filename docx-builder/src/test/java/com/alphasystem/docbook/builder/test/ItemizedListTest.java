@@ -15,7 +15,7 @@ public class ItemizedListTest extends AbstractTest {
 
     @Test
     public void testItemizedList() {
-        addResult(null, 0, 3, "ItemizedList Test", readXml("itemizedlist", ItemizedList.class));
+        addResult(null, 0, 5, "ItemizedList Test", readXml("itemizedlist", ItemizedList.class));
     }
 
     @Test(dependsOnMethods = "testItemizedList")

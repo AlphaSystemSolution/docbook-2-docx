@@ -13,7 +13,7 @@ import java.util.Collections;
  */
 public class ArticleBuilder extends BlockBuilder<Article> {
 
-    public ArticleBuilder(Builder parent, Article article, int indexInParent) {
+    public ArticleBuilder(Builder<?> parent, Article article, int indexInParent) {
         super(parent, article, indexInParent);
     }
 

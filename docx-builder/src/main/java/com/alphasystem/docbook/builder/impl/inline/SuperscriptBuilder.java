@@ -11,7 +11,7 @@ import static com.alphasystem.docbook.builder.DocumentBuilderHelper.SUPERSCRIPT;
  */
 public class SuperscriptBuilder extends InlineBuilder<Superscript> {
 
-    public SuperscriptBuilder(Builder parent, Superscript superscript, int indexInParent) {
+    public SuperscriptBuilder(Builder<?> parent, Superscript superscript, int indexInParent) {
         super(parent, superscript, indexInParent);
     }
 

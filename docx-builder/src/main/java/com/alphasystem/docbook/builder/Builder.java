@@ -11,6 +11,6 @@ public interface Builder<T> {
 
     T getSource();
 
-    Builder getParent();
+    Builder<?> getParent();
 
 }

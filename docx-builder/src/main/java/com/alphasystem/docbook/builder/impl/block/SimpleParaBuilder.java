@@ -8,7 +8,7 @@ import org.docbook.model.SimplePara;
  */
 public class SimpleParaBuilder extends AbstractParaBuilder<SimplePara> {
 
-    public SimpleParaBuilder(Builder parent, SimplePara simplePara, int indexInParent) {
+    public SimpleParaBuilder(Builder<?> parent, SimplePara simplePara, int indexInParent) {
         super(parent, simplePara, indexInParent);
         this.role = source.getRole();
     }

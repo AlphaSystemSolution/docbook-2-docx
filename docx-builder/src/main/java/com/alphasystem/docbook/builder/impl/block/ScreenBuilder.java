@@ -7,7 +7,7 @@ import org.docx4j.wml.Tr;
 
 public class ScreenBuilder extends TableBasedBlockBuilder<Screen> {
 
-    public ScreenBuilder(Builder parent, Screen screen, int indexInParent) {
+    public ScreenBuilder(Builder<?> parent, Screen screen, int indexInParent) {
         super(parent, screen, indexInParent);
     }
 

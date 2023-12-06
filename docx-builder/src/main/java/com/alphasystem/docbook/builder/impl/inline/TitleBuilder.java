@@ -9,7 +9,7 @@ import org.docbook.model.Title;
  */
 public class TitleBuilder extends InlineBuilder<Title> {
 
-    public TitleBuilder(Builder parent, Title title, int indexInParent) {
+    public TitleBuilder(Builder<?> parent, Title title, int indexInParent) {
         super(parent, title, indexInParent);
     }
 

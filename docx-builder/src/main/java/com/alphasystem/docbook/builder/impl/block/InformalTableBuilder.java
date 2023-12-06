@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class InformalTableBuilder extends AbstractTableBuilder<InformalTable> {
 
-    public InformalTableBuilder(Builder parent, InformalTable informalTable, int indexInParent) {
+    public InformalTableBuilder(Builder<?> parent, InformalTable informalTable, int indexInParent) {
         super(parent, informalTable, indexInParent);
     }
 

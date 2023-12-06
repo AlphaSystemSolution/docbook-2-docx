@@ -7,7 +7,6 @@ import com.alphasystem.openxml.builder.wml.WmlAdapter;
 import com.alphasystem.openxml.builder.wml.WmlBuilderFactory;
 import org.docx4j.wml.R;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -16,7 +15,7 @@ import java.util.List;
  */
 public class TextBuilder extends InlineBuilder<String> {
 
-    public TextBuilder(Builder parent, String text, int indexInParent) {
+    public TextBuilder(Builder<?> parent, String text, int indexInParent) {
         super(parent, text, indexInParent);
     }
 

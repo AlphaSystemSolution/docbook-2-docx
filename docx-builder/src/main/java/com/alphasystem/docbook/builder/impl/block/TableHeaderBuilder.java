@@ -10,7 +10,7 @@ import java.util.ArrayList;
  */
 public class TableHeaderBuilder extends TableContentBuilder<TableHeader> {
 
-    public TableHeaderBuilder(Builder parent, TableHeader source, int indexInParent) {
+    public TableHeaderBuilder(Builder<?> parent, TableHeader source, int indexInParent) {
         super(parent, source, indexInParent);
     }
 

@@ -9,7 +9,7 @@ import org.docbook.model.Important;
  */
 public class ImportantBuilder extends AdmonitionBuilder<Important> {
 
-    public ImportantBuilder(Builder parent, Important important, int indexInParent) {
+    public ImportantBuilder(Builder<?> parent, Important important, int indexInParent) {
         super(parent, important, indexInParent, Admonition.IMPORTANT);
     }
 

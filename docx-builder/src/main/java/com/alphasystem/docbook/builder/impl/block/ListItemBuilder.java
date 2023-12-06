@@ -18,7 +18,7 @@ public class ListItemBuilder extends BlockBuilder<ListItem> {
     private long number = -1;
     private long level = -1;
 
-    public ListItemBuilder(Builder parent, ListItem listitem, int indexInParent) {
+    public ListItemBuilder(Builder<?> parent, ListItem listitem, int indexInParent) {
         super(parent, listitem, indexInParent);
     }
 
@@ -31,22 +31,22 @@ public class ListItemBuilder extends BlockBuilder<ListItem> {
     @Override
     protected void preProcess() {
         PPr pPr = listParaProperties;
-        BlockBuilder currentParent = (BlockBuilder) parent;
+        var currentParent = (BlockBuilder<?>) parent;
         while (currentParent != null) {
             final PPr listParaProperties = currentParent.getListParaProperties();
             if (listParaProperties != null) {
                 pPr = listParaProperties;
                 break;
             }
-            currentParent = (BlockBuilder) currentParent.getParent();
+            currentParent = (BlockBuilder<?>) currentParent.getParent();
         }
         NumPr numPr = ((getNumber() < 0) || (getLevel() < 0)) ? null : getNumPr(getNumber(), getLevel());
         paraProperties = new PPrBuilder(pPr, paraProperties).withNumPr(numPr).getObject();
     }
 
     @Override
-    protected Builder getChildBuilder(Object o, int index) {
-        final Builder builder = super.getChildBuilder(o, index);
+    protected Builder<?> getChildBuilder(Object o, int index) {
+        final var builder = super.getChildBuilder(o, index);
         if (index == 1) {
             paraProperties.setNumPr(null);
         }

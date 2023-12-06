@@ -1,7 +1,8 @@
 package com.alphasystem.docbook.handler.impl.block;
 
 import com.alphasystem.docbook.handler.BlockHandler;
-import com.alphasystem.openxml.builder.wml.TableAdapter;
+import com.alphasystem.openxml.builder.wml.table.ColumnData;
+import com.alphasystem.openxml.builder.wml.table.TableAdapter;
 import org.docx4j.wml.*;
 
 import static com.alphasystem.openxml.builder.wml.WmlAdapter.getBorder;
@@ -25,7 +26,7 @@ public class ExampleHandler implements BlockHandler<Tbl> {
                 .withFill("FFFEF7").getObject();
         final TcPr tcPr = getTcPrBuilder().withShd(shade).getObject();
 
-        return new TableAdapter(1).startTable(tblPr).startRow()
-                .addColumn(0, null, tcPr, (Object[]) null).endRow().getTable();
+        return new TableAdapter().withWidths(100.0).withTableProperties(tblPr).startTable().startRow()
+                .addColumn(new ColumnData(0).withColumnProperties(tcPr)).endRow().getTable();
     }
 }

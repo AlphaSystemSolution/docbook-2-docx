@@ -16,7 +16,6 @@
             <class name="com.alphasystem.docbook.builder.test.TableTest"/>
             <class name="com.alphasystem.docbook.builder.test.ScreenTest"/>
             <class name="com.alphasystem.docbook.builder.test.TearDown"/>
-            <class name="com.alphasystem.docbook.builder.test.ColumnSpecAdapterTest"/>
         </classes>
     </test> <!-- Test -->
 </suite> <!-- Suite -->

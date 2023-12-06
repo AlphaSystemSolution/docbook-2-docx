@@ -11,7 +11,7 @@ import static com.alphasystem.docbook.builder.DocumentBuilderHelper.SUBSCRIPT;
  */
 public class SubscriptBuilder extends InlineBuilder<Subscript> {
 
-    public SubscriptBuilder(Builder parent, Subscript subscript, int indexInParent) {
+    public SubscriptBuilder(Builder<?> parent, Subscript subscript, int indexInParent) {
         super(parent, subscript, indexInParent);
     }
 

@@ -16,6 +16,7 @@ public class BaseInlineInlineHandlerService extends InlineHandlerService {
         instance.registerHandler(InlineHandlerFactory.BOLD, handler);
         instance.registerHandler(InlineHandlerFactory.HYPERLINK, new HyperlinkHandler());
         instance.registerHandler(InlineHandlerFactory.ITALIC, new ItalicHandler());
+        instance.registerHandler(InlineHandlerFactory.MARKED, new HighlightHandler());
         instance.registerHandler(InlineHandlerFactory.LITERAL, new LiteralHandler());
         instance.registerHandler(InlineHandlerFactory.LINE_THROUGH, new StrikeThroughHandler());
         instance.registerHandler(InlineHandlerFactory.SUBSCRIPT, new SubscriptHandler());

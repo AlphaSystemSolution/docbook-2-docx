@@ -5,6 +5,7 @@ import org.docbook.model.Article;
 import org.docbook.model.Literal;
 import org.docbook.model.Phrase;
 import org.docbook.model.SimplePara;
+import org.docx4j.wml.P;
 import org.docx4j.wml.R;
 import org.testng.annotations.Test;
 
@@ -38,6 +39,15 @@ public class InlineTest extends AbstractTest {
     }
 
     @Test(dependsOnMethods = "testItalic")
+    public void testHighlight() {
+        final var parent = builderFactory.getBuilder(null, new Article(), 0);
+        final var content = buildContent(parent, -1, createHighlight(nextId(), "highlighted text"));
+        assertEquals(content.size(), 1);
+        final var p = (P) content.get(0);
+        addResultToDocument("Highlight Test", p);
+    }
+
+    @Test(dependsOnMethods = "testHighlight")
     public void testTermBuilder() {
         final List<Object> content = buildContent(null, -1, createTerm("Term Title"));
         assertEquals(content.size(), 1);

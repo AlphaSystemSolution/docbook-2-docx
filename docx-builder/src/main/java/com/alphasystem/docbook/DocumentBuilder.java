@@ -88,6 +88,7 @@ public class DocumentBuilder {
             Document document = asciiDoctor.loadFile(srcFile, Options.builder().build());
             documentInfo.populateAttributes(document.getAttributes());
             docBookContent = convertToDocBook(documentInfo);
+            System.out.println(docBookContent);
         } else if ("xml".endsWith(extension)) {
             try {
                 try (InputStream inputStream = Files.newInputStream(srcPath);
@@ -176,11 +177,11 @@ public class DocumentBuilder {
         String docBookContent;
         AsciiDocumentInfo docBook = new AsciiDocumentInfo(asciiDocumentInfo);
         docBook.setBackend(DOC_BOOK.getValue());
-        OptionsBuilder optionsBuilder = docBook.getOptionsBuilder().headerFooter(true);
+        OptionsBuilder optionsBuilder = docBook.getOptionsBuilder().standalone(true);
         try {
             try (Reader reader = Files.newBufferedReader(asciiDocumentInfo.getSrcFile().toPath());
                  StringWriter writer = new StringWriter()) {
-                asciiDoctor.convert(reader, writer, optionsBuilder);
+                asciiDoctor.convert(reader, writer, optionsBuilder.build());
                 docBookContent = writer.toString();
             }
         } catch (IOException e) {
@@ -191,7 +192,7 @@ public class DocumentBuilder {
 
     private static String convertToDocBook(String content, AsciiDocumentInfo asciiDocumentInfo) {
         final OptionsBuilder optionsBuilder = asciiDocumentInfo.getOptionsBuilder();
-        optionsBuilder.toFile(false).inPlace(false).backend(DOC_BOOK.getValue()).headerFooter(true);
-        return asciiDoctor.convert(content, optionsBuilder);
+        optionsBuilder.toFile(false).inPlace(false).backend(DOC_BOOK.getValue()).standalone(true);
+        return asciiDoctor.convert(content, optionsBuilder.build());
     }
 }

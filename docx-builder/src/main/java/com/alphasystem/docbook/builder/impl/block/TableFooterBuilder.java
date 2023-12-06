@@ -10,7 +10,7 @@ import java.util.ArrayList;
  */
 public class TableFooterBuilder extends TableContentBuilder<TableFooter> {
 
-    public TableFooterBuilder(Builder parent, TableFooter source, int indexInParent) {
+    public TableFooterBuilder(Builder<?> parent, TableFooter source, int indexInParent) {
         super(parent, source, indexInParent);
     }
 

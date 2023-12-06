@@ -9,7 +9,7 @@ import org.docbook.model.Caution;
  */
 public class CautionBuilder extends AdmonitionBuilder<Caution> {
 
-    public CautionBuilder(Builder parent, Caution caution, int indexInParent) {
+    public CautionBuilder(Builder<?> parent, Caution caution, int indexInParent) {
         super(parent, caution, indexInParent, Admonition.CAUTION);
     }
 

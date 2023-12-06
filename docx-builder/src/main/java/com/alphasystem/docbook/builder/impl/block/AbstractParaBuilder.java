@@ -15,13 +15,13 @@ public abstract class AbstractParaBuilder<T> extends BlockBuilder<T> {
 
     protected String role;
 
-    protected AbstractParaBuilder(Builder parent, T obj, int indexInParent) {
+    protected AbstractParaBuilder(Builder<?> parent, T obj, int indexInParent) {
         super(parent, obj, indexInParent);
     }
 
     @Override
     protected void preProcess() {
-        final PPr ppr = ((BlockBuilder) parent).getParaProperties();
+        final PPr ppr = ((BlockBuilder<?>) parent).getParaProperties();
         if (ppr != null) {
             paraProperties = new PPrBuilder(ppr, paraProperties).getObject();
         }

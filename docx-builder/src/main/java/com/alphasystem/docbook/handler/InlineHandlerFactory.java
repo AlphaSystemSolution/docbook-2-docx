@@ -13,6 +13,8 @@ public final class InlineHandlerFactory extends HandlerFactory<InlineStyleHandle
     public static final String BOLD = "bold";
     public static final String STRONG = "strong";
     public static final String ITALIC = "italic";
+
+    public static final String MARKED = "marked";
     public static final String UNDERLINE = "underline";
     public static final String LINE_THROUGH = "line-through";
     public static final String LITERAL = "literal";

@@ -2,10 +2,8 @@ package com.alphasystem.docbook.builder.impl.block;
 
 import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.builder.impl.BlockBuilder;
-import com.alphasystem.docbook.model.ColumnInfo;
-import com.alphasystem.docbook.util.ColumnSpecAdapter;
-import com.alphasystem.docbook.util.TableAdapter;
 import com.alphasystem.openxml.builder.wml.TblPrBuilder;
+import com.alphasystem.openxml.builder.wml.table.*;
 import org.docbook.model.*;
 import org.docx4j.wml.CTBorder;
 import org.docx4j.wml.Tbl;
@@ -13,6 +11,7 @@ import org.docx4j.wml.TblBorders;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.alphasystem.openxml.builder.wml.WmlAdapter.getDefaultBorder;
 import static com.alphasystem.openxml.builder.wml.WmlAdapter.getNilBorder;
@@ -29,10 +28,12 @@ public abstract class AbstractTableBuilder<T> extends BlockBuilder<T> {
     private static final int HEADER = 1;
     private static final int FOOTER = 2;
 
-    protected ColumnSpecAdapter columnSpecAdapter;
+
+    private List<ColumnInfo> columnInfoList;
+    private TableType tableType;
     protected Tbl table;
 
-    protected AbstractTableBuilder(Builder parent, T source, int indexInParent) {
+    protected AbstractTableBuilder(Builder<?> parent, T source, int indexInParent) {
         super(parent, source, indexInParent);
     }
 
@@ -61,20 +62,33 @@ public abstract class AbstractTableBuilder<T> extends BlockBuilder<T> {
         if (numOfColumns <= 0) {
             throw new RuntimeException("Neither numOfColumns nor colSpec defined.");
         }
-        columnSpecAdapter = new ColumnSpecAdapter(colSpec);
-        TblPrBuilder tblPrBuilder = getTblPrBuilder().withTblBorders(createFrame(frame, rowSep, colSep));
+
         final ListItemBuilder listItemBuilder = getParent(ListItemBuilder.class);
         int level = -1;
         if (listItemBuilder != null) {
             level = (int) listItemBuilder.getLevel();
         }
-        table = TableAdapter.getTable(columnSpecAdapter, getTableStyle(tableGroup, styleName), level, tblPrBuilder.getObject());
+
+        tableType = level <= -1 ? TableType.PCT : TableType.AUTO;
+        var tableStyle = getTableStyle(tableGroup, styleName);
+
+        TblPrBuilder tblPrBuilder = getTblPrBuilder().withTblBorders(createFrame(frame, rowSep, colSep));
+
+        var tblPr = tblPrBuilder.getObject();
+        var tableAdapter = new TableAdapter().withTableType(tableType)
+                .withTableStyle(tableStyle)
+                .withIndentLevel(level)
+                .withTableProperties(tblPr)
+                .withColumnInputs(buildColumns(colSpec))
+                .startTable();
+        columnInfoList = tableAdapter.getColumns();
+        table = tableAdapter
+                .getTable();
     }
 
     @Override
     protected List<Object> postProcess(List<Object> processedTitleContent, List<Object> processedChildContent) {
-        List<Object> result = new ArrayList<>();
-        processedTitleContent.forEach(result::add);
+        List<Object> result = new ArrayList<>(processedTitleContent);
         processedChildContent.forEach(o -> table.getContent().add(o));
         result.add(table);
         return result;
@@ -160,18 +174,22 @@ public abstract class AbstractTableBuilder<T> extends BlockBuilder<T> {
                 .withRight(right).withInsideH(insideH).withInsideV(insideV).getObject();
     }
 
-    ColumnSpecAdapter getColumnSpecAdapter() {
-        return columnSpecAdapter;
+    public TableType getTableType() {
+        return tableType;
+    }
+
+    public List<ColumnInfo> getColumnInfos() {
+        return columnInfoList;
     }
 
     int getGridSpan(String startColumnName, String endColumnName) {
         int gridSpan = 1;
         if (startColumnName != null && endColumnName != null) {
-            final ColumnInfo startColumn = columnSpecAdapter.getColumnInfo(startColumnName);
+            final ColumnInfo startColumn = getColumnInfo(startColumnName);
             if (startColumn == null) {
                 throw new RuntimeException(format("No column info found with name \"%s\".", startColumnName));
             }
-            final ColumnInfo endColumn = columnSpecAdapter.getColumnInfo(endColumnName);
+            final ColumnInfo endColumn = getColumnInfo(endColumnName);
             if (endColumn == null) {
                 throw new RuntimeException(format("No column info found with name \"%s\".", endColumnName));
             }
@@ -184,5 +202,33 @@ public abstract class AbstractTableBuilder<T> extends BlockBuilder<T> {
             }
         }
         return gridSpan;
+    }
+
+    private ColumnInfo getColumnInfo(String name) {
+        var columnInfos = getColumnInfos().stream().filter(columnInfo -> columnInfo.getColumnName().equals(name))
+                .collect(Collectors.toList());
+        if (columnInfos.isEmpty()) {
+            return null;
+        } else {
+            return columnInfos.get(0);
+        }
+    }
+
+    private static ColumnInput[] buildColumns(List<ColumnSpec> columnSpecs) {
+        if (columnSpecs == null || columnSpecs.isEmpty()) {
+            throw new IllegalArgumentException("Invalid column spec");
+        }
+        final var numOfColumns = columnSpecs.size();
+
+        var columnInputs = new ColumnInput[numOfColumns];
+        for (int i = 0; i < numOfColumns; i++) {
+            final var columnSpec = columnSpecs.get(i);
+            var columnWidth = columnSpec.getColumnWidth();
+            if (columnWidth.endsWith("*")) {
+                columnWidth = columnWidth.substring(0, columnWidth.length() - 1);
+            }
+            columnInputs[i] = new ColumnInput(columnSpec.getColumnName(),  Double.parseDouble(columnWidth));
+        }
+        return columnInputs;
     }
 }

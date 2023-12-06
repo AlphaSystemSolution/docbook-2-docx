@@ -8,7 +8,7 @@ import org.docbook.model.Para;
  */
 public class ParaBuilder extends AbstractParaBuilder<Para> {
 
-    public ParaBuilder(Builder parent, Para obj, int indexInParent) {
+    public ParaBuilder(Builder<?> parent, Para obj, int indexInParent) {
         super(parent, obj, indexInParent);
         this.role = source.getRole();
     }

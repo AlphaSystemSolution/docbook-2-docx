@@ -4,8 +4,9 @@ import com.alphasystem.asciidoc.model.AsciiDocumentInfo;
 import com.alphasystem.docbook.ApplicationController;
 import com.alphasystem.docbook.builder.model.Admonition;
 import com.alphasystem.docbook.handler.BlockHandler;
-import com.alphasystem.openxml.builder.wml.TableAdapter;
 import com.alphasystem.openxml.builder.wml.WmlAdapter;
+import com.alphasystem.openxml.builder.wml.table.ColumnData;
+import com.alphasystem.openxml.builder.wml.table.TableAdapter;
 import org.docx4j.wml.Tbl;
 
 /**
@@ -26,8 +27,15 @@ abstract class AdmonitionBlockHandler implements BlockHandler<Tbl> {
         final AsciiDocumentInfo documentInfo = ApplicationController.getContext().getDocumentInfo();
         String captionText = getAdmonitionCaption(admonition, documentInfo);
         double widthOfContentColumn = 100.0 - widthOfCaptionColumn;
-        return new TableAdapter(widthOfCaptionColumn, widthOfContentColumn).startTable("AdmonitionTable").startRow()
-                .addColumn(0, WmlAdapter.getParagraph(captionText)).addColumn(1).endRow().getTable();
+        return new TableAdapter()
+                .withTableStyle("AdmonitionTable")
+                .withWidths(widthOfCaptionColumn, widthOfContentColumn)
+                .startTable()
+                .startRow()
+                .addColumn(new ColumnData(0).withContent(WmlAdapter.getParagraph(captionText)))
+                .addColumn(new ColumnData(1))
+                .endRow()
+                .getTable();
     }
 
     private String getAdmonitionCaption(Admonition admonition, AsciiDocumentInfo documentInfo) {

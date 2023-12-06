@@ -33,14 +33,14 @@ public abstract class TableContentBuilder<T> extends BlockBuilder<T> {
         return moreRows;
     }
 
-    protected TableContentBuilder(Builder parent, T source, int indexInParent) {
+    protected TableContentBuilder(Builder<?> parent, T source, int indexInParent) {
         super(parent, source, indexInParent);
     }
 
     @Override
     protected void preProcess() {
         super.preProcess();
-        final AbstractTableBuilder tableBuilder = getParent(AbstractTableBuilder.class);
+        final var tableBuilder = getParent(AbstractTableBuilder.class);
         Row nextRow = null;
         boolean hasNextRow = false;
         boolean hasMoreRows = false;
@@ -77,7 +77,7 @@ public abstract class TableContentBuilder<T> extends BlockBuilder<T> {
         }
     }
 
-    private void updateNextRow(Row row, Entry entry, int columnIndex, AbstractTableBuilder tableBuilder) {
+    private void updateNextRow(Row row, Entry entry, int columnIndex, AbstractTableBuilder<?> tableBuilder) {
         final List<Object> content = row.getContent();
         int index = 0;
         final int size = content.size();

@@ -2,9 +2,10 @@ package com.alphasystem.docbook.builder.impl.block;
 
 import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.builder.impl.BlockBuilder;
-import com.alphasystem.docbook.util.TableAdapter;
 import com.alphasystem.openxml.builder.wml.PPrBuilder;
 import com.alphasystem.openxml.builder.wml.TcBuilder;
+import com.alphasystem.openxml.builder.wml.table.TableAdapter;
+import com.alphasystem.openxml.builder.wml.table.VerticalMergeType;
 import org.docbook.model.Align;
 import org.docbook.model.BasicVerticalAlign;
 import org.docbook.model.Entry;
@@ -13,9 +14,6 @@ import org.docx4j.wml.*;
 
 import java.util.List;
 
-import static com.alphasystem.docbook.util.TableAdapter.VerticalMergeType.CONTINUE;
-import static com.alphasystem.docbook.util.TableAdapter.VerticalMergeType.RESTART;
-import static com.alphasystem.docbook.util.TableAdapter.getColumnProperties;
 import static com.alphasystem.openxml.builder.wml.WmlAdapter.getEmptyPara;
 import static com.alphasystem.openxml.builder.wml.WmlBuilderFactory.*;
 import static com.alphasystem.util.AppUtil.isInstanceOf;
@@ -29,7 +27,7 @@ public class EntryBuilder extends BlockBuilder<Entry> {
 
     protected Tc column;
 
-    public EntryBuilder(Builder parent, Entry entry, int indexInParent) {
+    public EntryBuilder(Builder<?> parent, Entry entry, int indexInParent) {
         super(parent, entry, indexInParent);
     }
 
@@ -40,7 +38,7 @@ public class EntryBuilder extends BlockBuilder<Entry> {
     }
 
     private void initializeColumn() {
-        final AbstractTableBuilder tableBuilder = getParent(AbstractTableBuilder.class);
+        final AbstractTableBuilder<?> tableBuilder = getParent(AbstractTableBuilder.class);
         TcPr tcPr = getTcPrBuilder().withVAlign(getVerticalAlign()).getObject();
 
         int columnIndex = indexInParent;
@@ -48,11 +46,12 @@ public class EntryBuilder extends BlockBuilder<Entry> {
         ((RowBuilder) getParent()).updateNextColumnIndex(gridSpan);
 
         final String moreRows = source.getMoreRows();
-        TableAdapter.VerticalMergeType vMergeType = null;
+        VerticalMergeType vMergeType = null;
         if (moreRows != null) {
-            vMergeType = moreRows.endsWith("*") ? CONTINUE : RESTART;
+            vMergeType = moreRows.endsWith("*") ? VerticalMergeType.CONTINUE : VerticalMergeType.RESTART;
         }
-        tcPr = getColumnProperties(tableBuilder.getColumnSpecAdapter(), columnIndex, gridSpan, vMergeType, tcPr);
+        tcPr = TableAdapter.getColumnProperties(tableBuilder.getTableType(), columnIndex, gridSpan, vMergeType, tcPr,
+                tableBuilder.getColumnInfos());
         TcBuilder tcBuilder = getTcBuilder().withTcPr(tcPr);
         column = tcBuilder.getObject();
     }
@@ -77,7 +76,7 @@ public class EntryBuilder extends BlockBuilder<Entry> {
     }
 
     private STVerticalJc getVerticalAlign() {
-        final Builder parent = getParent().getParent();
+        final Builder<?> parent = getParent().getParent();
         if (!isInstanceOf(TableContentBuilder.class, parent)) {
             // EntryBuilder immediate parent should be RowBuilder and RowBuilder parent must be either of TableBodyBuilder,
             // TableHeaderBuilder, or TableFooterBuilder, if not raise exception

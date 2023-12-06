@@ -17,7 +17,7 @@ public class RowBuilder extends BlockBuilder<Row> {
 
     protected int nextColumnIndex = 0;
 
-    public RowBuilder(Builder parent, Row source, int indexInParent) {
+    public RowBuilder(Builder<?> parent, Row source, int indexInParent) {
         super(parent, source, indexInParent);
     }
 
@@ -27,15 +27,15 @@ public class RowBuilder extends BlockBuilder<Row> {
     }
 
     @Override
-    protected Builder getChildBuilder(Object o, int index) {
-        // In case where column is span more then one column "nextColumnIndex" will be different then "index"
+    protected Builder<?> getChildBuilder(Object o, int index) {
+        // In case where column is span more than one column "nextColumnIndex" will be different from "index"
         return super.getChildBuilder(o, nextColumnIndex);
     }
 
     @Override
     protected List<Object> postProcess(List<Object> processedTitleContent, List<Object> processedChildContent) {
         final TrBuilder trBuilder = WmlBuilderFactory.getTrBuilder();
-        processedChildContent.forEach(o -> trBuilder.addContent(o));
+        processedChildContent.forEach(trBuilder::addContent);
         return singletonList(trBuilder.getObject());
     }
 
