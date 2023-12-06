@@ -29,7 +29,7 @@ public abstract class AbstractTableBuilder<T> extends BlockBuilder<T> {
     private static final int FOOTER = 2;
 
 
-    private ColumnAdapter columnAdapter;
+    private List<ColumnInfo> columnInfoList;
     private TableType tableType;
     protected Tbl table;
 
@@ -81,7 +81,7 @@ public abstract class AbstractTableBuilder<T> extends BlockBuilder<T> {
                 .withTableProperties(tblPr)
                 .withColumnInputs(buildColumns(colSpec))
                 .startTable();
-        columnAdapter = tableAdapter.getColumnAdapter();
+        columnInfoList = tableAdapter.getColumns();
         table = tableAdapter
                 .getTable();
     }
@@ -179,7 +179,7 @@ public abstract class AbstractTableBuilder<T> extends BlockBuilder<T> {
     }
 
     public List<ColumnInfo> getColumnInfos() {
-        return columnAdapter.getColumns();
+        return columnInfoList;
     }
 
     int getGridSpan(String startColumnName, String endColumnName) {

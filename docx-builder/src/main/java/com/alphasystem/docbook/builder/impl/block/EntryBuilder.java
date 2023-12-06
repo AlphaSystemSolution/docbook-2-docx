@@ -5,6 +5,7 @@ import com.alphasystem.docbook.builder.impl.BlockBuilder;
 import com.alphasystem.openxml.builder.wml.PPrBuilder;
 import com.alphasystem.openxml.builder.wml.TcBuilder;
 import com.alphasystem.openxml.builder.wml.table.TableAdapter;
+import com.alphasystem.openxml.builder.wml.table.VerticalMergeType;
 import org.docbook.model.Align;
 import org.docbook.model.BasicVerticalAlign;
 import org.docbook.model.Entry;
@@ -45,9 +46,9 @@ public class EntryBuilder extends BlockBuilder<Entry> {
         ((RowBuilder) getParent()).updateNextColumnIndex(gridSpan);
 
         final String moreRows = source.getMoreRows();
-        TableAdapter.VerticalMergeType vMergeType = null;
+        VerticalMergeType vMergeType = null;
         if (moreRows != null) {
-            vMergeType = moreRows.endsWith("*") ? TableAdapter.VerticalMergeType.CONTINUE : TableAdapter.VerticalMergeType.RESTART;
+            vMergeType = moreRows.endsWith("*") ? VerticalMergeType.CONTINUE : VerticalMergeType.RESTART;
         }
         tcPr = TableAdapter.getColumnProperties(tableBuilder.getTableType(), columnIndex, gridSpan, vMergeType, tcPr,
                 tableBuilder.getColumnInfos());

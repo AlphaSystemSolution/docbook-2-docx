@@ -5,6 +5,7 @@ import com.alphasystem.docbook.ApplicationController;
 import com.alphasystem.docbook.builder.model.Admonition;
 import com.alphasystem.docbook.handler.BlockHandler;
 import com.alphasystem.openxml.builder.wml.WmlAdapter;
+import com.alphasystem.openxml.builder.wml.table.ColumnData;
 import com.alphasystem.openxml.builder.wml.table.TableAdapter;
 import org.docx4j.wml.Tbl;
 
@@ -31,7 +32,8 @@ abstract class AdmonitionBlockHandler implements BlockHandler<Tbl> {
                 .withWidths(widthOfCaptionColumn, widthOfContentColumn)
                 .startTable()
                 .startRow()
-                .addColumn(0, WmlAdapter.getParagraph(captionText)).addColumn(1)
+                .addColumn(new ColumnData(0).withContent(WmlAdapter.getParagraph(captionText)))
+                .addColumn(new ColumnData(1))
                 .endRow()
                 .getTable();
     }

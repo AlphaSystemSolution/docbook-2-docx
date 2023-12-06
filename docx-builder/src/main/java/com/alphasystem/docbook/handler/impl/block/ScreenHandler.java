@@ -1,6 +1,7 @@
 package com.alphasystem.docbook.handler.impl.block;
 
 import com.alphasystem.docbook.handler.BlockHandler;
+import com.alphasystem.openxml.builder.wml.table.ColumnData;
 import com.alphasystem.openxml.builder.wml.table.TableAdapter;
 import org.docx4j.wml.Tbl;
 
@@ -16,7 +17,7 @@ public class ScreenHandler implements BlockHandler<Tbl> {
                 .withWidths(100.0)
                 .startTable()
                 .startRow()
-                .addColumn(0, null, null, (Object[]) null)
+                .addColumn(new ColumnData(0))
                 .endRow()
                 .getTable();
     }
