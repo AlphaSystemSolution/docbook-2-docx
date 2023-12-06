@@ -12,7 +12,9 @@ public class ScreenHandler implements BlockHandler<Tbl> {
     @Override
     public Tbl handleBlock() {
         return new TableAdapter()
-                .startTable("SourceCode", 100.0)
+                .withTableStyle("SourceCode")
+                .withWidths(100.0)
+                .startTable()
                 .startRow()
                 .addColumn(0, null, null, (Object[]) null)
                 .endRow()

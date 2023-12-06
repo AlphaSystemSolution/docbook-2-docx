@@ -27,7 +27,9 @@ abstract class AdmonitionBlockHandler implements BlockHandler<Tbl> {
         String captionText = getAdmonitionCaption(admonition, documentInfo);
         double widthOfContentColumn = 100.0 - widthOfCaptionColumn;
         return new TableAdapter()
-                .startTable("AdmonitionTable", widthOfCaptionColumn, widthOfContentColumn)
+                .withTableStyle("AdmonitionTable")
+                .withWidths(widthOfCaptionColumn, widthOfContentColumn)
+                .startTable()
                 .startRow()
                 .addColumn(0, WmlAdapter.getParagraph(captionText)).addColumn(1)
                 .endRow()

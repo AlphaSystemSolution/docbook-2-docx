@@ -24,7 +24,7 @@ public class SideBarHandler implements BlockHandler<Tbl> {
         final CTShd shade = getCTShdBuilder().withVal(STShd.CLEAR).withColor("auto").withFill("F8F8F7").getObject();
         final TcPr tcPr = getTcPrBuilder().withShd(shade).getObject();
 
-        return new TableAdapter().startTable(tblPr, 100.0)
+        return new TableAdapter().withWidths(100.0).withTableProperties(tblPr).startTable()
                 .startRow().addColumn(0, null, tcPr, (Object[]) null)
                 .endRow()
                 .getTable();

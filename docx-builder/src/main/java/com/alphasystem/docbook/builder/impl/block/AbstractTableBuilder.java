@@ -37,7 +37,7 @@ public abstract class AbstractTableBuilder<T> extends BlockBuilder<T> {
     private TableType tableType;
     protected Tbl table;
 
-    protected AbstractTableBuilder(Builder parent, T source, int indexInParent) {
+    protected AbstractTableBuilder(Builder<?> parent, T source, int indexInParent) {
         super(parent, source, indexInParent);
     }
 
@@ -76,12 +76,17 @@ public abstract class AbstractTableBuilder<T> extends BlockBuilder<T> {
         tableType = level <= -1 ? TableType.PCT : TableType.AUTO;
         var tableStyle = getTableStyle(tableGroup, styleName);
 
-        columnAdapter = TableHelper.buildColumns(tableType, level, colSpec);
         TblPrBuilder tblPrBuilder = getTblPrBuilder().withTblBorders(createFrame(frame, rowSep, colSep));
 
         var tblPr = tblPrBuilder.getObject();
-        table = new TableAdapter(tableType).
-                startTable(columnAdapter, tableStyle, level, tblPr)
+        var tableAdapter = new TableAdapter().withTableType(tableType)
+                .withTableStyle(tableStyle)
+                .withIndentLevel(level)
+                .withTableProperties(tblPr)
+                .withColumnInputs(TableHelper.buildColumns(colSpec))
+                .startTable();
+        columnAdapter = tableAdapter.getColumnAdapter();
+        table = tableAdapter
                 .getTable();
     }
 
@@ -173,9 +178,9 @@ public abstract class AbstractTableBuilder<T> extends BlockBuilder<T> {
                 .withRight(right).withInsideH(insideH).withInsideV(insideV).getObject();
     }
 
-   public TableType getTableType() {
+    public TableType getTableType() {
         return tableType;
-   }
+    }
 
     public List<ColumnInfo> getColumnInfos() {
         return columnAdapter.getColumns();
