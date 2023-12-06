@@ -9,7 +9,7 @@ import org.docbook.model.Note;
  */
 public class NoteBuilder extends AdmonitionBuilder<Note> {
 
-    public NoteBuilder(Builder parent, Note note, int indexInParent) {
+    public NoteBuilder(Builder<?> parent, Note note, int indexInParent) {
         super(parent, note, indexInParent, Admonition.NOTE);
     }
 

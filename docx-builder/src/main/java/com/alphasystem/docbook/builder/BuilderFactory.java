@@ -5,7 +5,6 @@ import com.alphasystem.docbook.DocumentContext;
 import com.alphasystem.docbook.builder.impl.AbstractBuilder;
 import com.alphasystem.docbook.builder.impl.BlockBuilder;
 import com.alphasystem.docbook.builder.impl.InlineBuilder;
-import com.alphasystem.docbook.handler.BuilderHandler;
 import com.alphasystem.docbook.handler.BuilderHandlerFactory;
 import org.docbook.model.Article;
 import org.docbook.model.Title;
@@ -37,7 +36,7 @@ public class BuilderFactory {
         return instance;
     }
 
-    private BuilderHandlerFactory handlerFactory = BuilderHandlerFactory.getInstance();
+    private final BuilderHandlerFactory handlerFactory = BuilderHandlerFactory.getInstance();
 
     /**
      * Do not let any one instantiate this class.
@@ -45,7 +44,7 @@ public class BuilderFactory {
     private BuilderFactory() {
     }
 
-    public Builder getBuilder(Builder parent, Object o, int indexInParent) {
+    public Builder<?> getBuilder(Builder<?> parent, Object o, int indexInParent) {
         if (o == null) {
             return null;
         }
@@ -56,15 +55,15 @@ public class BuilderFactory {
                     BlockBuilder.class.getSimpleName() : InlineBuilder.class.getSimpleName();
             sourceName = format("%s.%s", parentName, sourceName);
         }
-        final BuilderHandler handler = handlerFactory.getHandler(sourceName);
+        final var handler = handlerFactory.getHandler(sourceName);
         if (handler == null) {
             return null;
         }
         Class<?> builderClass = handler.getBuilderClass();
-        AbstractBuilder builder = null;
+        AbstractBuilder<?> builder = null;
         try {
             final Constructor<?> constructor = builderClass.getConstructor(Builder.class, o.getClass(), int.class);
-            builder = (AbstractBuilder) constructor.newInstance(parent, o, indexInParent);
+            builder = (AbstractBuilder<?>) constructor.newInstance(parent, o, indexInParent);
         } catch (NoSuchMethodException | IllegalAccessException |
                 InstantiationException | InvocationTargetException e) {
             // ignore

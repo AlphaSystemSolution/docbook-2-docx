@@ -12,7 +12,7 @@ import java.util.ArrayList;
  */
 public class OrderedListBuilder extends ListBuilder<OrderedList> {
 
-    public OrderedListBuilder(Builder parent, OrderedList orderedlist, int indexInParent) {
+    public OrderedListBuilder(Builder<?> parent, OrderedList orderedlist, int indexInParent) {
         super(parent, orderedlist, indexInParent);
     }
 
@@ -25,7 +25,7 @@ public class OrderedListBuilder extends ListBuilder<OrderedList> {
     }
 
     @Override
-    protected ListItem getItemByName(String styleName) {
+    protected ListItem<?> getItemByName(String styleName) {
         return com.alphasystem.openxml.builder.wml.OrderedList.getByStyleName(styleName);
     }
 

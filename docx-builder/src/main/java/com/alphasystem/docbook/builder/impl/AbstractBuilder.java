@@ -86,13 +86,13 @@ public abstract class AbstractBuilder<T> implements Builder<T> {
     protected final ApplicationController applicationController = ApplicationController.getInstance();
     protected final ConfigurationUtils configurationUtils = ConfigurationUtils.getInstance();
     protected final BuilderFactory factory = BuilderFactory.getInstance();
-    protected final Builder parent;
+    protected final Builder<?> parent;
     protected T source;
     protected List<Object> titleContent;
     protected List<Object> content;
     protected int indexInParent;
 
-    protected AbstractBuilder(Builder parent, T source, int indexInParent) {
+    protected AbstractBuilder(Builder<?> parent, T source, int indexInParent) {
         if (source == null) {
             throw new NullPointerException(String.format("Source object is null in \"%s\"", getClass().getName()));
         }
@@ -118,13 +118,13 @@ public abstract class AbstractBuilder<T> implements Builder<T> {
     }
 
     @Override
-    public Builder getParent() {
+    public Builder<?> getParent() {
         return parent;
     }
 
-    protected boolean hasParent(Class<? extends Builder> builderClass) {
+    protected boolean hasParent(Class<? extends Builder<?>> builderClass) {
         boolean result = false;
-        Builder currentParent = parent;
+        var currentParent = parent;
         while (currentParent != null) {
             if (isInstanceOf(builderClass, currentParent)) {
                 result = true;
@@ -136,9 +136,9 @@ public abstract class AbstractBuilder<T> implements Builder<T> {
     }
 
     @SuppressWarnings({"unchecked"})
-    protected <B extends BlockBuilder> B getParent(Class<B> builderClass) {
+    protected <B extends BlockBuilder<?>> B getParent(Class<B> builderClass) {
         B result = null;
-        Builder currentParent = parent;
+        var currentParent = parent;
         while (currentParent != null) {
             if (isInstanceOf(builderClass, currentParent)) {
                 result = (B) currentParent;

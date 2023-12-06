@@ -11,7 +11,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
  */
 public class PhraseBuilder extends InlineBuilder<Phrase> {
 
-    public PhraseBuilder(Builder parent, Phrase phrase, int indexInParent) {
+    public PhraseBuilder(Builder<?> parent, Phrase phrase, int indexInParent) {
         super(parent, phrase, indexInParent);
     }
 

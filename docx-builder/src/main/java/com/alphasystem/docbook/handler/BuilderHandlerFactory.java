@@ -3,7 +3,7 @@ package com.alphasystem.docbook.handler;
 /**
  * @author sali
  */
-public class BuilderHandlerFactory extends HandlerFactory<BuilderHandler> {
+public class BuilderHandlerFactory extends HandlerFactory<BuilderHandler<?, ?>> {
 
     private static BuilderHandlerFactory instance;
 
@@ -21,7 +21,7 @@ public class BuilderHandlerFactory extends HandlerFactory<BuilderHandler> {
     }
 
     @Override
-    public BuilderHandler getHandler(String key) {
+    public BuilderHandler<?, ?> getHandler(String key) {
         return handlers.get(key);
     }
 }

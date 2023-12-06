@@ -3,7 +3,7 @@ package com.alphasystem.docbook.handler;
 /**
  * @author sali
  */
-public class BlockHandlerFactory extends HandlerFactory<BlockHandler> {
+public class BlockHandlerFactory extends HandlerFactory<BlockHandler<?>> {
 
     public static final String EXAMPLE_KEY = "example";
     public static final String INFORMAL_EXAMPLE_KEY = "informal_example";
@@ -26,7 +26,7 @@ public class BlockHandlerFactory extends HandlerFactory<BlockHandler> {
     }
 
     @Override
-    public BlockHandler getHandler(String key) {
+    public BlockHandler<?> getHandler(String key) {
         return handlers.get(key);
     }
 }

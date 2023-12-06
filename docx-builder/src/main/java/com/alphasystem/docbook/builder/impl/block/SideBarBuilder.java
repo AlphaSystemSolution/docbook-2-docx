@@ -12,7 +12,7 @@ import java.util.ArrayList;
  */
 public class SideBarBuilder extends TableBasedBlockBuilder<SideBar> {
 
-    public SideBarBuilder(Builder parent, SideBar obj, int indexInParent) {
+    public SideBarBuilder(Builder<?> parent, SideBar obj, int indexInParent) {
         super(parent, obj, indexInParent);
     }
 

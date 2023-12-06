@@ -10,7 +10,7 @@ import org.docx4j.wml.Tr;
  */
 public class ExampleBuilder extends TableBasedBlockBuilder<Example> {
 
-    public ExampleBuilder(Builder parent, Example example, int indexInParent) {
+    public ExampleBuilder(Builder<?> parent, Example example, int indexInParent) {
         super(parent, example, indexInParent);
     }
 

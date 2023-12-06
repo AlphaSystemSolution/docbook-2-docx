@@ -11,7 +11,7 @@ import java.util.Collections;
  */
 public class FormalParaBuilder extends BlockBuilder<FormalPara> {
 
-    public FormalParaBuilder(Builder parent, FormalPara obj, int indexInParent) {
+    public FormalParaBuilder(Builder<?> parent, FormalPara obj, int indexInParent) {
         super(parent, obj, indexInParent);
     }
 

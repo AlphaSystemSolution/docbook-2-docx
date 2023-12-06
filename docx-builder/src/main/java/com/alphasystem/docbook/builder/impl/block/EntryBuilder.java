@@ -13,9 +13,6 @@ import org.docx4j.wml.*;
 
 import java.util.List;
 
-/*import static com.alphasystem.docbook.util.TableHelper.VerticalMergeType.CONTINUE;
-import static com.alphasystem.docbook.util.TableHelper.VerticalMergeType.RESTART;
-import static com.alphasystem.docbook.util.TableHelper.getColumnProperties;*/
 import static com.alphasystem.openxml.builder.wml.WmlAdapter.getEmptyPara;
 import static com.alphasystem.openxml.builder.wml.WmlBuilderFactory.*;
 import static com.alphasystem.util.AppUtil.isInstanceOf;

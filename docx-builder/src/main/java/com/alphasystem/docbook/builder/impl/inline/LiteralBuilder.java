@@ -11,7 +11,7 @@ import static com.alphasystem.docbook.builder.DocumentBuilderHelper.LITERAL;
  */
 public class LiteralBuilder extends InlineBuilder<Literal> {
 
-    public LiteralBuilder(Builder parent, Literal literal, int indexInParent) {
+    public LiteralBuilder(Builder<?> parent, Literal literal, int indexInParent) {
         super(parent, literal, indexInParent);
     }
 

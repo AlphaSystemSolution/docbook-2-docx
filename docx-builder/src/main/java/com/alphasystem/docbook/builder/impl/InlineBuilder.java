@@ -28,7 +28,7 @@ public abstract class InlineBuilder<T> extends AbstractBuilder<T> {
     protected String[] styles;
     protected InlineHandlerFactory handlerFactory = InlineHandlerFactory.getInstance();
 
-    protected InlineBuilder(Builder parent, T obj, int indexInParent) {
+    protected InlineBuilder(Builder<?> parent, T obj, int indexInParent) {
         super(parent, obj, indexInParent);
     }
 
@@ -69,9 +69,8 @@ public abstract class InlineBuilder<T> extends AbstractBuilder<T> {
         return handler.applyStyle(rPrBuilder).getObject();
     }
 
-    @SuppressWarnings({"unchecked"})
     protected List<R> processChildContent(Object childContent, RPr runProperties, int indexInParent) {
-        final Builder builder = factory.getBuilder(this, childContent, indexInParent);
+        final var builder = factory.getBuilder(this, childContent, indexInParent);
         if (builder == null) {
             logUnhandledContentWarning(childContent);
             return Collections.emptyList();
@@ -80,7 +79,7 @@ public abstract class InlineBuilder<T> extends AbstractBuilder<T> {
             throw new RuntimeException(format("\"%s\" does not implement InlineBuilder in builder \"%s\"",
                     childContent.getClass().getSimpleName(), getClass().getSimpleName()));
         }
-        InlineBuilder inlineBuilder = (InlineBuilder) builder;
+        var inlineBuilder = (InlineBuilder<?>) builder;
         final List<R> list = inlineBuilder.processContent();
         return list.stream().map(r -> copyRun(r, null, runProperties)).collect(Collectors.toList());
     }

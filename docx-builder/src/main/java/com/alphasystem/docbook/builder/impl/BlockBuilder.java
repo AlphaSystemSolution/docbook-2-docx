@@ -21,7 +21,7 @@ public abstract class BlockBuilder<T> extends AbstractBuilder<T> {
     protected PPr paraProperties;
     protected PPr listParaProperties;
 
-    protected BlockBuilder(Builder parent, T source, int indexInParent) {
+    protected BlockBuilder(Builder<?> parent, T source, int indexInParent) {
         super(parent, source, indexInParent);
     }
 
@@ -111,7 +111,7 @@ public abstract class BlockBuilder<T> extends AbstractBuilder<T> {
         PBuilder pBuilder = null;
         for (int i = 0; i < content.size(); i++) {
             final Object o = content.get(i);
-            final Builder builder = getChildBuilder(o, i);
+            final var builder = getChildBuilder(o, i);
             if (builder == null) {
                 logUnhandledContentWarning(o);
                 continue;

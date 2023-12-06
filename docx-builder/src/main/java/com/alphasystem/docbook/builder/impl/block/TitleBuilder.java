@@ -16,7 +16,7 @@ import static com.alphasystem.openxml.builder.wml.WmlBuilderFactory.getPPrBuilde
  */
 public class TitleBuilder extends BlockBuilder<Title> {
 
-    public TitleBuilder(Builder parent, Title title, int indexInParent) {
+    public TitleBuilder(Builder<?> parent, Title title, int indexInParent) {
         super(parent, title, indexInParent);
     }
 

@@ -9,7 +9,7 @@ import org.docbook.model.Term;
  */
 public class TermBuilder extends InlineBuilder<Term> {
 
-    public TermBuilder(Builder parent, Term term, int indexInParent) {
+    public TermBuilder(Builder<?> parent, Term term, int indexInParent) {
         super(parent, term, indexInParent);
     }
 
