@@ -11,6 +11,7 @@ public class ArabicInlineHandlerService extends InlineHandlerService {
     @Override
     public void initializeHandlers() {
         final InlineHandlerFactory instance = InlineHandlerFactory.getInstance();
+        instance.registerHandler(ArabicHandler.TRANSLATION, new TranslationHandler());
         instance.registerHandler(ArabicHandler.ARABIC_HEADING_1, new ArabicHeading1Handler());
         instance.registerHandler(ArabicHandler.ARABIC_NORMAL, new ArabicNormalHandler());
         instance.registerHandler(ArabicHandler.ARABIC_SMALL, new ArabicSmallHandler());

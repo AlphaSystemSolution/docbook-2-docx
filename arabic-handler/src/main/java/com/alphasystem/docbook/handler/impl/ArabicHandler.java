@@ -1,7 +1,5 @@
 package com.alphasystem.docbook.handler.impl;
 
-import org.docx4j.wml.RFonts;
-
 import com.alphasystem.docbook.handler.InlineStyleHandler;
 import com.alphasystem.openxml.builder.wml.RPrBuilder;
 
@@ -19,22 +17,32 @@ abstract class ArabicHandler implements InlineStyleHandler {
     static final String ARABIC_NORMAL = "arabicNormal";
     static final String ARABIC_SMALL = "arabicSmall";
     static final String ARABIC_BOLD = "arabicBold";
+    static final String TRANSLATION = "translation";
     static final String ARABIC_NORMAL_HIGHLIGHT = "arabicNormalHighlight";
 
     private final long size;
+    private final String fontName;
+    private final boolean rtl;
+
 
     ArabicHandler() {
         this(DEFAULT_SIZE);
     }
 
     ArabicHandler(long size) {
+        this(size, ARABIC_FONT_NAME, true);
+    }
+
+    public ArabicHandler(long size, String fontName, boolean rtl) {
         this.size = (size <= 0) ? DEFAULT_SIZE : size;
+        this.fontName = fontName;
+        this.rtl = rtl;
     }
 
     @Override
     public RPrBuilder applyStyle(RPrBuilder rprBuilder) {
-        final RFonts rFonts = getRFontsBuilder().withAscii(ARABIC_FONT_NAME).withHAnsi(ARABIC_FONT_NAME)
-                .withCs(ARABIC_FONT_NAME).getObject();
-        return rprBuilder.withRFonts(rFonts).withSz(size).withSzCs(size).withRtl(true);
+        final var rFonts = getRFontsBuilder().withAscii(fontName).withHAnsi(fontName)
+                .withCs(fontName).getObject();
+        return rprBuilder.withRFonts(rFonts).withSz(size).withSzCs(size).withRtl(rtl);
     }
 }
