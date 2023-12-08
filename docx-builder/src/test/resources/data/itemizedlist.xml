@@ -23,4 +23,9 @@
             </tgroup>
         </informaltable>
     </listitem>
+    <listitem>
+        <note>
+            <simpara>A note within a list item</simpara>
+        </note>
+    </listitem>
 </itemizedlist>

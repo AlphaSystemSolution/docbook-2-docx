@@ -50,7 +50,7 @@ public final class ApplicationController {
         return instance;
     }
 
-    private BlockHandlerFactory blockHandlerFactory;
+    private final BlockHandlerFactory blockHandlerFactory;
 
     /**
      * Do not let anyone instantiate this class

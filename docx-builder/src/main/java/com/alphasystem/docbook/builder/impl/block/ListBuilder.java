@@ -1,7 +1,10 @@
 package com.alphasystem.docbook.builder.impl.block;
 
+import com.alphasystem.docbook.ApplicationController;
 import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.builder.impl.BlockBuilder;
+
+import java.util.List;
 
 import static com.alphasystem.docbook.ApplicationController.getContext;
 import static com.alphasystem.util.AppUtil.isInstanceOf;
@@ -32,6 +35,7 @@ public abstract class ListBuilder<T> extends BlockBuilder<T> {
             level = 0;
             number = getContext().getListNumber(number, level);
         }
+        ApplicationController.getContext().setCurrentListLevel(level);
     }
 
     @Override
@@ -45,4 +49,9 @@ public abstract class ListBuilder<T> extends BlockBuilder<T> {
         return builder;
     }
 
+    @Override
+    protected List<Object> postProcess(List<Object> processedTitleContent, List<Object> processedChildContent) {
+        ApplicationController.getContext().setCurrentListLevel(-1);
+        return super.postProcess(processedTitleContent, processedChildContent);
+    }
 }

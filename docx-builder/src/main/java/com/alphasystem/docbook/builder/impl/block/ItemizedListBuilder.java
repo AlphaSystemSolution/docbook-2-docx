@@ -12,7 +12,7 @@ import java.util.ArrayList;
  */
 public class ItemizedListBuilder extends ListBuilder<ItemizedList> {
 
-    public ItemizedListBuilder(Builder parent, ItemizedList obj, int indexInParent) {
+    public ItemizedListBuilder(Builder<?> parent, ItemizedList obj, int indexInParent) {
         super(parent, obj, indexInParent);
     }
 
@@ -25,7 +25,7 @@ public class ItemizedListBuilder extends ListBuilder<ItemizedList> {
     }
 
     @Override
-    protected ListItem getItemByName(String styleName) {
+    protected ListItem<?> getItemByName(String styleName) {
         return UnorderedList.getByStyleName(styleName);
     }
 

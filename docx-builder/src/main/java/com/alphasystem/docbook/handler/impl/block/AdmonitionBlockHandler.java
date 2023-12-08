@@ -7,6 +7,7 @@ import com.alphasystem.docbook.handler.BlockHandler;
 import com.alphasystem.openxml.builder.wml.WmlAdapter;
 import com.alphasystem.openxml.builder.wml.table.ColumnData;
 import com.alphasystem.openxml.builder.wml.table.TableAdapter;
+import com.alphasystem.openxml.builder.wml.table.TableType;
 import org.docx4j.wml.Tbl;
 
 /**
@@ -24,11 +25,15 @@ abstract class AdmonitionBlockHandler implements BlockHandler<Tbl> {
 
     @Override
     public Tbl handleBlock() {
-        final AsciiDocumentInfo documentInfo = ApplicationController.getContext().getDocumentInfo();
-        String captionText = getAdmonitionCaption(admonition, documentInfo);
+        var context = ApplicationController.getContext();
+        var currentLevel = context.getCurrentListLevel();
+        final var documentInfo = context.getDocumentInfo();
+        final var captionText = getAdmonitionCaption(admonition, documentInfo);
         double widthOfContentColumn = 100.0 - widthOfCaptionColumn;
         return new TableAdapter()
                 .withTableStyle("AdmonitionTable")
+                .withTableType(currentLevel >= 0 ? TableType.AUTO : TableType.PCT)
+                .withIndentLevel((int) currentLevel)
                 .withWidths(widthOfCaptionColumn, widthOfContentColumn)
                 .startTable()
                 .startRow()

@@ -56,13 +56,16 @@ public class BaseBuilderHandlerService extends BuilderHandlerService {
         registerHandler(instance, InlineBuilder.class, new InlineTitleHandler());
     }
 
-    private <B extends Builder> void registerHandler(final BuilderHandlerFactory instance, Class<B> builderClass, BuilderHandler handler) {
+    private <B extends Builder<?>> void registerHandler(final BuilderHandlerFactory instance,
+                                                        Class<B> builderClass,
+                                                        BuilderHandler<?,?> handler) {
         String prefix = (builderClass == null) ? "" : format("%s.", builderClass.getSimpleName());
         String key = format("%s%s", prefix, handler.getModelClass().getName());
         instance.registerHandler(key, handler);
     }
 
-    private void registerHandler(final BuilderHandlerFactory instance, BuilderHandler handler) {
+    private void registerHandler(final BuilderHandlerFactory instance,
+                                 BuilderHandler<?,?> handler) {
        registerHandler(instance, null, handler);
     }
 }

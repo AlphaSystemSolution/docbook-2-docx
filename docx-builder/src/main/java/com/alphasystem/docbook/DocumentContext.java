@@ -32,6 +32,7 @@ public final class DocumentContext {
     private final boolean article;
     private MainDocumentPart mainDocumentPart;
     private NumberingDefinitionsPart numberingDefinitionsPart;
+    private long currentListLevel = -1;
 
     public DocumentContext(final AsciiDocumentInfo documentInfo, final Object document) {
         this.documentInfo = documentInfo;
@@ -77,6 +78,14 @@ public final class DocumentContext {
             numberId = numberingDefinitionsPart.restart(numberId, level, 1);
         }
         return numberId;
+    }
+
+    public long getCurrentListLevel() {
+        return currentListLevel;
+    }
+
+    public void setCurrentListLevel(long currentListLevel) {
+        this.currentListLevel = currentListLevel;
     }
 
     private void updateDocumentCompatibility() {
