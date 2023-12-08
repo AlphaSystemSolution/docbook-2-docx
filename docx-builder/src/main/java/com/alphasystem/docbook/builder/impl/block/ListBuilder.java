@@ -24,10 +24,9 @@ public abstract class ListBuilder<T> extends BlockBuilder<T> {
     protected abstract com.alphasystem.openxml.builder.wml.ListItem<?> getItemByName(String styleName);
 
     protected void parseStyleAndLevel(String styleName) {
-        final Builder<?> parent = getParent();
-        if (hasParent(ListItemBuilder.class)) {
+        final var listItemBuilder = getParent(ListItemBuilder.class);
+        if (listItemBuilder != null) {
             // we have nested list, get the current list item and pass it down to
-            ListItemBuilder listItemBuilder = (ListItemBuilder) parent;
             number = listItemBuilder.getNumber();
             level = listItemBuilder.getLevel() + 1;
         } else {
