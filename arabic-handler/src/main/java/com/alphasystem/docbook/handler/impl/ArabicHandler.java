@@ -17,6 +17,7 @@ abstract class ArabicHandler implements InlineStyleHandler {
     static final String ARABIC_HEADING_1 = "arabicHeading1";
     static final String ARABIC_TABLE_CAPTION = "arabicTableCaption";
     static final String ARABIC_NORMAL = "arabicNormal";
+    static final String ARABIC_SMALL = "arabicSmall";
     static final String ARABIC_BOLD = "arabicBold";
     static final String ARABIC_NORMAL_HIGHLIGHT = "arabicNormalHighlight";
 
