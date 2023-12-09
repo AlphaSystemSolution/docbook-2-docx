@@ -4,7 +4,11 @@ import com.alphasystem.openxml.builder.wml.RPrBuilder;
 
 class ArabicBoldHandler extends ArabicHandler {
 
-    public ArabicBoldHandler(){}
+    ArabicBoldHandler(){}
+
+    ArabicBoldHandler(long size) {
+        super(size);
+    }
 
     @Override
     public RPrBuilder applyStyle(RPrBuilder rprBuilder) {
