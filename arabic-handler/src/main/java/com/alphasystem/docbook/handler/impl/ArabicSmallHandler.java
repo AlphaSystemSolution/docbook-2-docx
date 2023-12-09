@@ -6,6 +6,6 @@ package com.alphasystem.docbook.handler.impl;
 class ArabicSmallHandler extends ArabicHandler {
 
     ArabicSmallHandler() {
-        super(20);
+        super(16);
     }
 }
