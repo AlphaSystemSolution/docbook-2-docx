@@ -14,6 +14,7 @@ plugins {
 }
 
 dependencies {
+    api project(":asciidoctor-adapter")
     api project(":arabic-handler")
     api 'commons-cli:commons-cli:1.6.0'
 }

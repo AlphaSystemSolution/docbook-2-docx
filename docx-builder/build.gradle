@@ -3,6 +3,7 @@ dependencies {
     api project(":asciidoctor-adapter")
     api("org.glassfish.jaxb:jaxb-runtime:${jaxbRuntimeVersion}")
     api("jakarta.xml.bind:jakarta.xml.bind-api:${bindApiVersion}")
+    api "com.alphasystem:commons:${commonsVersion}"
     api("com.alphasystem.openxml:openxml-builder:${openxmlBuilderVersion}")
     testImplementation group: 'org.testng', name: 'testng', version: '7.7.0'
     testImplementation group: 'com.google.inject', name: 'guice', version: '7.0.0'

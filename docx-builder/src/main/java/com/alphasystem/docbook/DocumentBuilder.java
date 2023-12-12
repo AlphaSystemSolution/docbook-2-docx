@@ -9,10 +9,7 @@ import com.alphasystem.openxml.builder.wml.TocGenerator;
 import com.alphasystem.openxml.builder.wml.WmlPackageBuilder;
 import com.alphasystem.util.nio.NIOFileUtils;
 import com.alphasystem.xml.UnmarshallerTool;
-import org.asciidoctor.Asciidoctor;
-import org.asciidoctor.Options;
-import org.asciidoctor.OptionsBuilder;
-import org.asciidoctor.ast.Document;
+import org.apache.commons.lang3.StringUtils;
 import org.docbook.model.Article;
 import org.docbook.model.Book;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
@@ -22,25 +19,23 @@ import org.docx4j.openpackaging.parts.WordprocessingML.StyleDefinitionsPart;
 import org.docx4j.wml.Style;
 import org.docx4j.wml.Styles;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import static com.alphasystem.asciidoc.model.Backend.DOC_BOOK;
 import static com.alphasystem.docbook.builder.model.DocumentCaption.EXAMPLE;
 import static com.alphasystem.docbook.builder.model.DocumentCaption.TABLE;
 import static com.alphasystem.openxml.builder.wml.WmlAdapter.save;
 import static java.nio.file.Files.exists;
-import static org.apache.commons.io.FilenameUtils.getExtension;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * @author sali
  */
 public class DocumentBuilder {
 
-    private final static Asciidoctor asciiDoctor = Asciidoctor.Factory.create();
     private final static ConfigurationUtils configurationUtils = ConfigurationUtils.getInstance();
 
     static {
@@ -48,66 +43,46 @@ public class DocumentBuilder {
         ApplicationController.getInstance();
     }
 
-    public static Path buildDocument(String content, AsciiDocumentInfo documentInfo) throws SystemException {
-        if (isBlank(content) || documentInfo == null) {
-            throw new SystemException("No content or document info");
+    public static Path buildDocument(final AsciiDocumentInfo documentInfo, Path docxPath) throws SystemException {
+        buildDocument(docxPath, createContext(documentInfo));
+        return docxPath;
+    }
+
+    public static Path buildDocument(final AsciiDocumentInfo documentInfo) throws SystemException {
+        return buildDocument(documentInfo, FileUtil.getDocxFile(documentInfo.getSrcFile().toPath()));
+    }
+
+    public static DocumentContext createContext(final AsciiDocumentInfo documentInfo) throws SystemException {
+        final var content = documentInfo.getContent();
+        if (StringUtils.isBlank(content)) {
+            throw new IllegalArgumentException("Content not provided");
         }
-        String docBookContent = convertToDocBook(content, documentInfo);
-        UnmarshallerTool unmarshallerTool = new UnmarshallerTool();
-
-        final Path docxPath = FileUtil.getDocxFile(documentInfo.getSrcFile().toPath());
-        final Object document = getDocument(docBookContent, unmarshallerTool);
-        final DocumentContext documentContext = new DocumentContext(documentInfo, document);
-        buildDocument(docxPath, documentContext);
-        return docxPath;
-    }
-
-    public static Path buildDocument(Path srcPath, Path docxPath) throws SystemException {
-        buildDocument(docxPath, createContext(srcPath));
-        return docxPath;
-    }
-
-    public static Path buildDocument(Path srcPath) throws SystemException {
-        return buildDocument(srcPath, FileUtil.getDocxFile(srcPath));
+        UnmarshallerTool unmarshallerTool = new UnmarshallerTool(documentInfo);
+        Object document = getDocument(content, unmarshallerTool);
+        return new DocumentContext(unmarshallerTool.getDocumentInfo(), document);
     }
 
     public static DocumentContext createContext(Path srcPath) throws SystemException {
-        final File srcFile = srcPath.toFile();
         if (!exists(srcPath)) {
             throw new NullPointerException("Source file does not exists.");
         }
-        final Path fileNamePath = srcPath.getFileName();
-        final String fileName = fileNamePath.toString();
-        final String extension = getExtension(fileName);
-        String docBookContent = null;
-        AsciiDocumentInfo documentInfo = null;
-        if ("adoc".endsWith(extension)) {
-            // load ascii document info
-            documentInfo = new AsciiDocumentInfo();
-            documentInfo.setSrcFile(srcFile);
-            Document document = asciiDoctor.loadFile(srcFile, Options.builder().build());
-            documentInfo.populateAttributes(document.getAttributes());
-            docBookContent = convertToDocBook(documentInfo);
-            System.out.println(docBookContent);
-        } else if ("xml".endsWith(extension)) {
-            try {
-                try (InputStream inputStream = Files.newInputStream(srcPath);
-                     ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-                    NIOFileUtils.fastCopy(inputStream, outputStream);
-                    docBookContent = outputStream.toString();
-                }
-            } catch (IOException e) {
-                throw new SystemException(e.getMessage(), e);
+        String docBookContent;
+        try {
+            try (InputStream inputStream = Files.newInputStream(srcPath);
+                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+                NIOFileUtils.fastCopy(inputStream, outputStream);
+                docBookContent = outputStream.toString();
             }
+        } catch (IOException e) {
+            throw new SystemException(e.getMessage(), e);
         }
 
-        UnmarshallerTool unmarshallerTool = new UnmarshallerTool();
-        Object document = getDocument(docBookContent, unmarshallerTool);
-        if (documentInfo == null) {
-            documentInfo = unmarshallerTool.getDocumentInfo();
-        }
-        return new DocumentContext(documentInfo, document);
+        final var documentInfo = new AsciiDocumentInfo();
+        documentInfo.setContent(docBookContent);
+
+        return createContext(documentInfo);
     }
+
 
     public static WordprocessingMLPackage buildDocument(final DocumentContext documentContext) throws SystemException {
         ApplicationController.startContext(documentContext);
@@ -171,28 +146,5 @@ public class DocumentBuilder {
             document = unmarshallerTool.unmarshal(docBookContent, Book.class);
         }
         return document;
-    }
-
-    private static String convertToDocBook(AsciiDocumentInfo asciiDocumentInfo) throws SystemException {
-        String docBookContent;
-        AsciiDocumentInfo docBook = new AsciiDocumentInfo(asciiDocumentInfo);
-        docBook.setBackend(DOC_BOOK.getValue());
-        OptionsBuilder optionsBuilder = docBook.getOptionsBuilder().standalone(true);
-        try {
-            try (Reader reader = Files.newBufferedReader(asciiDocumentInfo.getSrcFile().toPath());
-                 StringWriter writer = new StringWriter()) {
-                asciiDoctor.convert(reader, writer, optionsBuilder.build());
-                docBookContent = writer.toString();
-            }
-        } catch (IOException e) {
-            throw new SystemException(e.getMessage(), e);
-        }
-        return docBookContent;
-    }
-
-    private static String convertToDocBook(String content, AsciiDocumentInfo asciiDocumentInfo) {
-        final OptionsBuilder optionsBuilder = asciiDocumentInfo.getOptionsBuilder();
-        optionsBuilder.toFile(false).inPlace(false).backend(DOC_BOOK.getValue()).standalone(true);
-        return asciiDoctor.convert(content, optionsBuilder.build());
     }
 }

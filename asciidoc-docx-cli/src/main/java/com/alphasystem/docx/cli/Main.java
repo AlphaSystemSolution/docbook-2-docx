@@ -1,5 +1,6 @@
 package com.alphasystem.docx.cli;
 
+import com.alphasystem.asciidoc.util.DocumentConverter;
 import com.alphasystem.docbook.DocumentBuilder;
 import org.apache.commons.cli.*;
 
@@ -52,11 +53,12 @@ public class Main {
                 docxPath = toPath(cmd.getOptionValue(destOption));
             }
 
+            var documentInfo = DocumentConverter.convertToDocBook(srcPath);
             Path destPath;
             if (docxPath == null) {
-                destPath = DocumentBuilder.buildDocument(srcPath);
+                destPath = DocumentBuilder.buildDocument(documentInfo);
             } else {
-                destPath = DocumentBuilder.buildDocument(srcPath, docxPath);
+                destPath = DocumentBuilder.buildDocument(documentInfo, docxPath);
             }
             Desktop.getDesktop().open(destPath.toFile());
         } catch (Exception ex) {

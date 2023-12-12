@@ -41,7 +41,11 @@ public class UnmarshallerTool {
     private final AsciiDocumentInfo documentInfo;
 
     public UnmarshallerTool() {
-        documentInfo = new AsciiDocumentInfo();
+        this(new AsciiDocumentInfo());
+    }
+
+    public UnmarshallerTool(final AsciiDocumentInfo src) {
+        documentInfo = new AsciiDocumentInfo(src);
         documentInfo.setTocTitle(configurationUtils.getTableOfContentCaption());
         documentInfo.setCautionCaption(configurationUtils.getAdmonitionCaption(Admonition.CAUTION));
         documentInfo.setImportantCaption(configurationUtils.getAdmonitionCaption(Admonition.IMPORTANT));
