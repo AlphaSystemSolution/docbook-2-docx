@@ -1,4 +1,6 @@
 dependencies {
+    // api 'commons-io:commons-io:2.15.1'
+    api("com.alphasystem:commons:${commonsVersion}")
     api "org.asciidoctor:asciidoctorj:${asciidoctorjVersion}"
     api "org.asciidoctor:asciidoctorj-api:${asciidoctorjVersion}"
 }

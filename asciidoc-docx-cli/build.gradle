@@ -20,6 +20,7 @@ dependencies {
 
 jar {
     dependsOn(":docbook-model:jar")
+    dependsOn(":asciidoctor-adapter:jar")
     dependsOn(":docx-builder:jar")
     dependsOn(":arabic-handler:jar")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
