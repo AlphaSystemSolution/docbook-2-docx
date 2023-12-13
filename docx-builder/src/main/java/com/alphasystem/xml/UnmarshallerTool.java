@@ -1,7 +1,7 @@
 package com.alphasystem.xml;
 
+import com.alphasystem.asciidoc.model.DocumentInfo;
 import com.alphasystem.SystemException;
-import com.alphasystem.asciidoc.model.AsciiDocumentInfo;
 import com.alphasystem.docbook.builder.model.Admonition;
 import com.alphasystem.docbook.util.ConfigurationUtils;
 import org.slf4j.Logger;
@@ -21,7 +21,7 @@ public class UnmarshallerTool {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UnmarshallerTool.class);
 
-    private static void populateProcessingInstructions(ProcessingInstruction pi, AsciiDocumentInfo documentInfo) {
+    private static void populateProcessingInstructions(ProcessingInstruction pi, DocumentInfo documentInfo) {
         final String target = pi.getTarget();
         switch (target) {
             case "asciidoc-toc":
@@ -38,14 +38,14 @@ public class UnmarshallerTool {
 
     private static final ConfigurationUtils configurationUtils = ConfigurationUtils.getInstance();
 
-    private final AsciiDocumentInfo documentInfo;
+    private final DocumentInfo documentInfo;
 
     public UnmarshallerTool() {
-        this(new AsciiDocumentInfo());
+        this(new DocumentInfo());
     }
 
-    public UnmarshallerTool(final AsciiDocumentInfo src) {
-        documentInfo = new AsciiDocumentInfo(src);
+    public UnmarshallerTool(final DocumentInfo src) {
+        documentInfo = new DocumentInfo(src);
         documentInfo.setTocTitle(configurationUtils.getTableOfContentCaption());
         documentInfo.setCautionCaption(configurationUtils.getAdmonitionCaption(Admonition.CAUTION));
         documentInfo.setImportantCaption(configurationUtils.getAdmonitionCaption(Admonition.IMPORTANT));
@@ -81,7 +81,7 @@ public class UnmarshallerTool {
         return document;
     }
 
-    public AsciiDocumentInfo getDocumentInfo() {
+    public DocumentInfo getDocumentInfo() {
         return documentInfo;
     }
 }

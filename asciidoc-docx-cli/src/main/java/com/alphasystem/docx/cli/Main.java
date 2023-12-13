@@ -53,7 +53,8 @@ public class Main {
                 docxPath = toPath(cmd.getOptionValue(destOption));
             }
 
-            var documentInfo = DocumentConverter.convertToDocBook(srcPath);
+            var documentInfo = DocumentConverter.convertToDocBook(srcPath).getDocumentInfo();
+            System.out.println(documentInfo.getContent());
             Path destPath;
             if (docxPath == null) {
                 destPath = DocumentBuilder.buildDocument(documentInfo);

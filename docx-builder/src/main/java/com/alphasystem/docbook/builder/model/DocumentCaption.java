@@ -1,6 +1,5 @@
 package com.alphasystem.docbook.builder.model;
 
-import com.alphasystem.asciidoc.model.AsciiDocumentInfo;
 import com.alphasystem.docbook.ApplicationController;
 import com.alphasystem.openxml.builder.wml.HeadingList;
 import org.docbook.model.Example;
@@ -18,7 +17,7 @@ public abstract class DocumentCaption extends HeadingList<DocumentCaption> {
 
         @Override
         public String getValue(int i) {
-            final AsciiDocumentInfo documentInfo = ApplicationController.getContext().getDocumentInfo();
+            final var documentInfo = ApplicationController.getContext().getDocumentInfo();
             return format("%s %%%s.", documentInfo.getExampleCaption(), i);
         }
 
@@ -28,7 +27,7 @@ public abstract class DocumentCaption extends HeadingList<DocumentCaption> {
 
         @Override
         public String getValue(int i) {
-            final AsciiDocumentInfo documentInfo = ApplicationController.getContext().getDocumentInfo();
+            final var documentInfo = ApplicationController.getContext().getDocumentInfo();
             return format("%s %%%s.", documentInfo.getTableCaption(), i);
         }
 

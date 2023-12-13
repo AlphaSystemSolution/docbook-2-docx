@@ -1,6 +1,6 @@
 package com.alphasystem.docbook.handler.impl.block;
 
-import com.alphasystem.asciidoc.model.AsciiDocumentInfo;
+import com.alphasystem.asciidoc.model.DocumentInfo;
 import com.alphasystem.docbook.ApplicationController;
 import com.alphasystem.docbook.builder.model.Admonition;
 import com.alphasystem.docbook.handler.BlockHandler;
@@ -43,7 +43,7 @@ abstract class AdmonitionBlockHandler implements BlockHandler<Tbl> {
                 .getTable();
     }
 
-    private String getAdmonitionCaption(Admonition admonition, AsciiDocumentInfo documentInfo) {
+    private String getAdmonitionCaption(Admonition admonition, DocumentInfo documentInfo) {
         String title = null;
         switch (admonition) {
             case CAUTION:

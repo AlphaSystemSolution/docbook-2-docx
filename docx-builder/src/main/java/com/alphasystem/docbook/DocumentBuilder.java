@@ -1,7 +1,7 @@
 package com.alphasystem.docbook;
 
 import com.alphasystem.SystemException;
-import com.alphasystem.asciidoc.model.AsciiDocumentInfo;
+import com.alphasystem.asciidoc.model.DocumentInfo;
 import com.alphasystem.docbook.builder.BuilderFactory;
 import com.alphasystem.docbook.util.ConfigurationUtils;
 import com.alphasystem.docbook.util.FileUtil;
@@ -43,23 +43,24 @@ public class DocumentBuilder {
         ApplicationController.getInstance();
     }
 
-    public static Path buildDocument(final AsciiDocumentInfo documentInfo, Path docxPath) throws SystemException {
+    public static Path buildDocument(final DocumentInfo documentInfo, Path docxPath) throws SystemException {
         buildDocument(docxPath, createContext(documentInfo));
         return docxPath;
     }
 
-    public static Path buildDocument(final AsciiDocumentInfo documentInfo) throws SystemException {
+    public static Path buildDocument(final DocumentInfo documentInfo) throws SystemException {
         return buildDocument(documentInfo, FileUtil.getDocxFile(documentInfo.getSrcFile().toPath()));
     }
 
-    public static DocumentContext createContext(final AsciiDocumentInfo documentInfo) throws SystemException {
+    public static DocumentContext createContext(final DocumentInfo documentInfo) throws SystemException {
         final var content = documentInfo.getContent();
         if (StringUtils.isBlank(content)) {
             throw new IllegalArgumentException("Content not provided");
         }
         UnmarshallerTool unmarshallerTool = new UnmarshallerTool(documentInfo);
         Object document = getDocument(content, unmarshallerTool);
-        return new DocumentContext(unmarshallerTool.getDocumentInfo(), document);
+        var documentInfo1 = unmarshallerTool.getDocumentInfo();
+        return new DocumentContext(documentInfo1, document);
     }
 
     public static DocumentContext createContext(Path srcPath) throws SystemException {
@@ -77,7 +78,7 @@ public class DocumentBuilder {
             throw new SystemException(e.getMessage(), e);
         }
 
-        final var documentInfo = new AsciiDocumentInfo();
+        final var documentInfo = new DocumentInfo();
         documentInfo.setContent(docBookContent);
 
         return createContext(documentInfo);
@@ -98,7 +99,7 @@ public class DocumentBuilder {
             final List<Style> list = styles.getStyle();
             list.forEach(style -> documentContext.getDocumentStyles().add(style.getStyleId()));
 
-            AsciiDocumentInfo documentInfo = documentContext.getDocumentInfo();
+            final var documentInfo = documentContext.getDocumentInfo();
             if (documentInfo.isSectionNumbers()) {
                 wmlPackageBuilder.multiLevelHeading();
             }
@@ -118,7 +119,7 @@ public class DocumentBuilder {
 
             content.forEach(mainDocumentPart::addObject);
 
-            if (documentInfo.isToc()) {
+            if (documentInfo.isToc() && documentInfo.isSectionNumbers()) {
                 new TocGenerator().level(5).tocHeading(documentInfo.getTocTitle()).level(5)
                         .mainDocumentPart(mainDocumentPart).generateToc();
             }

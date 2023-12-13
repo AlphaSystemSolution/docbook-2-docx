@@ -43,7 +43,7 @@ public class DocumentConverter {
         docBook.setBackend(DOC_BOOK.getValue());
         OptionsBuilder optionsBuilder = docBook.getOptionsBuilder().standalone(true);
         try {
-            try (Reader reader = Files.newBufferedReader(docBook.getSrcFile().toPath());
+            try (Reader reader = Files.newBufferedReader(docBook.getDocumentInfo().getSrcFile().toPath());
                  StringWriter writer = new StringWriter()) {
                 asciiDoctor.convert(reader, writer, optionsBuilder.build());
                 docBookContent = writer.toString();

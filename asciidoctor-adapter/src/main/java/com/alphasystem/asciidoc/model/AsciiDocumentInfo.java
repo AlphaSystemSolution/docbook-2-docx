@@ -1,18 +1,17 @@
 package com.alphasystem.asciidoc.model;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.util.Map;
-
 import org.apache.commons.lang3.StringUtils;
-import org.asciidoctor.*;
+import org.asciidoctor.Attributes;
+import org.asciidoctor.Options;
+import org.asciidoctor.OptionsBuilder;
+import org.asciidoctor.Placement;
 import org.asciidoctor.ast.Document;
 
+import java.io.File;
+import java.util.Map;
+
 import static com.alphasystem.util.AppUtil.USER_HOME_DIR;
-import static com.alphasystem.util.AppUtil.toRelativePath;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.stripToNull;
+import static org.apache.commons.lang3.StringUtils.*;
 import static org.asciidoctor.SafeMode.UNSAFE;
 
 /**
@@ -25,7 +24,8 @@ public class AsciiDocumentInfo {
     }
 
     private static boolean getFailSafeBoolean(Map<String, Object> attributes, String key) {
-        return attributes.get(key) != null;
+        final var value = attributes.get(key);
+        return value != null && Boolean.parseBoolean(value.toString().toLowerCase());
     }
 
     private static String getFailSafeString(final String src, final String defaultValue) {
@@ -34,53 +34,13 @@ public class AsciiDocumentInfo {
 
     private final Attributes attributes;
     private final OptionsBuilder optionsBuilder;
-    private String documentType;
-    private String documentName;
-    private String documentTitle;
-    private String backend;
-    private String stylesDir;
-    private File customStyleSheetFile;
-    private boolean linkCss;
-    private String includeDir;
-    private String docInfoDir;
-    private String imagesDir;
-    private String iconsDir;
-    private String icons;
-    private String iconFontName;
-    private String idPrefix;
-    private String idSeparator;
-    private String docInfo;
-    private boolean docInfo2;
-    private String sourceLanguage;
-    private String lastUpdateLabel;
-    private boolean omitLastUpdatedTimeStamp;
-    private boolean compact;
-    private boolean experimental;
-    private boolean toc;
-    private String tocClass;
-    private String tocPlacement;
-    private String tocPosition;
-    private String tocTitle;
-    private String appendixCaption;
-    private String cautionCaption;
-    private String exampleCaption;
-    private String figureCaption;
-    private String importantCaption;
-    private String noteCaption;
-    private String tableCaption;
-    private String tipCaption;
-    private String untitledLabel;
-    private String versionLabel;
-    private String warningCaption;
-    private boolean sectionNumbers;
-    private boolean hideUriSchema;
-    private File srcFile;
+    private final DocumentInfo documentInfo;
     private Document document;
-    private String content;
 
     public AsciiDocumentInfo() {
         attributes = Attributes.builder().build();
         optionsBuilder = Options.builder().attributes(attributes);
+        this.documentInfo = new DocumentInfo();
         setDocument(null);
         setDocumentType(null);
         setBackend(null);
@@ -103,61 +63,59 @@ public class AsciiDocumentInfo {
         if (src == null) {
             throw new IllegalArgumentException("source object cannot be null");
         }
+        final var srcDocInfo = src.getDocumentInfo();
+
         setDocument(src.getDocument());
-        setContent(src.getContent());
-        setDocumentType(getFailSafeString(src.getDocumentType(), getDocumentType()));
-        setDocumentName(getFailSafeString(src.getDocumentName(), getDocumentName()));
-        setDocumentTitle(getFailSafeString(src.getDocumentTitle(), getDocumentTitle()));
-        setDocInfo2(src.isDocInfo2());
-        setIncludeDir(getFailSafeString(src.getIncludeDir(), getIncludeDir()));
-        setDocInfoDir(getFailSafeString(src.getDocInfoDir(), getDocInfoDir()));
-        setDocInfo(getFailSafeString(src.getDocInfo(), getDocInfo()));
-        setImagesDir(getFailSafeString(src.getImagesDir(), getImagesDir()));
-        setIconsDir(getFailSafeString(src.getIconsDir(), getIconsDir()));
-        setIcons(getFailSafeString(src.getIcons(), getIcons()));
-        setIconFontName(getFailSafeString(src.getIconFontName(), getIconFontName()));
-        setLinkCss(src.isLinkCss());
-        setSrcFile(src.getSrcFile() == null ? getSrcFile() : src.getSrcFile());
-        setStylesDir(getFailSafeString(src.getStylesDir(), getStylesDir()));
-        setCustomStyleSheetFile(src.getCustomStyleSheetFile() == null ? getCustomStyleSheetFile() : src.getCustomStyleSheetFile());
-        setSourceLanguage(getFailSafeString(src.getSourceLanguage(), getSourceLanguage()));
-        setLastUpdateLabel(getFailSafeString(src.getLastUpdateLabel(), getLastUpdateLabel()));
-        setOmitLastUpdatedTimeStamp(src.isOmitLastUpdatedTimeStamp());
-        setCompact(src.isCompact());
-        setIdSeparator(getFailSafeString(src.getIdSeparator(), getIdSeparator()));
-        setIdPrefix(getFailSafeString(src.getIdPrefix(), getIdPrefix()));
-        setSectionNumbers(src.isSectionNumbers());
-        setExperimental(src.isExperimental());
-        setToc(src.isToc());
-        setTocTitle(getFailSafeString(src.getTocTitle(), getTocTitle()));
-        setTocPlacement(getFailSafeString(src.getTocPlacement(), getTocPlacement()));
-        setTocPosition(getFailSafeString(src.getTocPosition(), getTocPosition()));
-        setTocClass(getFailSafeString(src.getTocClass(), getTocClass()));
-        setAppendixCaption(getFailSafeString(src.getAppendixCaption(), getAppendixCaption()));
-        setCautionCaption(getFailSafeString(src.getCautionCaption(), getCautionCaption()));
-        setExampleCaption(getFailSafeString(src.getExampleCaption(), getExampleCaption()));
-        setFigureCaption(getFailSafeString(src.getFigureCaption(), getFigureCaption()));
-        setImportantCaption(getFailSafeString(src.getImportantCaption(), getImportantCaption()));
-        setNoteCaption(getFailSafeString(src.getNoteCaption(), getNoteCaption()));
-        setTableCaption(getFailSafeString(src.getTableCaption(), getTableCaption()));
-        setTipCaption(getFailSafeString(src.getTipCaption(), getTipCaption()));
-        setUntitledLabel(getFailSafeString(src.getUntitledLabel(), getUntitledLabel()));
-        setVersionLabel(getFailSafeString(src.getVersionLabel(), getVersionLabel()));
-        setWarningCaption(getFailSafeString(src.getWarningCaption(), getWarningCaption()));
-        setBackend(getFailSafeString(src.getBackend(), getBackend()));
-        setHideUriSchema(src.isHideUriSchema());
+        setContent(srcDocInfo.getContent());
+        setDocumentType(srcDocInfo.getDocumentType());
+        setDocumentName(srcDocInfo.getDocumentName());
+        setDocumentTitle(srcDocInfo.getDocumentTitle());
+        setDocInfo2(srcDocInfo.isDocInfo2());
+        setIncludeDir(srcDocInfo.getIncludeDir());
+        setDocInfoDir(srcDocInfo.getDocInfoDir());
+        setDocInfo(srcDocInfo.getDocInfo());
+        setImagesDir(srcDocInfo.getImagesDir());
+        setIconsDir(srcDocInfo.getIconsDir());
+        setIcons(srcDocInfo.getIcons());
+        setIconFontName(srcDocInfo.getIconFontName());
+        setLinkCss(srcDocInfo.isLinkCss());
+        setSrcFile(srcDocInfo.getSrcFile());
+        setStylesDir(srcDocInfo.getStylesDir());
+        setCustomStyleSheetFile(srcDocInfo.getCustomStyleSheetFile());
+        setSourceLanguage(srcDocInfo.getSourceLanguage());
+        setLastUpdateLabel(srcDocInfo.getLastUpdateLabel());
+        setOmitLastUpdatedTimeStamp(srcDocInfo.isOmitLastUpdatedTimeStamp());
+        setCompact(srcDocInfo.isCompact());
+        setIdSeparator(srcDocInfo.getIdSeparator());
+        setIdPrefix(srcDocInfo.getIdPrefix());
+        setSectionNumbers(srcDocInfo.isSectionNumbers());
+        setExperimental(srcDocInfo.isExperimental());
+        setToc(srcDocInfo.isToc());
+        setTocTitle(srcDocInfo.getTocTitle());
+        setTocPlacement(srcDocInfo.getTocPlacement());
+        setTocPosition(srcDocInfo.getTocPosition());
+        setTocClass(srcDocInfo.getTocClass());
+        setAppendixCaption(srcDocInfo.getAppendixCaption());
+        setCautionCaption(srcDocInfo.getCautionCaption());
+        setExampleCaption(srcDocInfo.getExampleCaption());
+        setFigureCaption(srcDocInfo.getFigureCaption());
+        setImportantCaption(srcDocInfo.getImportantCaption());
+        setNoteCaption(srcDocInfo.getNoteCaption());
+        setTableCaption(srcDocInfo.getTableCaption());
+        setTipCaption(srcDocInfo.getTipCaption());
+        setUntitledLabel(srcDocInfo.getUntitledLabel());
+        setVersionLabel(srcDocInfo.getVersionLabel());
+        setWarningCaption(srcDocInfo.getWarningCaption());
+        setBackend(srcDocInfo.getBackend());
+        setHideUriSchema(srcDocInfo.isHideUriSchema());
     }
 
     public OptionsBuilder getOptionsBuilder() {
         return optionsBuilder;
     }
 
-    public String getBaseDir() {
-        return (srcFile == null) ? null : srcFile.getParent();
-    }
-
-    public String getDocumentType() {
-        return documentType;
+    public DocumentInfo getDocumentInfo() {
+        return documentInfo;
     }
 
     public Document getDocument() {
@@ -168,368 +126,215 @@ public class AsciiDocumentInfo {
         this.document = document;
     }
 
-    public String getContent() {
-        return content;
-    }
-
     public void setContent(String content) {
-        this.content = content;
+        documentInfo.setContent(content);
     }
 
     public void setDocumentType(String documentType) {
-        this.documentType = isBlank(documentType) ? "article" : documentType;
-        attributes.setDocType(this.documentType);
-    }
-
-    public String getDocumentName() {
-        return documentName;
+        var dt = isBlank(documentType) ? "article" : documentType;
+        documentInfo.setDocumentType(dt);
+        attributes.setDocType(dt);
     }
 
     public void setDocumentName(String documentName) {
-        this.documentName = documentName;
-    }
-
-    public String getDocumentTitle() {
-        return documentTitle;
+        documentInfo.setDocumentName(getFailSafeString(documentName, documentInfo.getDocumentName()));
     }
 
     public void setDocumentTitle(String documentTitle) {
-        this.documentTitle = documentTitle;
-    }
-
-    public String getBackend() {
-        return backend;
+        documentInfo.setDocumentTitle(getFailSafeString(documentTitle, documentInfo.getDocumentTitle()));
     }
 
     public void setBackend(String backend) {
-        this.backend = (backend == null) ? Backend.HTML.getValue() : backend;
-        optionsBuilder.backend(this.backend);
-    }
-
-    public String getStylesDir() {
-        return stylesDir;
+        var value = getFailSafeString(backend, documentInfo.getBackend());
+        value = (backend == null) ? Backend.HTML.getValue() : backend;
+        documentInfo.setBackend(value);
+        optionsBuilder.backend(value);
     }
 
     public void setStylesDir(String stylesDir) {
-        this.stylesDir = stylesDir;
-        if (linkCss) {
-            attributes.setStylesDir(this.stylesDir);
+        final var value = getFailSafeString(stylesDir, documentInfo.getStylesDir());
+        documentInfo.setStylesDir(value);
+        if (documentInfo.isLinkCss()) {
+            attributes.setStylesDir(documentInfo.getStylesDir());
         } else {
             attributes.setStylesDir(null);
         }
-    }
-
-    public File getCustomStyleSheetFile() {
-        return customStyleSheetFile;
     }
 
     public void setCustomStyleSheetFile(File customStyleSheetFile) {
-        this.customStyleSheetFile = customStyleSheetFile;
-        if (this.customStyleSheetFile != null) {
-            String styleSheetName = this.customStyleSheetFile.getName();
-            attributes.setStyleSheetName(styleSheetName);
+        final var value = customStyleSheetFile == null ? documentInfo.getCustomStyleSheetFile() : customStyleSheetFile;
+        documentInfo.setCustomStyleSheetFile(value);
+        if (value != null) {
+            attributes.setStyleSheetName(value.getName());
         }
     }
 
-    public boolean isLinkCss() {
-        return linkCss;
-    }
-
     public void setLinkCss(boolean linkCss) {
-        this.linkCss = linkCss;
-        if (this.linkCss) {
-            attributes.setLinkCss(isLinkCss());
-            attributes.setStylesDir(stylesDir);
+        documentInfo.setLinkCss(linkCss);
+        if (linkCss) {
+            attributes.setLinkCss(linkCss);
+            attributes.setStylesDir(documentInfo.getStylesDir());
         } else {
             attributes.setStylesDir(null);
         }
     }
 
-    public String getIncludeDir() {
-        return includeDir;
-    }
-
     public void setIncludeDir(String includeDir) {
-        this.includeDir = includeDir;
-    }
-
-    public String getDocInfoDir() {
-        return docInfoDir;
+        documentInfo.setIncludeDir(getFailSafeString(includeDir, documentInfo.getIncludeDir()));
     }
 
     public void setDocInfoDir(String docInfoDir) {
-        this.docInfoDir = docInfoDir;
-    }
-
-    public String getImagesDir() {
-        return imagesDir;
+        documentInfo.setDocInfoDir(getFailSafeString(docInfoDir, documentInfo.getDocInfoDir()));
     }
 
     public void setImagesDir(String imagesDir) {
-        this.imagesDir = imagesDir;
-        attributes.setImagesDir(getImagesDir());
-    }
-
-    public String getIconsDir() {
-        return iconsDir;
+        final var value = getFailSafeString(imagesDir, documentInfo.getImagesDir());
+        documentInfo.setImagesDir(value);
+        attributes.setImagesDir(value);
     }
 
     public void setIconsDir(String iconsDir) {
-        this.iconsDir = iconsDir;
-        attributes.setIconsDir(getIconsDir());
-    }
-
-    public String getIcons() {
-        return icons;
+        final var value = getFailSafeString(iconsDir, documentInfo.getIconsDir());
+        documentInfo.setIconsDir(value);
+        attributes.setIconsDir(value);
     }
 
     public void setIcons(String icons) {
-        this.icons = icons;
-        attributes.setIcons(getIcons());
-    }
-
-    public String getIconFontName() {
-        return iconFontName;
+        final var value = getFailSafeString(icons, documentInfo.getIcons());
+        documentInfo.setIcons(value);
+        attributes.setIcons(value);
     }
 
     public void setIconFontName(String iconFontName) {
-        this.iconFontName = iconFontName;
-        boolean localFontName = isNotBlank(iconFontName);
-        attributes.setIconFontName(this.iconFontName);
-        attributes.setIconFontRemote(!localFontName);
-    }
-
-    public String getIdPrefix() {
-        return idPrefix;
+        final var value = getFailSafeString(iconFontName, documentInfo.getIconFontName());
+        documentInfo.setIconFontName(value);
+        attributes.setIconFontName(value);
+        attributes.setIconFontRemote(!isNotBlank(value));
     }
 
     public void setIdPrefix(String idPrefix) {
-        this.idPrefix = idPrefix;
-    }
-
-    public String getIdSeparator() {
-        return idSeparator;
+        documentInfo.setIdSeparator(getFailSafeString(idPrefix, documentInfo.getIdPrefix()));
     }
 
     public void setIdSeparator(String idSeparator) {
-        this.idSeparator = idSeparator;
-    }
-
-    public String getDocInfo() {
-        return docInfo;
+        documentInfo.setIdSeparator(getFailSafeString(idSeparator, documentInfo.getIdSeparator()));
     }
 
     public void setDocInfo(String docInfo) {
-        this.docInfo = docInfo;
-    }
-
-    public boolean isDocInfo2() {
-        return docInfo2;
+        documentInfo.setDocInfo(getFailSafeString(docInfo, documentInfo.getDocInfo()));
     }
 
     public void setDocInfo2(boolean docInfo2) {
-        this.docInfo2 = docInfo2;
-    }
-
-    public String getSourceLanguage() {
-        return sourceLanguage;
+        documentInfo.setDocInfo2(docInfo2);
     }
 
     public void setSourceLanguage(String sourceLanguage) {
-        this.sourceLanguage = sourceLanguage;
-        attributes.setSourceLanguage(this.sourceLanguage);
-    }
-
-    public String getLastUpdateLabel() {
-        return lastUpdateLabel;
+        final var value = getFailSafeString(sourceLanguage, documentInfo.getSourceLanguage());
+        documentInfo.setSourceLanguage(value);
+        attributes.setSourceLanguage(value);
     }
 
     public void setLastUpdateLabel(String lastUpdateLabel) {
-        this.lastUpdateLabel = lastUpdateLabel;
-    }
-
-    public boolean isOmitLastUpdatedTimeStamp() {
-        return omitLastUpdatedTimeStamp;
+        documentInfo.setLastUpdateLabel(getFailSafeString(lastUpdateLabel, documentInfo.getLastUpdateLabel()));
     }
 
     public void setOmitLastUpdatedTimeStamp(boolean omitLastUpdatedTimeStamp) {
-        this.omitLastUpdatedTimeStamp = omitLastUpdatedTimeStamp;
-    }
-
-    public boolean isCompact() {
-        return compact;
+        documentInfo.setOmitLastUpdatedTimeStamp(omitLastUpdatedTimeStamp);
     }
 
     public void setCompact(boolean compact) {
-        this.compact = compact;
-        optionsBuilder.compact(this.compact);
-    }
-
-    public boolean isExperimental() {
-        return experimental;
+        documentInfo.setCompact(compact);
+        optionsBuilder.compact(compact);
     }
 
     public void setExperimental(boolean experimental) {
-        this.experimental = experimental;
-        attributes.setExperimental(this.experimental);
-    }
-
-    public boolean isSectionNumbers() {
-        return sectionNumbers;
+        documentInfo.setExperimental(experimental);
+        attributes.setExperimental(experimental);
     }
 
     public void setSectionNumbers(boolean sectionNumbers) {
-        this.sectionNumbers = sectionNumbers;
-        attributes.setSectionNumbers(isSectionNumbers());
-    }
-
-    public boolean isToc() {
-        return toc;
+        documentInfo.setSectionNumbers(sectionNumbers);
+        attributes.setSectionNumbers(sectionNumbers);
     }
 
     public void setToc(boolean toc) {
-        this.toc = toc;
-        attributes.setTableOfContents(isToc());
-    }
-
-    public String getTocClass() {
-        return tocClass;
+        documentInfo.setToc(toc);
+        attributes.setTableOfContents(toc);
     }
 
     public void setTocClass(String tocClass) {
-        this.tocClass = tocClass;
-    }
-
-    public String getTocPlacement() {
-        return tocPlacement;
+        documentInfo.setTocClass(getFailSafeString(tocClass, documentInfo.getTocClass()));
     }
 
     public void setTocPlacement(String tocPlacement) {
-        this.tocPlacement = tocPlacement;
-        attributes.setTableOfContents((isBlank(tocPlacement) || tocPlacement.equals("auto")) ? Placement.LEFT :
-                Placement.valueOf(tocPlacement.toUpperCase()));
-    }
-
-    public String getTocPosition() {
-        return tocPosition;
+        final var value = getFailSafeString(tocPlacement, documentInfo.getTocPlacement());
+        documentInfo.setTocPlacement(value);
+        attributes.setTableOfContents((isBlank(value) || value.equals("auto")) ? Placement.LEFT :
+                Placement.valueOf(value.toUpperCase()));
     }
 
     public void setTocPosition(String tocPosition) {
-        this.tocPosition = tocPosition;
-    }
-
-    public String getTocTitle() {
-        return tocTitle;
+        documentInfo.setTocPosition(getFailSafeString(tocPosition, documentInfo.getTocPosition()));
     }
 
     public void setTocTitle(String tocTitle) {
-        this.tocTitle = tocTitle;
-    }
-
-    public String getUntitledLabel() {
-        return untitledLabel;
+        documentInfo.setIdSeparator(getFailSafeString(tocTitle, documentInfo.getTocTitle()));
     }
 
     public void setUntitledLabel(String untitledLabel) {
-        this.untitledLabel = untitledLabel;
-        attributes.setUntitledLabel(getUntitledLabel());
-    }
-
-    public String getAppendixCaption() {
-        return appendixCaption;
+        final var value = getFailSafeString(untitledLabel, documentInfo.getUntitledLabel());
+        documentInfo.setUntitledLabel(value);
+        attributes.setUntitledLabel(value);
     }
 
     public void setAppendixCaption(String appendixCaption) {
-        this.appendixCaption = appendixCaption;
-    }
-
-    public String getCautionCaption() {
-        return cautionCaption;
+        documentInfo.setAppendixCaption(getFailSafeString(appendixCaption, documentInfo.getAppendixCaption()));
     }
 
     public void setCautionCaption(String cautionCaption) {
-        this.cautionCaption = cautionCaption;
-    }
-
-    public String getExampleCaption() {
-        return exampleCaption;
+        documentInfo.setCautionCaption(getFailSafeString(cautionCaption, documentInfo.getCautionCaption()));
     }
 
     public void setExampleCaption(String exampleCaption) {
-        this.exampleCaption = exampleCaption;
-    }
-
-    public String getFigureCaption() {
-        return figureCaption;
+        documentInfo.setExampleCaption(getFailSafeString(exampleCaption, documentInfo.getExampleCaption()));
     }
 
     public void setFigureCaption(String figureCaption) {
-        this.figureCaption = figureCaption;
-    }
-
-    public String getImportantCaption() {
-        return importantCaption;
+        documentInfo.setFigureCaption(getFailSafeString(figureCaption, documentInfo.getFigureCaption()));
     }
 
     public void setImportantCaption(String importantCaption) {
-        this.importantCaption = importantCaption;
-    }
-
-    public String getNoteCaption() {
-        return noteCaption;
+        documentInfo.setImportantCaption(getFailSafeString(importantCaption, documentInfo.getImportantCaption()));
     }
 
     public void setNoteCaption(String noteCaption) {
-        this.noteCaption = noteCaption;
-    }
-
-    public String getTableCaption() {
-        return tableCaption;
+        documentInfo.setNoteCaption(getFailSafeString(noteCaption, documentInfo.getNoteCaption()));
     }
 
     public void setTableCaption(String tableCaption) {
-        this.tableCaption = tableCaption;
-    }
-
-    public String getTipCaption() {
-        return tipCaption;
+        documentInfo.setTableCaption(getFailSafeString(tableCaption, documentInfo.getTableCaption()));
     }
 
     public void setTipCaption(String tipCaption) {
-        this.tipCaption = tipCaption;
-    }
-
-    public String getVersionLabel() {
-        return versionLabel;
+        documentInfo.setTipCaption(getFailSafeString(tipCaption, documentInfo.getTipCaption()));
     }
 
     public void setVersionLabel(String versionLabel) {
-        this.versionLabel = versionLabel;
-    }
-
-    public String getWarningCaption() {
-        return warningCaption;
+        documentInfo.setVersionLabel(getFailSafeString(versionLabel, documentInfo.getVersionLabel()));
     }
 
     public void setWarningCaption(String warningCaption) {
-        this.warningCaption = warningCaption;
-    }
-
-    public boolean isHideUriSchema() {
-        return hideUriSchema;
+        documentInfo.setWarningCaption(getFailSafeString(warningCaption, documentInfo.getWarningCaption()));
     }
 
     public void setHideUriSchema(boolean hideUriSchema) {
-        this.hideUriSchema = hideUriSchema;
-    }
-
-    public File getSrcFile() {
-        return srcFile;
+        documentInfo.setHideUriSchema(hideUriSchema);
     }
 
     public void setSrcFile(File srcFile) {
-        this.srcFile = (srcFile == null) ? USER_HOME_DIR : srcFile;
-        optionsBuilder.baseDir(this.srcFile.getParentFile());
+        final var value = (srcFile == null) ? USER_HOME_DIR : srcFile;
+        documentInfo.setSrcFile(value);
+        optionsBuilder.baseDir(value.getParentFile());
     }
 
     public void populateAttributes(final Document document) {
@@ -557,7 +362,7 @@ public class AsciiDocumentInfo {
         }
         s = getFailSafeString(attributes, "stylesheet");
         if (s != null) {
-            File parent = new File(getSrcFile().getAbsoluteFile(), getStylesDir());
+            File parent = new File(documentInfo.getSrcFile().getAbsoluteFile(), documentInfo.getStylesDir());
             setCustomStyleSheetFile(new File(parent, s));
         }
         s = getFailSafeString(attributes, "includedir");
@@ -661,63 +466,52 @@ public class AsciiDocumentInfo {
         }
     }
 
-    private void setPreview(File srcFile, File previewFile) {
-        if (srcFile == null || previewFile == null) {
-            return;
-        }
-        File baseDir = srcFile.getParentFile();
-        Path relativePath = toRelativePath(baseDir, previewFile.getParentFile());
-        File destFolder = new File(baseDir, relativePath.toFile().getPath());
-        File destFile = new File(destFolder, previewFile.getName());
-        optionsBuilder.toDir(destFolder).toFile(destFile).inPlace(baseDir.equals(destFolder));
-    }
-
     @Override
     public String toString() {
         return "AsciiDocumentInfo{" +
                 "attributesBuilder=" + attributes +
                 ", optionsBuilder=" + optionsBuilder +
-                ", documentType='" + documentType + '\'' +
-                ", documentName='" + documentName + '\'' +
-                ", documentTitle='" + documentTitle + '\'' +
-                ", backend='" + backend + '\'' +
-                ", stylesDir='" + stylesDir + '\'' +
-                ", customStyleSheetFile=" + customStyleSheetFile +
-                ", linkCss=" + linkCss +
-                ", includeDir='" + includeDir + '\'' +
-                ", docInfoDir='" + docInfoDir + '\'' +
-                ", imagesDir='" + imagesDir + '\'' +
-                ", iconsDir='" + iconsDir + '\'' +
-                ", icons='" + icons + '\'' +
-                ", iconFontName='" + iconFontName + '\'' +
-                ", idPrefix='" + idPrefix + '\'' +
-                ", idSeparator='" + idSeparator + '\'' +
-                ", docInfo='" + docInfo + '\'' +
-                ", docInfo2=" + docInfo2 +
-                ", sourceLanguage='" + sourceLanguage + '\'' +
-                ", lastUpdateLabel='" + lastUpdateLabel + '\'' +
-                ", omitLastUpdatedTimeStamp=" + omitLastUpdatedTimeStamp +
-                ", compact=" + compact +
-                ", experimental=" + experimental +
-                ", toc=" + toc +
-                ", tocClass='" + tocClass + '\'' +
-                ", tocPlacement='" + tocPlacement + '\'' +
-                ", tocPosition='" + tocPosition + '\'' +
-                ", tocTitle='" + tocTitle + '\'' +
-                ", appendixCaption='" + appendixCaption + '\'' +
-                ", cautionCaption='" + cautionCaption + '\'' +
-                ", exampleCaption='" + exampleCaption + '\'' +
-                ", figureCaption='" + figureCaption + '\'' +
-                ", importantCaption='" + importantCaption + '\'' +
-                ", noteCaption='" + noteCaption + '\'' +
-                ", tableCaption='" + tableCaption + '\'' +
-                ", tipCaption='" + tipCaption + '\'' +
-                ", untitledLabel='" + untitledLabel + '\'' +
-                ", versionLabel='" + versionLabel + '\'' +
-                ", warningCaption='" + warningCaption + '\'' +
-                ", sectionNumbers=" + sectionNumbers +
-                ", hideUriSchema=" + hideUriSchema +
-                ", srcFile=" + srcFile +
+                ", documentType='" + documentInfo.getDocumentType() + '\'' +
+                ", documentName='" + documentInfo.getDocumentName() + '\'' +
+                ", documentTitle='" + documentInfo.getDocumentTitle() + '\'' +
+                ", backend='" + documentInfo.getBackend() + '\'' +
+                ", stylesDir='" + documentInfo.getStylesDir() + '\'' +
+                ", customStyleSheetFile=" + documentInfo.getCustomStyleSheetFile() +
+                ", linkCss=" + documentInfo.isLinkCss() +
+                ", includeDir='" + documentInfo.getIncludeDir() + '\'' +
+                ", docInfoDir='" + documentInfo.getDocInfoDir() + '\'' +
+                ", imagesDir='" + documentInfo.getImagesDir() + '\'' +
+                ", iconsDir='" + documentInfo.getIconsDir() + '\'' +
+                ", icons='" + documentInfo.getIcons() + '\'' +
+                ", iconFontName='" + documentInfo.getIconFontName() + '\'' +
+                ", idPrefix='" + documentInfo.getIdPrefix() + '\'' +
+                ", idSeparator='" + documentInfo.getIdSeparator() + '\'' +
+                ", docInfo='" + documentInfo.getDocInfo() + '\'' +
+                ", docInfo2=" + documentInfo.isDocInfo2() +
+                ", sourceLanguage='" + documentInfo.getSourceLanguage() + '\'' +
+                ", lastUpdateLabel='" + documentInfo.getLastUpdateLabel() + '\'' +
+                ", omitLastUpdatedTimeStamp=" + documentInfo.isOmitLastUpdatedTimeStamp() +
+                ", compact=" + documentInfo.isCompact() +
+                ", experimental=" + documentInfo.isExperimental() +
+                ", toc=" + documentInfo.isToc() +
+                ", tocClass='" + documentInfo.getTocClass() + '\'' +
+                ", tocPlacement='" + documentInfo.getTocPlacement() + '\'' +
+                ", tocPosition='" + documentInfo.getTocPosition() + '\'' +
+                ", tocTitle='" + documentInfo.getTocTitle() + '\'' +
+                ", appendixCaption='" + documentInfo.getAppendixCaption() + '\'' +
+                ", cautionCaption='" + documentInfo.getCautionCaption() + '\'' +
+                ", exampleCaption='" + documentInfo.getExampleCaption() + '\'' +
+                ", figureCaption='" + documentInfo.getFigureCaption() + '\'' +
+                ", importantCaption='" + documentInfo.getImportantCaption() + '\'' +
+                ", noteCaption='" + documentInfo.getNoteCaption() + '\'' +
+                ", tableCaption='" + documentInfo.getTableCaption() + '\'' +
+                ", tipCaption='" + documentInfo.getTipCaption() + '\'' +
+                ", untitledLabel='" + documentInfo.getUntitledLabel() + '\'' +
+                ", versionLabel='" + documentInfo.getVersionLabel() + '\'' +
+                ", warningCaption='" + documentInfo.getWarningCaption() + '\'' +
+                ", sectionNumbers=" + documentInfo.isSectionNumbers() +
+                ", hideUriSchema=" + documentInfo.isHideUriSchema() +
+                ", srcFile=" + documentInfo.getSrcFile() +
                 '}';
     }
 }
