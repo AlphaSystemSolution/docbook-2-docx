@@ -23,7 +23,7 @@ jar {
     dependsOn(":common:jar")
     dependsOn(":docbook-model:jar")
     dependsOn(":asciidoctor-adapter:jar")
-    dependsOn(":docx-builder:jar")
+    dependsOn(":docbook-2-docx:jar")
     dependsOn(":arabic-handler:jar")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     manifest {

@@ -19,7 +19,7 @@ public abstract class HandlerFactory<H extends Handler> {
         if (handler == null || key == null) {
             return;
         }
-        // service handler loads service from the resources of the client jar then it comes to docx-builder
+        // service handler loads service from the resources of the client jar then it comes to docbook-2-docx
         // we would like to honour handler(s) from the client first, so that client can override default handler(s)
         final H h = handlers.get(key);
         if (h == null) {

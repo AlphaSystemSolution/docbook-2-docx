@@ -1,4 +1,4 @@
 dependencies {
-    api project(":docx-builder")
+    api project(":docbook-2-docx")
 }
 
