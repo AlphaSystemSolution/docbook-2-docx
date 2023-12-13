@@ -4,7 +4,9 @@
 
 rootProject.name = 'docbook-2-docx-parent'
 
+include ':common'
 include ':docbook-model'
-include ':docx-builder'
+include ':asciidoctor-adapter'
+include ':docbook-2-docx'
 include ':arabic-handler'
 include ':asciidoc-docx-cli'

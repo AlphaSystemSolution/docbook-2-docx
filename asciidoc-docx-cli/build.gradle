@@ -14,13 +14,16 @@ plugins {
 }
 
 dependencies {
+    api project(":asciidoctor-adapter")
     api project(":arabic-handler")
     api 'commons-cli:commons-cli:1.6.0'
 }
 
 jar {
+    dependsOn(":common:jar")
     dependsOn(":docbook-model:jar")
-    dependsOn(":docx-builder:jar")
+    dependsOn(":asciidoctor-adapter:jar")
+    dependsOn(":docbook-2-docx:jar")
     dependsOn(":arabic-handler:jar")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     manifest {

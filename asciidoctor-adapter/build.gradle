@@ -1,0 +1,5 @@
+dependencies {
+    api project(":common")
+    api "org.asciidoctor:asciidoctorj:${asciidoctorjVersion}"
+    api "org.asciidoctor:asciidoctorj-api:${asciidoctorjVersion}"
+}
