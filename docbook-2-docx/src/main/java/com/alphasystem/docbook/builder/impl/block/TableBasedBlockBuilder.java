@@ -29,9 +29,7 @@ public abstract class TableBasedBlockBuilder<T> extends BlockBuilder<T> {
 
     @Override
     protected List<Object> postProcess(List<Object> processedTitleContent, List<Object> processedChildContent) {
-        tc.getContent().add(getEmptyParaNoSpacing());
         processedChildContent.forEach(o -> tc.getContent().add(o));
-        tc.getContent().add(getEmptyParaNoSpacing());
         List<Object> result = new ArrayList<>();
         if (processedTitleContent.isEmpty()) {
             result.add(getEmptyParaNoSpacing());
