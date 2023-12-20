@@ -25,7 +25,7 @@ public class AsciiDocumentInfo {
 
     private static boolean getFailSafeBoolean(Map<String, Object> attributes, String key) {
         final var value = attributes.get(key);
-        return value != null && Boolean.parseBoolean(value.toString().toLowerCase());
+        return value != null && (value.toString().trim().isBlank() || Boolean.parseBoolean(value.toString().trim().toLowerCase()));
     }
 
     private static String getFailSafeString(final String src, final String defaultValue) {
