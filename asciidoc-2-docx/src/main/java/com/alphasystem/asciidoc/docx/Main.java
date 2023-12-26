@@ -11,12 +11,12 @@ import java.nio.file.Paths;
 public class Main {
 
     public static void main(String[] args) throws SystemException, IOException {
-        final var basePath = "/Users/sfali/Documents/Arabic/AsciiDocs";
-        final var srcPath = Paths.get(basePath + "/full.adoc");
+        final var basePath = "/Users/sfali/Documents/Arabic/AsciiDocs/test";
+        final var srcPath = Paths.get(basePath + "/test.adoc");
         final var asciiDocumentInfo = DocumentConverter.convertToXhtml(srcPath);
         final var documentInfo = asciiDocumentInfo.getDocumentInfo();
         parseDocument(documentInfo.getContent());
-        Files.writeString(Paths.get(basePath + "/full.html"), documentInfo.getContent());
+        Files.writeString(Paths.get(basePath + "/test.html"), documentInfo.getContent());
     }
 
     private static void parseDocument(String content) {

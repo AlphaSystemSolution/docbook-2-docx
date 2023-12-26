@@ -54,6 +54,8 @@ public class Main {
             }
 
             var documentInfo = DocumentConverter.convertToDocBook(srcPath).getDocumentInfo();
+            /*final var docBookFile = FileUtil.getDocBookFile(docxPath);
+            Files.writeString(docBookFile, documentInfo.getContent());*/
             System.out.println(documentInfo.getContent());
             Path destPath;
             if (docxPath == null) {
