@@ -2,6 +2,7 @@ package com.alphasystem.docx.cli;
 
 import com.alphasystem.asciidoc.util.DocumentConverter;
 import com.alphasystem.docbook.DocumentBuilder;
+import com.alphasystem.docbook.util.FileUtil;
 import org.apache.commons.cli.*;
 
 import java.awt.*;
@@ -54,8 +55,8 @@ public class Main {
             }
 
             var documentInfo = DocumentConverter.convertToDocBook(srcPath).getDocumentInfo();
-            /*final var docBookFile = FileUtil.getDocBookFile(docxPath);
-            Files.writeString(docBookFile, documentInfo.getContent());*/
+            final var docBookFile = FileUtil.getDocBookFile(docxPath);
+            Files.writeString(docBookFile, documentInfo.getContent());
             Path destPath;
             if (docxPath == null) {
                 destPath = DocumentBuilder.buildDocument(documentInfo);
@@ -64,6 +65,7 @@ public class Main {
             }
             Desktop.getDesktop().open(destPath.toFile());
         } catch (Exception ex) {
+            ex.printStackTrace();
             printHelp(ex.getMessage(), helper, options);
         }
     }

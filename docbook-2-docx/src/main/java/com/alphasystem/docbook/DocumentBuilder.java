@@ -44,7 +44,12 @@ public class DocumentBuilder {
     }
 
     public static Path buildDocument(final DocumentInfo documentInfo, Path docxPath) throws SystemException {
-        buildDocument(docxPath, createContext(documentInfo));
+        final var unmarshallerTool = new UnmarshallerTool(documentInfo);
+        try {
+            save(docxPath.toFile(), unmarshallerTool.unmarshal(documentInfo.getContent()));
+        } catch (Docx4JException e) {
+            throw new SystemException(e.getMessage(), e);
+        }
         return docxPath;
     }
 
@@ -57,7 +62,7 @@ public class DocumentBuilder {
         if (StringUtils.isBlank(content)) {
             throw new IllegalArgumentException("Content not provided");
         }
-        UnmarshallerTool unmarshallerTool = new UnmarshallerTool(documentInfo);
+        final var unmarshallerTool = new UnmarshallerTool(documentInfo);
         Object document = getDocument(content, unmarshallerTool);
         var documentInfo1 = unmarshallerTool.getDocumentInfo();
         return new DocumentContext(documentInfo1, document);

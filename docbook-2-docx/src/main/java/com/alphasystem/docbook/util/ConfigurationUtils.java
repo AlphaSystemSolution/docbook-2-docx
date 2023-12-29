@@ -10,6 +10,7 @@ import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.lang3.StringUtils;
+import org.docbook.model.Section;
 
 import java.io.File;
 
@@ -53,6 +54,16 @@ public class ConfigurationUtils {
         configuration = new CompositeConfiguration();
         configuration.addConfiguration(new SystemConfiguration());
         configuration.addConfiguration(builder.getConfiguration());
+    }
+
+    public String getTitleStyle(int level, Class<?> parentClass) {
+        String defaultTitle = configuration.getString("default.title");
+        var titleKey = parentClass.getName();
+        if (parentClass.equals(Section.class)) {
+            titleKey = format("%s.%s", titleKey, level);
+        }
+        titleKey = format("%s.title", titleKey);
+        return configuration.getString(titleKey, defaultTitle);
     }
 
     public String getTitleStyle(Builder builder) {

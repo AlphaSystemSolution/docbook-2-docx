@@ -1,9 +1,11 @@
 package com.alphasystem.xml;
 
-import com.alphasystem.asciidoc.model.DocumentInfo;
 import com.alphasystem.SystemException;
+import com.alphasystem.asciidoc.model.DocumentInfo;
+import com.alphasystem.docbook.DocumentContext;
 import com.alphasystem.docbook.builder.model.Admonition;
 import com.alphasystem.docbook.util.ConfigurationUtils;
+import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
@@ -54,6 +56,23 @@ public class UnmarshallerTool {
         documentInfo.setWarningCaption(configurationUtils.getAdmonitionCaption(Admonition.WARNING));
         documentInfo.setExampleCaption(configurationUtils.getExampleCaption());
         documentInfo.setTableCaption(configurationUtils.getTableCaption());
+    }
+
+    public WordprocessingMLPackage unmarshal(String source) throws SystemException {
+        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(source.getBytes())) {
+            final var handler = new DocBookUnmarshallerHandler(new DocumentContext(documentInfo, null));
+
+            SAXParserFactory spf = SAXParserFactory.newInstance();
+            spf.setNamespaceAware(true);
+
+            XMLReader xmlReader = spf.newSAXParser().getXMLReader();
+            xmlReader.setContentHandler(handler);
+            xmlReader.parse(new InputSource(inputStream));
+
+            return (WordprocessingMLPackage) handler.getResult();
+        }  catch (Exception ex) {
+            throw new SystemException(ex.getMessage(), ex);
+        }
     }
 
     public <T> T unmarshal(String source, Class<T> declaredType) throws SystemException {
