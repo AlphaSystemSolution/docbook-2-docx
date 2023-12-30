@@ -17,11 +17,12 @@ public class BuilderFactory {
 
     private static BuilderFactory instance;
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private final SimpleParaBuilder simpleParaBuilder = new SimpleParaBuilder();
-    private final PhraseBuilder phraseBuilder = new PhraseBuilder();
+
     private final EmphasisBuilder emphasisBuilder = new EmphasisBuilder();
-    private final TextBuilder textBuilder = new TextBuilder();
     private final InformalTableBuilder informalTableBuilder = new InformalTableBuilder();
+    private final PhraseBuilder phraseBuilder = new PhraseBuilder();
+    private final SimpleParaBuilder simpleParaBuilder = new SimpleParaBuilder();
+    private final TextBuilder textBuilder = new TextBuilder();
     private final TitleBuilder titleBuilder = new TitleBuilder();
 
     public static synchronized BuilderFactory getInstance() {
