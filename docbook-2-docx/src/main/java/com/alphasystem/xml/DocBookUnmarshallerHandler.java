@@ -3,17 +3,12 @@ package com.alphasystem.xml;
 import com.alphasystem.docbook.ApplicationController;
 import com.alphasystem.docbook.DocumentContext;
 import com.alphasystem.docbook.builder.model.DocumentCaption;
-import com.alphasystem.docbook.builder2.Builder;
-import com.alphasystem.docbook.builder2.impl.InlineBuilder;
-import com.alphasystem.docbook.builder2.impl.block.*;
-import com.alphasystem.docbook.builder2.impl.inline.EmphasisBuilder;
-import com.alphasystem.docbook.builder2.impl.inline.PhraseBuilder;
-import com.alphasystem.docbook.builder2.impl.inline.TextBuilder;
+import com.alphasystem.docbook.builder2.BuilderFactory;
 import com.alphasystem.docbook.model.DocBookTableAdapter;
 import com.alphasystem.docbook.util.ConfigurationUtils;
+import com.alphasystem.docbook.util.Utils;
 import com.alphasystem.openxml.builder.wml.TocGenerator;
 import com.alphasystem.openxml.builder.wml.WmlAdapter;
-import com.alphasystem.openxml.builder.wml.WmlBuilderFactory;
 import com.alphasystem.openxml.builder.wml.WmlPackageBuilder;
 import com.alphasystem.util.AppUtil;
 import com.alphasystem.util.IdGenerator;
@@ -22,14 +17,12 @@ import org.docbook.model.*;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
-import org.docx4j.wml.R;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 
 import javax.xml.bind.UnmarshallerHandler;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
@@ -55,8 +48,9 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
     private static final String DATE = "date";
     private static final String ENTRY = "entry";
 
-    private final static ConfigurationUtils configurationUtils = ConfigurationUtils.getInstance();
     private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final BuilderFactory builderFactory = BuilderFactory.getInstance();
+    private final ConfigurationUtils configurationUtils = ConfigurationUtils.getInstance();
     private final DocumentContext documentContext;
     private WordprocessingMLPackage wordprocessingMLPackage;
     private WmlPackageBuilder wmlPackageBuilder;
@@ -64,7 +58,6 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
     private String currentText = "";
     private int sectionLevel = 0;
     private int listLevel = -1;
-    private List<Object> inlineObjects = new ArrayList<>();
     private DocBookTableAdapter tableAdapter;
     private TablePart curentTablePart;
     private TableHeader tableHeader;
@@ -72,7 +65,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
     private TableFooter tableFooter;
     private Row currentRow;
     private Entry currentEntry;
-    private final Stack<Builder<?, ?>> builders = new Stack<>();
+    private final Stack<Object> docbookObjects = new Stack<>();
 
     public DocBookUnmarshallerHandler(final DocumentContext documentContext) {
         this.documentContext = documentContext;
@@ -127,12 +120,12 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
                     .mainDocumentPart(mainDocumentPart).generateToc();
         }
         ApplicationController.endContext();
-        if (!builders.isEmpty()) {
+        if (!docbookObjects.isEmpty()) {
             logger.warn("===================================");
-            logger.warn("Builders are non empty");
-            while (!builders.isEmpty()) {
-                var builder = builders.pop();
-                logger.warn("Builder: " + builder.getClass().getName());
+            logger.warn("Docbook objects are non empty");
+            while (!docbookObjects.isEmpty()) {
+                var builder = docbookObjects.pop();
+                logger.warn("Object: " + builder.getClass().getName());
             }
 
             logger.warn("===================================");
@@ -156,14 +149,14 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
         switch (localName) {
             case ARTICLE:
                 sectionLevel = 0;
-                builders.push(new ArticleBuilder(new Article().withId(id)));
+                docbookObjects.push(new Article().withId(id));
                 break;
             case SECTION:
                 sectionLevel += 1;
-                builders.push(new SectionBuilder(new Section().withId(id)));
+                docbookObjects.push(new Section().withId(id));
                 break;
             case TITLE:
-                startTitle(id);
+                startTitle();
                 break;
             case SIMPLE_PARA:
                 startSimplePara(id, attributes);
@@ -217,7 +210,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
             case ARTICLE:
             case SECTION:
                 sectionLevel -= 1;
-                builders.pop();
+                docbookObjects.pop();
                 break;
             case TITLE:
                 endTitle();
@@ -315,77 +308,41 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
 
     private void pushText() {
         if (StringUtils.isNotBlank(currentText)) {
-            inlineObjects.add(currentText);
-            builders.push(new TextBuilder(currentText, IdGenerator.nextId()));
+            docbookObjects.push(currentText);
+            mergeUpward();
             currentText = "";
         }
     }
 
-    private List<R> mergeInlineBuilders() {
-        final var runs = new ArrayList<R>();
-        // get all inline builders
-        var builder = builders.peek();
-        while (AppUtil.isInstanceOf(InlineBuilder.class, builder)) {
-            final var b = (InlineBuilder<?>) builders.pop();
-            runs.add(b.process());
-            builder = builders.peek();
-        }
-
-        return runs;
-    }
-
     // blocks
 
-    private void startTitle(String id) {
-        final var builder = builders.peek();
-        final var titleStyle = configurationUtils.getTitleStyle(sectionLevel, builder.getSource().getClass());
-        builders.push(new TitleBuilder(new Title().withId(id), titleStyle, builder.getId()));
+    private void startTitle() {
+        final var parent = docbookObjects.peek();
+        final var titleStyle = configurationUtils.getTitleStyle(sectionLevel, parent.getClass());
+        docbookObjects.push(new Title().withId(Utils.getId(parent)).withRole(titleStyle));
     }
 
     private void endTitle() {
         pushText();
-        final var runs = mergeInlineBuilders();
-        final var titleBuilder = (TitleBuilder) builders.pop();
-        final var pBuilder = WmlBuilderFactory.getPBuilder(titleBuilder.process());
-        for (int i = runs.size() - 1; i >= 0; i--) {
-            pBuilder.addContent(runs.get(i));
-        }
-        mainDocumentPart.addObject(pBuilder.getObject());
-        inlineObjects.clear();
+        var title = (Title) docbookObjects.pop();
+        addProcessedContent(builderFactory.process(title));
     }
 
     private void startSimplePara(String id, Attributes attributes) {
-        pushText();
+        // pushText();
         final var simplePara = new SimplePara().withId(id).withRole(getAttributeValue("role", attributes));
-        builders.push(new SimpleParaBuilder(simplePara));
+        docbookObjects.push(simplePara);
     }
 
     private void endSimplePara() {
         pushText();
-
-        final var runs = mergeInlineBuilders();
-
-        System.out.println("^^^^^^^^^^^^^^^^^^^^^");
-        inlineObjects.forEach(System.out::println);
-        System.out.println("^^^^^^^^^^^^^^^^^^^^^");
-        System.out.println(builders.peek().getClass().getName());
-        System.out.println(NEW_LINE + NEW_LINE);
-
-        if (!runs.isEmpty()) {
-            final var simpleParaBuilder = (SimpleParaBuilder) builders.pop();
-            final var pBuilder = WmlBuilderFactory.getPBuilder(simpleParaBuilder.process());
-            for (int i = runs.size() - 1; i >= 0; i--) {
-                pBuilder.addContent(runs.get(i));
-            }
-
-            final var p = pBuilder.getObject();
-            if (currentEntry == null) {
-                mainDocumentPart.addObject(p);
-            } else {
-                currentEntry.getContent().add(p);
-            }
+        var simplePara = (SimplePara) docbookObjects.pop();
+        final var list = builderFactory.process(simplePara);
+        if (currentEntry == null) {
+            addProcessedContent(list);
+        } else {
+            list.forEach(l -> currentEntry.getContent().add(l));
         }
-        inlineObjects.clear();
     }
 
     private void startInformalTable(String id, Attributes attributes) {
@@ -398,18 +355,15 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
         final var informalTable = new InformalTable().withId(id).withRole(role).withFrame(frame).withRowSep(rowSep)
                 .withColSep(colSep).withTableStyle(tableStyle).withStyle(style);
         tableAdapter = DocBookTableAdapter.fromInformalTable(informalTable);
-        builders.push(new InformalTableBuilder(informalTable, listLevel));
+        docbookObjects.push(informalTable);
     }
 
     private void endInformalTable() {
-        var v = builders.peek();
-        if (AppUtil.isInstanceOf(PhraseBuilder.class, v)) {
-            var b = (PhraseBuilder) v;
-            b.getSource().getContent().forEach(c -> System.out.println(">>>>: " + c));
+        final var obj = docbookObjects.pop();
+        if (!AppUtil.isInstanceOf(InformalTable.class, obj)) {
+            throw new IllegalArgumentException("Invalid object: " + obj.getClass().getName());
         }
-        var builder = (AbstractTableBuilder<?>) builders.pop();
-        builder = new InformalTableBuilder(tableAdapter.getInformalTable(), listLevel);
-        mainDocumentPart.addObject(builder.process());
+        addProcessedContent(builderFactory.process(tableAdapter.getInformalTable(), listLevel));
     }
 
     private void startTableGroup(Attributes attributes) {
@@ -497,42 +451,73 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
     private void startPhrase(String id, Attributes attributes) {
         pushText();
         final var phrase = new Phrase().withId(id).withRole(getAttributeValue("role", attributes));
-        builders.push(new PhraseBuilder(phrase));
+        docbookObjects.push(phrase);
     }
 
     private void endPhrase() {
         endInline();
+        mergeUpward();
     }
 
     private void starEmphasis(String id, Attributes attributes) {
         pushText();
         final var emphasis = new Emphasis().withId(id).withRole(getAttributeValue("role", attributes));
-        builders.push(new EmphasisBuilder(emphasis));
+        docbookObjects.push(emphasis);
     }
 
     private void endEmphasis() {
         endInline();
+        mergeUpward();
     }
 
     private void endInline() {
         if (StringUtils.isNotBlank(currentText)) {
-            final var builder = builders.pop();
-            if (AppUtil.isInstanceOf(PhraseBuilder.class, builder)) {
-                final var b = (PhraseBuilder) builder;
-                final var phrase = b.getSource();
+            final var obj = docbookObjects.pop();
+            if (AppUtil.isInstanceOf(Phrase.class, obj)) {
+                final var phrase = (Phrase) obj;
                 phrase.getContent().add(currentText);
-                builders.push(new PhraseBuilder(phrase));
-                inlineObjects.add(phrase);
-            } else if (AppUtil.isInstanceOf(EmphasisBuilder.class, builder)) {
-                final var b = (EmphasisBuilder) builder;
-                final var emphasis = b.getSource();
+                docbookObjects.push(phrase);
+                // inlineObjects.add(phrase);
+            } else if (AppUtil.isInstanceOf(Emphasis.class, obj)) {
+                final var emphasis = (Emphasis) obj;
                 emphasis.getContent().add(currentText);
-                builders.push(new EmphasisBuilder(emphasis));
-                inlineObjects.add(emphasis);
+                docbookObjects.push(emphasis);
+                // inlineObjects.add(emphasis);
             } else {
-                throw new IllegalArgumentException("Unhandled builder: " + builder.getClass().getName());
+                throw new IllegalArgumentException("Unhandled object: " + obj.getClass().getName());
             }
+        } else {
+            final var obj = docbookObjects.peek();
+            logger.warn("Current text is blank for: " + obj.getClass().getName());
         }
+    }
+
+    private void mergeUpward() {
+        final var child = docbookObjects.pop();
+        final var parent = docbookObjects.pop();
+        if (AppUtil.isInstanceOf(Phrase.class, parent)) {
+            final var obj = (Phrase) parent;
+            obj.getContent().add(child);
+            docbookObjects.push(obj);
+        } else if (AppUtil.isInstanceOf(Emphasis.class, parent)) {
+            final var obj = (Emphasis) parent;
+            obj.getContent().add(child);
+            docbookObjects.push(obj);
+        } else if (AppUtil.isInstanceOf(SimplePara.class, parent)) {
+            final var obj = (SimplePara) parent;
+            obj.getContent().add(child);
+            docbookObjects.push(obj);
+        } else if (AppUtil.isInstanceOf(Title.class, parent)) {
+            final var obj = (Title) parent;
+            obj.getContent().add(child);
+            docbookObjects.push(obj);
+        } else {
+            throw new IllegalArgumentException("Unhandled object: " + parent.getClass().getName());
+        }
+    }
+
+    private void addProcessedContent(List<Object> content) {
+        content.forEach(mainDocumentPart::addObject);
     }
 
     private static String getId(Attributes attributes) {

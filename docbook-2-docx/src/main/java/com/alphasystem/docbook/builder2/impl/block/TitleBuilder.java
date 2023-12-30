@@ -4,22 +4,20 @@ import com.alphasystem.openxml.builder.wml.WmlAdapter;
 import org.docbook.model.Title;
 import org.docx4j.wml.P;
 
+import java.util.List;
+
 
 public class TitleBuilder extends AbstractParaBuilder<Title> {
 
-    private final String parentId;
-
-    public TitleBuilder(Title title, String titleStyle, String parentId) {
-        super(title, titleStyle);
-        this.parentId = parentId;
+    @Override
+    protected List<Object> doProcess(List<Object> processedChildContent) {
+        final var result = super.doProcess(processedChildContent);
+        WmlAdapter.addBookMark((P) result.get(0), getId());
+        return result;
     }
 
     @Override
-    public P process() {
-        final var p = super.process();
-        if (parentId != null) {
-            WmlAdapter.addBookMark(p, parentId);
-        }
-        return p;
+    protected List<Object> getChildContent() {
+        return source.getContent();
     }
 }

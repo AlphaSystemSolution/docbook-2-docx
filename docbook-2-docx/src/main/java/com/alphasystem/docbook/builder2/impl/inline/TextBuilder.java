@@ -3,12 +3,15 @@ package com.alphasystem.docbook.builder2.impl.inline;
 import com.alphasystem.docbook.builder2.impl.InlineBuilder;
 import com.alphasystem.openxml.builder.wml.WmlAdapter;
 import com.alphasystem.openxml.builder.wml.WmlBuilderFactory;
+import com.alphasystem.util.IdGenerator;
+
+import java.util.Collections;
+import java.util.List;
 
 public class TextBuilder extends InlineBuilder<String> {
 
-    public TextBuilder(String source, String id) {
-        super(source);
-        this.id = id;
+    public TextBuilder() {
+        this.id = IdGenerator.nextId();
     }
 
     @Override
@@ -25,5 +28,10 @@ public class TextBuilder extends InlineBuilder<String> {
                     .addContent(WmlAdapter.getText(lines[i], "preserve"));
         }
 
+    }
+
+    @Override
+    protected List<Object> getChildContent() {
+        return Collections.emptyList();
     }
 }

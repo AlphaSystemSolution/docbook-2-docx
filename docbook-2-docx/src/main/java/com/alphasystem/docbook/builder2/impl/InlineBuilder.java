@@ -9,17 +9,17 @@ import com.alphasystem.openxml.builder.wml.WmlBuilderFactory;
 import org.docx4j.wml.R;
 import org.docx4j.wml.RPr;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 
-public abstract class InlineBuilder<S> extends AbstractBuilder<S, R> {
+public abstract class InlineBuilder<S> extends AbstractBuilder<S> {
 
     protected String[] styles = null;
     protected RBuilder runBuilder;
     protected InlineHandlerFactory handlerFactory = InlineHandlerFactory.getInstance();
-
-    protected InlineBuilder(S source) {
-        super(source);
-    }
 
     protected RPr handleStyles() {
         if (isEmpty(styles)) {
@@ -57,10 +57,21 @@ public abstract class InlineBuilder<S> extends AbstractBuilder<S, R> {
     }
 
     @Override
-    public R process() {
+    protected List<Object> doProcess(List<Object> processedChildContent) {
         createRunBuilder();
-        var rPr = handleStyles();
-        rPr = new RPrBuilder(rPr, runBuilder.getObject().getRPr()).getObject();
-        return runBuilder.withRPr(rPr).getObject();
+        final var rPr = new RPrBuilder(handleStyles(), runBuilder.getObject().getRPr()).getObject();
+        final var r = runBuilder.withRPr(rPr).getObject();
+        final var result = new ArrayList<>();
+        result.add(r);
+
+        final var updatedChildContent =
+                processedChildContent.stream().map(content -> {
+                    final var childR = (R) content;
+                    childR.setRPr(new RPrBuilder(rPr, childR.getRPr()).getObject());
+                    return childR;
+                }).collect(Collectors.toList());
+
+        result.addAll(updatedChildContent);
+        return result;
     }
 }

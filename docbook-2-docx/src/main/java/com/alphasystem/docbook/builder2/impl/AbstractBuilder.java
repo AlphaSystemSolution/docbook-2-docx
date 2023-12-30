@@ -1,28 +1,24 @@
 package com.alphasystem.docbook.builder2.impl;
 
 import com.alphasystem.docbook.builder2.Builder;
+import com.alphasystem.docbook.builder2.BuilderFactory;
 import com.alphasystem.docbook.util.ConfigurationUtils;
+import com.alphasystem.docbook.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
-public abstract class AbstractBuilder<S, T> implements Builder<S, T> {
+
+public abstract class AbstractBuilder<S> implements Builder<S> {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
     protected final ConfigurationUtils configurationUtils = ConfigurationUtils.getInstance();
+    protected BuilderFactory builderFactory;
     protected String id;
     protected S source;
-
-    protected AbstractBuilder(S source) {
-        if (source == null) {
-            throw new NullPointerException(String.format("Source object is null in \"%s\"", getClass().getName()));
-        }
-        logger.debug("Initializing builder: {}", getClass().getName());
-        this.source = source;
-        this.id = getId(source);
-    }
 
     @Override
     public String getId() {
@@ -34,30 +30,26 @@ public abstract class AbstractBuilder<S, T> implements Builder<S, T> {
         return source;
     }
 
-    private static Method getMethod(Object obj, String methodName) {
-        Method method = null;
-        try {
-            method = obj.getClass().getMethod(methodName);
-        } catch (NoSuchMethodException e) {
-            // ignore
+    @Override
+    public List<Object> process(S source) {
+        if (source == null) {
+            throw new NullPointerException(String.format("Source object is null in \"%s\"", getClass().getName()));
         }
-        return method;
+        doInit(source);
+        return doProcess(processChildContent(getChildContent()));
     }
 
-    private static Object invokeMethod(Object obj, String methodName) {
-        Object value = null;
-        final Method method = getMethod(obj, methodName);
-        if (method != null) {
-            try {
-                value = method.invoke(obj);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                // ignore
-            }
-        }
-        return value;
+    protected void doInit(S source) {
+        builderFactory = BuilderFactory.getInstance();
+        this.source = source;
+        this.id = Utils.getId(source);
     }
 
-    protected static String getId(Object source) {
-        return (String) invokeMethod(source, "getId");
+    protected abstract List<Object> getChildContent();
+
+    protected List<Object> processChildContent(List<Object> childContent) {
+        return childContent.stream().map(builderFactory::process).flatMap(Collection::stream).collect(Collectors.toList());
     }
+
+    protected abstract List<Object> doProcess(List<Object> processedChildContent);
 }

@@ -10,9 +10,9 @@ import com.alphasystem.openxml.builder.wml.table.TableType;
 import com.alphasystem.util.AppUtil;
 import org.docbook.model.*;
 import org.docx4j.wml.CTBorder;
-import org.docx4j.wml.Tbl;
 import org.docx4j.wml.TblBorders;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,22 +25,22 @@ import static com.alphasystem.openxml.builder.wml.WmlBuilderFactory.getTblPrBuil
 import static java.lang.String.format;
 import static org.docbook.model.Choice.ONE;
 
-public abstract class AbstractTableBuilder<S> extends AbstractBuilder<S, Tbl> {
+public abstract class AbstractTableBuilder<S> extends AbstractBuilder<S> {
 
     private static final int HEADER = 1;
     private static final int FOOTER = 2;
 
 
-    private final int level;
+    private int level = -1;
     private final Map<Integer, ColumnBuilder.NextColumnInfo> nextColumnInfoMap = new HashMap<>();
     private List<ColumnInfo> columnInfoList;
     protected TableType tableType;
     protected TableAdapter tableAdapter;
     protected DocBookTableAdapter docBookTableAdapter;
 
-    protected AbstractTableBuilder(S source, int level) {
-        super(source);
+    public AbstractTableBuilder<S> withLevel(int level) {
         this.level = level;
+        return this;
     }
 
     public TableAdapter getTableAdapter() {
@@ -48,7 +48,12 @@ public abstract class AbstractTableBuilder<S> extends AbstractBuilder<S, Tbl> {
     }
 
     @Override
-    public Tbl process() {
+    protected List<Object> getChildContent() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    protected List<Object> doProcess(List<Object> processedChildContent) {
         final var tableGroups = docBookTableAdapter.getTableGroup();
         final var tableGroup = ((tableGroups != null) && !tableGroups.isEmpty()) ? tableGroups.get(0) : null;
         if (tableGroup == null) {
@@ -59,7 +64,7 @@ public abstract class AbstractTableBuilder<S> extends AbstractBuilder<S, Tbl> {
         buildHeader(tableGroup.getTableHeader());
         buildBody(tableGroup.getTableBody());
         buildFooter(tableGroup.getTableFooter());
-        return tableAdapter.getTable();
+        return Collections.singletonList(tableAdapter.getTable());
     }
 
     private void initializeTableAdapter(TableGroup tableGroup, Frame frame, Choice rowSep, Choice colSep, String styleName) {

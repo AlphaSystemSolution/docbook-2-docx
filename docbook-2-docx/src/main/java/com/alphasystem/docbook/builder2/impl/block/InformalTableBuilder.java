@@ -5,8 +5,9 @@ import org.docbook.model.InformalTable;
 
 public class InformalTableBuilder extends AbstractTableBuilder<InformalTable> {
 
-    public InformalTableBuilder(InformalTable source, int level) {
-        super(source, level);
+    @Override
+    protected void doInit(InformalTable source) {
+        super.doInit(source);
         this.docBookTableAdapter = DocBookTableAdapter.fromInformalTable(source);
     }
 }

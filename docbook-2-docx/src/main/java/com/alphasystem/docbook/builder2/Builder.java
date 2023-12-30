@@ -1,8 +1,10 @@
 package com.alphasystem.docbook.builder2;
 
-public interface Builder<S, T> {
+import java.util.List;
+
+public interface Builder<S> {
 
     String getId();
     S getSource();
-    T process();
+    List<Object> process(S source);
 }

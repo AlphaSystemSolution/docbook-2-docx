@@ -7,13 +7,12 @@ import com.alphasystem.openxml.builder.wml.table.ColumnData;
 import com.alphasystem.openxml.builder.wml.table.VerticalMergeType;
 import com.alphasystem.util.AppUtil;
 import com.alphasystem.xml.UnmarshallerUtils;
-import org.docbook.model.Align;
-import org.docbook.model.BasicVerticalAlign;
-import org.docbook.model.Entry;
-import org.docbook.model.VerticalAlign;
+import org.docbook.model.*;
 import org.docx4j.wml.JcEnumeration;
 import org.docx4j.wml.P;
 import org.docx4j.wml.STVerticalJc;
+
+import java.util.Collections;
 
 public class ColumnBuilder {
 
