@@ -1,7 +1,7 @@
 package com.alphasystem.docbook.builder.impl.block;
 
 import com.alphasystem.docbook.builder.Builder;
-import com.alphasystem.docbook.builder.model.Admonition;
+import com.alphasystem.docbook.model.Admonition;
 import org.docx4j.wml.Tc;
 import org.docx4j.wml.Tr;
 

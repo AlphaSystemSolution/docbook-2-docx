@@ -14,8 +14,8 @@ import com.alphasystem.docbook.util.ConfigurationUtils;
 import com.alphasystem.openxml.builder.wml.WmlPackageBuilder;
 import com.alphasystem.xml.UnmarshallerTool;
 
-import static com.alphasystem.docbook.builder.model.DocumentCaption.EXAMPLE;
-import static com.alphasystem.docbook.builder.model.DocumentCaption.TABLE;
+import static com.alphasystem.docbook.model.DocumentCaption.EXAMPLE;
+import static com.alphasystem.docbook.model.DocumentCaption.TABLE;
 import static org.testng.Assert.fail;
 
 /**

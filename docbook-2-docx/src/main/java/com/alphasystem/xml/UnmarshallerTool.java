@@ -3,7 +3,7 @@ package com.alphasystem.xml;
 import com.alphasystem.SystemException;
 import com.alphasystem.asciidoc.model.DocumentInfo;
 import com.alphasystem.docbook.DocumentContext;
-import com.alphasystem.docbook.builder.model.Admonition;
+import com.alphasystem.docbook.model.Admonition;
 import com.alphasystem.docbook.util.ConfigurationUtils;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.slf4j.Logger;

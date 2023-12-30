@@ -1,6 +1,6 @@
 package com.alphasystem.docbook.handler;
 
-import com.alphasystem.docbook.builder.model.Admonition;
+import com.alphasystem.docbook.model.Admonition;
 import org.docbook.model.Example;
 import org.docbook.model.Screen;
 import org.docbook.model.SideBar;

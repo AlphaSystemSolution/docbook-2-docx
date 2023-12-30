@@ -2,7 +2,7 @@ package com.alphasystem.docbook.util;
 
 import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.builder.impl.block.SectionBuilder;
-import com.alphasystem.docbook.builder.model.Admonition;
+import com.alphasystem.docbook.model.Admonition;
 import org.apache.commons.configuration2.CompositeConfiguration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.SystemConfiguration;

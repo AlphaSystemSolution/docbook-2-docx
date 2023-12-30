@@ -1,6 +1,6 @@
 package com.alphasystem.docbook.handler.impl.block;
 
-import static com.alphasystem.docbook.builder.model.Admonition.NOTE;
+import static com.alphasystem.docbook.model.Admonition.NOTE;
 
 /**
  * @author sali

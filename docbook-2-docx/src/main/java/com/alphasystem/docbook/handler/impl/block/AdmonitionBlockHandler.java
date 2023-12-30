@@ -2,7 +2,7 @@ package com.alphasystem.docbook.handler.impl.block;
 
 import com.alphasystem.asciidoc.model.DocumentInfo;
 import com.alphasystem.docbook.ApplicationController;
-import com.alphasystem.docbook.builder.model.Admonition;
+import com.alphasystem.docbook.model.Admonition;
 import com.alphasystem.docbook.handler.BlockHandler;
 import com.alphasystem.openxml.builder.wml.WmlAdapter;
 import com.alphasystem.openxml.builder.wml.table.ColumnData;

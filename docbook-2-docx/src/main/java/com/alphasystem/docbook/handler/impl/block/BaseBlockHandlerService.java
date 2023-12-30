@@ -3,7 +3,7 @@ package com.alphasystem.docbook.handler.impl.block;
 import com.alphasystem.docbook.handler.BlockHandlerFactory;
 import com.alphasystem.docbook.handler.BlockHandlerService;
 
-import static com.alphasystem.docbook.builder.model.Admonition.*;
+import static com.alphasystem.docbook.model.Admonition.*;
 import static com.alphasystem.docbook.handler.BlockHandlerFactory.*;
 
 /**

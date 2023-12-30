@@ -26,8 +26,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import static com.alphasystem.docbook.builder.model.DocumentCaption.EXAMPLE;
-import static com.alphasystem.docbook.builder.model.DocumentCaption.TABLE;
+import static com.alphasystem.docbook.model.DocumentCaption.EXAMPLE;
+import static com.alphasystem.docbook.model.DocumentCaption.TABLE;
 import static com.alphasystem.openxml.builder.wml.WmlAdapter.save;
 import static java.nio.file.Files.exists;
 

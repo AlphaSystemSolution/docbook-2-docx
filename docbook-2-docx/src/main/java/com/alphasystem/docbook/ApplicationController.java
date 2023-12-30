@@ -1,6 +1,6 @@
 package com.alphasystem.docbook;
 
-import com.alphasystem.docbook.builder.model.Admonition;
+import com.alphasystem.docbook.model.Admonition;
 import com.alphasystem.docbook.handler.BlockHandlerFactory;
 import com.alphasystem.docbook.handler.BlockHandlerService;
 import com.alphasystem.docbook.handler.BuilderHandlerService;

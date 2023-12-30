@@ -1,4 +1,4 @@
-package com.alphasystem.docbook.builder.model;
+package com.alphasystem.docbook.model;
 
 /**
  * @author sali

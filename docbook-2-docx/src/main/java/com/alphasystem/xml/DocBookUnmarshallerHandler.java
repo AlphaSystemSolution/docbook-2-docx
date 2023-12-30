@@ -2,7 +2,7 @@ package com.alphasystem.xml;
 
 import com.alphasystem.docbook.ApplicationController;
 import com.alphasystem.docbook.DocumentContext;
-import com.alphasystem.docbook.builder.model.DocumentCaption;
+import com.alphasystem.docbook.model.DocumentCaption;
 import com.alphasystem.docbook.builder2.BuilderFactory;
 import com.alphasystem.docbook.model.DocBookTableAdapter;
 import com.alphasystem.docbook.util.ConfigurationUtils;

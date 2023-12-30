@@ -1,4 +1,4 @@
-package com.alphasystem.docbook.builder.model;
+package com.alphasystem.docbook.model;
 
 import com.alphasystem.docbook.ApplicationController;
 import com.alphasystem.openxml.builder.wml.HeadingList;
