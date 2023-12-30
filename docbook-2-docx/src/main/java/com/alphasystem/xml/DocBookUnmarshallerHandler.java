@@ -2,9 +2,9 @@ package com.alphasystem.xml;
 
 import com.alphasystem.docbook.ApplicationController;
 import com.alphasystem.docbook.DocumentContext;
-import com.alphasystem.docbook.model.DocumentCaption;
 import com.alphasystem.docbook.builder2.BuilderFactory;
 import com.alphasystem.docbook.model.DocBookTableAdapter;
+import com.alphasystem.docbook.model.DocumentCaption;
 import com.alphasystem.docbook.util.ConfigurationUtils;
 import com.alphasystem.docbook.util.Utils;
 import com.alphasystem.openxml.builder.wml.TocGenerator;
@@ -84,6 +84,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
     @Override
     public void startDocument() {
         ApplicationController.startContext(documentContext);
+        ApplicationController.getContext().setCurrentListLevel(listLevel);
         try {
             wmlPackageBuilder = WmlPackageBuilder.createPackage(configurationUtils.getTemplate())
                     .styles(configurationUtils.getStyles());
@@ -363,7 +364,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
         if (!AppUtil.isInstanceOf(InformalTable.class, obj)) {
             throw new IllegalArgumentException("Invalid object: " + obj.getClass().getName());
         }
-        addProcessedContent(builderFactory.process(tableAdapter.getInformalTable(), listLevel));
+        addProcessedContent(builderFactory.process(tableAdapter.getInformalTable()));
     }
 
     private void startTableGroup(Attributes attributes) {

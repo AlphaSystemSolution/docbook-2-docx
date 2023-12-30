@@ -37,7 +37,7 @@ public class BuilderFactory {
     private BuilderFactory() {
     }
 
-    public List<Object> process(Object o, Object... extraParams) {
+    public List<Object> process(Object o) {
         if (o == null) {
             return null;
         }
@@ -51,7 +51,6 @@ public class BuilderFactory {
         } else if (AppUtil.isInstanceOf(String.class, o)) {
             return textBuilder.process((String) o);
         } else if (AppUtil.isInstanceOf(InformalTable.class, o)) {
-            informalTableBuilder.withLevel((Integer) extraParams[0]);
             return informalTableBuilder.process((InformalTable) o);
         } else if (AppUtil.isInstanceOf(Title.class, o)) {
             return titleBuilder.process((Title) o);
