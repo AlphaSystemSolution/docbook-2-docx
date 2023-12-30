@@ -32,21 +32,21 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
 
     private final static String NEW_LINE = System.lineSeparator();
     private static final String ARTICLE = "article";
-    private static final String SECTION = "section";
-    private static final String TITLE = "title";
-    private static final String INFORMAL_TABLE = "informaltable";
-    private static final String TABLE_GROUP = "tgroup";
     private static final String COLUMN_SPEC = "colspec";
-    private static final String TABLE_HEAD = "thead";
-    private static final String TABLE_BODY = "tbody";
-    private static final String TABLE_FOOTER = "tfoot";
+    private static final String DATE = "date";
+    private static final String EMPHASIS = "emphasis";
+    private static final String ENTRY = "entry";
+    private static final String INFO = "info";
+    private static final String INFORMAL_TABLE = "informaltable";
+    private static final String PHRASE = "phrase";
     private static final String ROW = "row";
     private static final String SIMPLE_PARA = "simpara";
-    private static final String PHRASE = "phrase";
-    private static final String EMPHASIS = "emphasis";
-    private static final String INFO = "info";
-    private static final String DATE = "date";
-    private static final String ENTRY = "entry";
+    private static final String SECTION = "section";
+    private static final String TABLE_BODY = "tbody";
+    private static final String TABLE_FOOTER = "tfoot";
+    private static final String TABLE_GROUP = "tgroup";
+    private static final String TABLE_HEAD = "thead";
+    private static final String TITLE = "title";
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final BuilderFactory builderFactory = BuilderFactory.getInstance();
@@ -267,7 +267,6 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
 
         final var newLine = NEW_LINE.equals(s);
         if (!newLine) {
-            // logger.info("characters: string = \"{}\", whitespace = {}, start = {}, length = {}, total_length = {}", s, newLine, start, length, ch.length);
             currentText += s;
         }
     }
@@ -330,7 +329,6 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
     }
 
     private void startSimplePara(String id, Attributes attributes) {
-        // pushText();
         final var simplePara = new SimplePara().withId(id).withRole(getAttributeValue("role", attributes));
         docbookObjects.push(simplePara);
     }
@@ -478,12 +476,10 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
                 final var phrase = (Phrase) obj;
                 phrase.getContent().add(currentText);
                 docbookObjects.push(phrase);
-                // inlineObjects.add(phrase);
             } else if (AppUtil.isInstanceOf(Emphasis.class, obj)) {
                 final var emphasis = (Emphasis) obj;
                 emphasis.getContent().add(currentText);
                 docbookObjects.push(emphasis);
-                // inlineObjects.add(emphasis);
             } else {
                 throw new IllegalArgumentException("Unhandled object: " + obj.getClass().getName());
             }
