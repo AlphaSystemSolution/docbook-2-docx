@@ -17,7 +17,7 @@ public abstract class AbstractParaBuilder<S> extends AbstractBuilder<S> {
     @Override
     protected void doInit(S source) {
         super.doInit(source);
-        this.role = (String) Utils.invokeMethod(source,"role");
+        this.role = (String) Utils.invokeMethod(source,"getRole");
         if (StringUtils.isNotBlank(this.role)) {
             paraProperties = WmlBuilderFactory.getPPrBuilder().withPStyle(this.role).getObject();
         }
