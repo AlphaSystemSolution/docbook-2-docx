@@ -4,6 +4,7 @@ import com.alphasystem.docbook.ApplicationController;
 import com.alphasystem.docbook.DocumentContext;
 import com.alphasystem.docbook.builder2.BuilderFactory;
 import com.alphasystem.docbook.model.DocumentCaption;
+import com.alphasystem.docbook.model.ListInfo;
 import com.alphasystem.docbook.model.NotImplementedException;
 import com.alphasystem.docbook.util.ConfigurationUtils;
 import com.alphasystem.docbook.util.Utils;
@@ -79,7 +80,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
     @Override
     public void startDocument() {
         ApplicationController.startContext(documentContext);
-        ApplicationController.getContext().setCurrentListLevel(getCurrentListInfo().getLevel());
+        ApplicationController.getContext().setCurrentListInfo(getCurrentListInfo());
         try {
             wmlPackageBuilder = WmlPackageBuilder.createPackage(configurationUtils.getTemplate())
                     .styles(configurationUtils.getStyles());
@@ -453,11 +454,11 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
     private void endList() {
         processEndElement();
         listInfos.pop();
-        var level = -1L;
+        var listInfo = new ListInfo();
         if (!listInfos.isEmpty()) {
-            level = listInfos.peek().getLevel();
+            listInfo = listInfos.peek();
         }
-        ApplicationController.getContext().setCurrentListLevel(level);
+        ApplicationController.getContext().setCurrentListInfo(listInfo);
     }
 
     private void startListItem() {
@@ -636,12 +637,13 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
         if (!listInfos.isEmpty()) {
             level = listInfos.peek().getLevel() + 1L;
         }
-        ApplicationController.getContext().setCurrentListLevel(level);
-        listInfos.push(new ListInfo(listItem.getNumberId(), level));
+        final var listInfo = new ListInfo(listItem.getNumberId(), level);
+        ApplicationController.getContext().setCurrentListInfo(listInfo);
+        listInfos.push(listInfo);
     }
 
     private ListInfo getCurrentListInfo() {
-        var listInfo = new ListInfo(0L, -1);
+        var listInfo = new ListInfo();
         if (!listInfos.isEmpty()) {
             listInfo = listInfos.peek();
         }
@@ -662,25 +664,6 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
             return com.alphasystem.openxml.builder.wml.OrderedList.getByStyleName(styleName);
         } else {
             return UnorderedList.getByStyleName(styleName);
-        }
-    }
-
-    private static class ListInfo {
-
-        private final long number;
-        private final long level;
-
-        public ListInfo(long number, long level) {
-            this.number = number;
-            this.level = level;
-        }
-
-        public long getNumber() {
-            return number;
-        }
-
-        public long getLevel() {
-            return level;
         }
     }
 }

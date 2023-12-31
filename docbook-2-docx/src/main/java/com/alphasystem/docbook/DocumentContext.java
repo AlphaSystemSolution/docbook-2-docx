@@ -1,6 +1,7 @@
 package com.alphasystem.docbook;
 
 import com.alphasystem.asciidoc.model.DocumentInfo;
+import com.alphasystem.docbook.model.ListInfo;
 import org.docbook.model.Article;
 import org.docx4j.jaxb.Context;
 import org.docx4j.openpackaging.parts.WordprocessingML.DocumentSettingsPart;
@@ -34,6 +35,8 @@ public final class DocumentContext {
     private NumberingDefinitionsPart numberingDefinitionsPart;
 
     private long currentListLevel = -1;
+
+    private ListInfo currentListInfo;
 
     public DocumentContext(final DocumentInfo documentInfo, final Object document) {
         this.documentInfo = documentInfo;
@@ -82,13 +85,23 @@ public final class DocumentContext {
     }
 
     public long getCurrentListLevel() {
-        return currentListLevel;
+        return getCurrentListInfo().getLevel();
     }
 
-    public void setCurrentListLevel(long currentListLevel) {
-        this.currentListLevel = currentListLevel;
+    @Deprecated
+    public void setCurrentListLevel(long level) {
     }
 
+    public ListInfo getCurrentListInfo() {
+        if (currentListInfo == null) {
+            this.currentListInfo = new ListInfo(0, -1);
+        }
+        return currentListInfo;
+    }
+
+    public void setCurrentListInfo(ListInfo currentListInfo) {
+        this.currentListInfo = currentListInfo;
+    }
 
     private void updateDocumentCompatibility() {
         try {
