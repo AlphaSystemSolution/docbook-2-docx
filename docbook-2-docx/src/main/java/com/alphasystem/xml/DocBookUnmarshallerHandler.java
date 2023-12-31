@@ -4,7 +4,6 @@ import com.alphasystem.docbook.ApplicationController;
 import com.alphasystem.docbook.DocumentContext;
 import com.alphasystem.docbook.builder2.BuilderFactory;
 import com.alphasystem.docbook.model.DocumentCaption;
-import com.alphasystem.docbook.model.ListInfo;
 import com.alphasystem.docbook.model.NotImplementedException;
 import com.alphasystem.docbook.util.ConfigurationUtils;
 import com.alphasystem.docbook.util.Utils;
@@ -512,10 +511,6 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
         }
     }
 
-    private void processEndElement2() {
-
-    }
-
     private void processEndElement() {
         final var child = docbookObjects.pop();
         final var parent = docbookObjects.pop();
@@ -647,7 +642,6 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
 
     private ListInfo getCurrentListInfo() {
         var listInfo = new ListInfo(0L, -1);
-        var level = -1L;
         if (!listInfos.isEmpty()) {
             listInfo = listInfos.peek();
         }
@@ -671,4 +665,22 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
         }
     }
 
+    private static class ListInfo {
+
+        private final long number;
+        private final long level;
+
+        public ListInfo(long number, long level) {
+            this.number = number;
+            this.level = level;
+        }
+
+        public long getNumber() {
+            return number;
+        }
+
+        public long getLevel() {
+            return level;
+        }
+    }
 }

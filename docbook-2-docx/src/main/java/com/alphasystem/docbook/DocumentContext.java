@@ -1,7 +1,6 @@
 package com.alphasystem.docbook;
 
 import com.alphasystem.asciidoc.model.DocumentInfo;
-import com.alphasystem.docbook.model.ListInfo;
 import org.docbook.model.Article;
 import org.docx4j.jaxb.Context;
 import org.docx4j.openpackaging.parts.WordprocessingML.DocumentSettingsPart;
@@ -35,8 +34,6 @@ public final class DocumentContext {
     private NumberingDefinitionsPart numberingDefinitionsPart;
 
     private long currentListLevel = -1;
-
-    private ListInfo currentListInfo;
 
     public DocumentContext(final DocumentInfo documentInfo, final Object document) {
         this.documentInfo = documentInfo;
