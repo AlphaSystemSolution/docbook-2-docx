@@ -3,10 +3,9 @@ package com.alphasystem.xml;
 import com.alphasystem.docbook.ApplicationController;
 import com.alphasystem.docbook.DocumentContext;
 import com.alphasystem.docbook.builder2.BuilderFactory;
-import com.alphasystem.docbook.model.DocBookListAdapter;
-import com.alphasystem.docbook.model.DocBookTableAdapter;
 import com.alphasystem.docbook.model.DocumentCaption;
 import com.alphasystem.docbook.model.ListInfo;
+import com.alphasystem.docbook.model.NotImplementedException;
 import com.alphasystem.docbook.util.ConfigurationUtils;
 import com.alphasystem.docbook.util.Utils;
 import com.alphasystem.openxml.builder.wml.TocGenerator;
@@ -27,7 +26,6 @@ import org.xml.sax.Locator;
 
 import javax.xml.bind.UnmarshallerHandler;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Stack;
 
 
@@ -63,15 +61,6 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
     private MainDocumentPart mainDocumentPart;
     private String currentText = "";
     private int sectionLevel = 0;
-    private DocBookTableAdapter tableAdapter;
-    private DocBookListAdapter listAdapter;
-    private TablePart curentTablePart;
-    private TableHeader tableHeader;
-    private TableBody tableBody;
-    private TableFooter tableFooter;
-    private Row currentRow;
-    private Entry currentEntry;
-    private ListItem currentListItem;
     private final Stack<Object> docbookObjects = new Stack<>();
     private final Stack<ListInfo> listInfos = new Stack<>();
 
@@ -187,7 +176,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
                 startTableFooter(attributes);
                 break;
             case ROW:
-                currentRow = new Row();
+                docbookObjects.push(new Row());
                 break;
             case ENTRY:
                 startEntry(attributes);
@@ -199,7 +188,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
                 startItemizedList(id, attributes);
                 break;
             case LIST_ITEM:
-                currentListItem = new ListItem();
+                startListItem();
                 break;
             case PHRASE:
                 startPhrase(id, attributes);
@@ -234,20 +223,17 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
             case SIMPLE_PARA:
                 endSimplePara();
                 break;
-            case INFORMAL_TABLE:
-                endInformalTable();
-                break;
-            case ORDERED_LIST:
-
-                break;
-            case ITEMIZED_LIST:
-
-                break;
             case PHRASE:
                 endPhrase();
                 break;
             case EMPHASIS:
                 endEmphasis();
+                break;
+            case INFORMAL_TABLE:
+                endInformalTable();
+                break;
+            case TABLE_GROUP:
+                endTableGroup();
                 break;
             case TABLE_HEAD:
                 endTableHeader();
@@ -264,11 +250,14 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
             case ENTRY:
                 endEntry();
                 break;
+            case ORDERED_LIST:
+            case ITEMIZED_LIST:
+                endList();
+                break;
             case LIST_ITEM:
                 endListItem();
             case INFO:
             case DATE:
-            case TABLE_GROUP:
             case COLUMN_SPEC:
                 // ignored
                 break;
@@ -332,7 +321,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
     private void pushText() {
         if (StringUtils.isNotBlank(currentText)) {
             docbookObjects.push(currentText);
-            mergeUpward();
+            processEndElement();
             currentText = "";
         }
     }
@@ -347,8 +336,8 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
 
     private void endTitle() {
         pushText();
-        var title = (Title) docbookObjects.pop();
-        addProcessedContent(builderFactory.process(title));
+        // title is handled differently
+        processContent(docbookObjects.pop());
     }
 
     private void startSimplePara(String id, Attributes attributes) {
@@ -358,15 +347,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
 
     private void endSimplePara() {
         pushText();
-        var simplePara = (SimplePara) docbookObjects.pop();
-        final var list = builderFactory.process(simplePara);
-        if (currentEntry != null) {
-            list.forEach(l -> currentEntry.getContent().add(l));
-        } else if (currentListItem != null) {
-            list.forEach(l -> currentListItem.getContent().add(l));
-        } else {
-            addProcessedContent(list);
-        }
+        processEndElement();
     }
 
     private void startInformalTable(String id, Attributes attributes) {
@@ -378,87 +359,67 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
         final var style = getAttributeValue("style", attributes);
         final var informalTable = new InformalTable().withId(id).withRole(role).withFrame(frame).withRowSep(rowSep)
                 .withColSep(colSep).withTableStyle(tableStyle).withStyle(style);
-        tableAdapter = DocBookTableAdapter.fromInformalTable(informalTable);
         docbookObjects.push(informalTable);
     }
 
     private void endInformalTable() {
-        final var obj = docbookObjects.pop();
-        if (!AppUtil.isInstanceOf(InformalTable.class, obj)) {
-            throw new IllegalArgumentException("Invalid object: " + obj.getClass().getName());
-        }
-        final var processedContent = builderFactory.process(tableAdapter.getInformalTable());
-        if (currentListItem != null) {
-            currentListItem.getContent().add(processedContent);
-        } else {
-            addProcessedContent(processedContent);
-        }
+        processEndElement();
     }
 
     private void startTableGroup(Attributes attributes) {
         final var cols = getAttributeValue("cols", attributes);
-        tableAdapter.addTableGroup(new TableGroup().withCols(cols));
+        final var tableGroup = new TableGroup().withCols(cols);
+        docbookObjects.push(tableGroup);
+    }
+
+    private void endTableGroup() {
+        processEndElement();
     }
 
     private void startColumnSpec(Attributes attributes) {
         final var columnName = getAttributeValue("colname", attributes);
         final var columnWidth = getAttributeValue("colwidth", attributes);
         final var columnSpec = new ColumnSpec().withColumnName(columnName).withColumnWidth(columnWidth);
-        tableAdapter.addColumnSpec(columnSpec);
+        final var tableGroup = (TableGroup) docbookObjects.pop();
+        tableGroup.getColSpec().add(columnSpec);
+        docbookObjects.push(tableGroup);
     }
 
     private void startTableHeader(Attributes attributes) {
-        curentTablePart = TablePart.HEADER;
         final var align = UnmarshallerUtils.toAlign(getAttributeValue("align", attributes));
         final var valign = UnmarshallerUtils.toVerticalAlign(getAttributeValue("valign", attributes));
-        tableHeader = new TableHeader().withId(getId(attributes)).withAlign(align).withVAlign(valign);
+        final var tableHeader = new TableHeader().withId(getId(attributes)).withAlign(align).withVAlign(valign);
+        docbookObjects.push(tableHeader);
     }
 
     private void endTableHeader() {
-        tableAdapter.addTableHeader(tableHeader);
-        tableHeader = null;
-        curentTablePart = null;
+        processEndElement();
     }
 
     private void startTableBody(Attributes attributes) {
-        curentTablePart = TablePart.BODY;
         final var align = UnmarshallerUtils.toAlign(getAttributeValue("align", attributes));
         final var valign = UnmarshallerUtils.toVerticalAlign(getAttributeValue("valign", attributes));
-        tableBody = new TableBody().withId(getId(attributes)).withAlign(align).withVAlign(valign);
+        final var tableBody = new TableBody().withId(getId(attributes)).withAlign(align).withVAlign(valign);
+        docbookObjects.push(tableBody);
     }
 
     private void endTableBody() {
-        tableAdapter.addTableBody(tableBody);
-        tableBody = null;
-        curentTablePart = null;
+        processEndElement();
     }
 
     private void startTableFooter(Attributes attributes) {
-        curentTablePart = TablePart.FOOTER;
         final var align = UnmarshallerUtils.toAlign(getAttributeValue("align", attributes));
         final var valign = UnmarshallerUtils.toVerticalAlign(getAttributeValue("valign", attributes));
-        tableFooter = new TableFooter().withId(getId(attributes)).withAlign(align).withVAlign(valign);
+        final var tableFooter = new TableFooter().withId(getId(attributes)).withAlign(align).withVAlign(valign);
+        docbookObjects.push(tableFooter);
     }
 
     private void endTableFooter() {
-        tableAdapter.addTableFooter(tableFooter);
-        curentTablePart = null;
-        tableFooter = null;
+        processEndElement();
     }
 
     private void endRow() {
-        switch (curentTablePart) {
-            case HEADER:
-                tableHeader.getRow().add(currentRow);
-                break;
-            case BODY:
-                tableBody.getRow().add(currentRow);
-                break;
-            case FOOTER:
-                tableFooter.getRow().add(currentRow);
-                break;
-        }
-        currentRow = null;
+        processEndElement();
     }
 
     private void startEntry(Attributes attributes) {
@@ -467,35 +428,45 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
         final var nameStart = getAttributeValue("namest", attributes);
         final var nameEnd = getAttributeValue("nameend", attributes);
         final var moreRows = getAttributeValue("morerows", attributes);
-        currentEntry = new Entry().withAlign(align).withValign(valign).withNameStart(nameStart).withNameEnd(nameEnd)
+        final var entry = new Entry().withAlign(align).withValign(valign).withNameStart(nameStart).withNameEnd(nameEnd)
                 .withMoreRows(moreRows);
+        docbookObjects.push(entry);
     }
 
     private void endEntry() {
-        currentRow.getContent().add(currentEntry);
-        currentEntry = null;
+        processEndElement();
     }
 
     private void startOrderedList(String id, Attributes attributes) {
         final var numeration = UnmarshallerUtils.toNumeration(getAttributeValue("numeration", attributes), Numeration.ARABIC);
         final var startingNumber = getAttributeValue("startingnumber", attributes);
         final var orderedList = new OrderedList().withId(id).withNumeration(numeration).withStartigNumber(startingNumber);
-        listAdapter = DocBookListAdapter.fromOrderedList(orderedList);
         docbookObjects.push(orderedList);
         pushListInfo(numeration.value(), true);
     }
 
     private void startItemizedList(String id, Attributes attributes) {
         final var mark = getAttributeValue("mark", attributes);
-        final var itemizedList = new ItemizedList().withId(id).withMark(mark);
-        listAdapter = DocBookListAdapter.fromItemizedList(itemizedList);
-        docbookObjects.push(itemizedList);
+        docbookObjects.push(new ItemizedList().withId(id).withMark(mark));
         pushListInfo(mark, false);
     }
 
-    private void endListItem() {
+    private void endList() {
+        processEndElement();
+        listInfos.pop();
+        var level = -1L;
+        if (!listInfos.isEmpty()) {
+            level = listInfos.peek().getLevel();
+        }
+        ApplicationController.getContext().setCurrentListLevel(level);
+    }
 
-        currentListItem = null;
+    private void startListItem() {
+        docbookObjects.push(new ListItem());
+    }
+
+    private void endListItem() {
+        processEndElement();
     }
 
     // inlines
@@ -507,7 +478,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
 
     private void endPhrase() {
         endInline();
-        mergeUpward();
+        processEndElement();
     }
 
     private void starEmphasis(String id, Attributes attributes) {
@@ -518,7 +489,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
 
     private void endEmphasis() {
         endInline();
-        mergeUpward();
+        processEndElement();
     }
 
     private void endInline() {
@@ -541,9 +512,14 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
         }
     }
 
-    private void mergeUpward() {
+    private void processEndElement2() {
+
+    }
+
+    private void processEndElement() {
         final var child = docbookObjects.pop();
         final var parent = docbookObjects.pop();
+        logger.info("Processing end element of \"{}\" of \"{}\".", child.getClass().getName(), parent.getClass().getName());
         if (AppUtil.isInstanceOf(Phrase.class, parent)) {
             final var obj = (Phrase) parent;
             obj.getContent().add(child);
@@ -560,13 +536,103 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
             final var obj = (Title) parent;
             obj.getContent().add(child);
             docbookObjects.push(obj);
+        } else if (AppUtil.isInstanceOf(InformalTable.class, parent)) {
+            final var obj = (InformalTable) parent;
+            if (AppUtil.isInstanceOf(TableGroup.class, child)) {
+                obj.getTableGroup().add((TableGroup) child);
+            } else {
+                throw new NotImplementedException(parent, child);
+            }
+            docbookObjects.push(obj);
+        } else if (AppUtil.isInstanceOf(TableGroup.class, parent)) {
+            final var obj = (TableGroup) parent;
+            if (AppUtil.isInstanceOf(TableHeader.class, child)) {
+                obj.setTableHeader((TableHeader) child);
+            } else if (AppUtil.isInstanceOf(TableBody.class, child)) {
+                obj.setTableBody((TableBody) child);
+            } else if (AppUtil.isInstanceOf(TableFooter.class, child)) {
+                obj.setTableFooter((TableFooter) child);
+            } else {
+                throw new NotImplementedException(parent, child);
+            }
+            docbookObjects.push(obj);
+        } else if (AppUtil.isInstanceOf(TableHeader.class, parent)) {
+            final var obj = (TableHeader) parent;
+            if (AppUtil.isInstanceOf(Row.class, child)) {
+                obj.getRow().add((Row) child);
+            } else if (AppUtil.isInstanceOf(ColumnSpec.class, child)) {
+                obj.getColSpec().add((ColumnSpec) child);
+            } else if (AppUtil.isInstanceOf(Tr.class, child)) {
+                throw new NotImplementedException(parent, child);
+            }
+            docbookObjects.push(obj);
+        } else if (AppUtil.isInstanceOf(TableBody.class, parent)) {
+            final var obj = (TableBody) parent;
+            if (AppUtil.isInstanceOf(Row.class, child)) {
+                obj.getRow().add((Row) child);
+            } else if (AppUtil.isInstanceOf(Tr.class, child)) {
+                throw new IllegalArgumentException("\"Tr\" is not implemented yet");
+            }
+            docbookObjects.push(obj);
+        } else if (AppUtil.isInstanceOf(TableFooter.class, parent)) {
+            final var obj = (TableFooter) parent;
+            if (AppUtil.isInstanceOf(Row.class, child)) {
+                obj.getRow().add((Row) child);
+            } else if (AppUtil.isInstanceOf(ColumnSpec.class, child)) {
+                obj.getColSpec().add((ColumnSpec) child);
+            } else if (AppUtil.isInstanceOf(Tr.class, child)) {
+                throw new IllegalArgumentException("\"Tr\" is not implemented yet");
+            }
+            docbookObjects.push(obj);
+        } else if (AppUtil.isInstanceOf(Row.class, parent)) {
+            final var obj = (Row) parent;
+            obj.getContent().add(child);
+            docbookObjects.push(obj);
+        } else if (AppUtil.isInstanceOf(Entry.class, parent)) {
+            final var obj = (Entry) parent;
+            obj.getContent().add(child);
+            docbookObjects.push(obj);
+        } else if (AppUtil.isInstanceOf(OrderedList.class, parent)) {
+            final var obj = (OrderedList) parent;
+            if (AppUtil.isInstanceOf(ListItem.class, child)) {
+                obj.getListItem().add((ListItem) child);
+            } else {
+                throw new NotImplementedException(parent, child);
+            }
+            docbookObjects.push(obj);
+        } else if (AppUtil.isInstanceOf(ItemizedList.class, parent)) {
+            final var obj = (ItemizedList) parent;
+            if (AppUtil.isInstanceOf(ListItem.class, child)) {
+                obj.getListItem().add((ListItem) child);
+            } else {
+                throw new NotImplementedException(parent, child);
+            }
+            docbookObjects.push(obj);
+        } else if (AppUtil.isInstanceOf(ListItem.class, parent)) {
+            final var obj = (ListItem) parent;
+            obj.getContent().add(child);
+            docbookObjects.push(obj);
+        } else if (AppUtil.isInstanceOf(Section.class, parent)) {
+            // now process the content add it to document
+            processContent(child);
+            docbookObjects.push(parent);
+        } else if (AppUtil.isInstanceOf(Article.class, parent)) {
+            if (AppUtil.isInstanceOf(Section.class, child)) {
+                logger.warn("Not sure how to handle section");
+            }
+            processContent(child);
+            docbookObjects.push(parent);
         } else {
-            throw new IllegalArgumentException("Unhandled object: " + parent.getClass().getName());
+            throw new NotImplementedException(parent, child);
         }
     }
 
-    private void addProcessedContent(List<Object> content) {
-        content.forEach(mainDocumentPart::addObject);
+    private void processContent(Object content) {
+        logger.info("Processing content: {}", content.getClass().getName());
+        final var processedContent = builderFactory.process(content);
+        if (processedContent != null) {
+            processedContent.forEach(mainDocumentPart::addObject);
+        }
     }
 
     private void pushListInfo(String styleName, boolean ordered) {
@@ -575,6 +641,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
         if (!listInfos.isEmpty()) {
             level = listInfos.peek().getLevel() + 1L;
         }
+        ApplicationController.getContext().setCurrentListLevel(level);
         listInfos.push(new ListInfo(listItem.getNumberId(), level));
     }
 
@@ -602,10 +669,6 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
         } else {
             return UnorderedList.getByStyleName(styleName);
         }
-    }
-
-    private enum TablePart {
-        HEADER, BODY, FOOTER;
     }
 
 }
