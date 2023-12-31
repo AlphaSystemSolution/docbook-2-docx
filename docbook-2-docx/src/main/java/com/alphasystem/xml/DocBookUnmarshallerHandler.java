@@ -3,11 +3,14 @@ package com.alphasystem.xml;
 import com.alphasystem.docbook.ApplicationController;
 import com.alphasystem.docbook.DocumentContext;
 import com.alphasystem.docbook.builder2.BuilderFactory;
+import com.alphasystem.docbook.model.DocBookListAdapter;
 import com.alphasystem.docbook.model.DocBookTableAdapter;
 import com.alphasystem.docbook.model.DocumentCaption;
+import com.alphasystem.docbook.model.ListInfo;
 import com.alphasystem.docbook.util.ConfigurationUtils;
 import com.alphasystem.docbook.util.Utils;
 import com.alphasystem.openxml.builder.wml.TocGenerator;
+import com.alphasystem.openxml.builder.wml.UnorderedList;
 import com.alphasystem.openxml.builder.wml.WmlAdapter;
 import com.alphasystem.openxml.builder.wml.WmlPackageBuilder;
 import com.alphasystem.util.AppUtil;
@@ -38,6 +41,9 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
     private static final String ENTRY = "entry";
     private static final String INFO = "info";
     private static final String INFORMAL_TABLE = "informaltable";
+    private static final String ITEMIZED_LIST = "itemizedlist";
+    private static final String LIST_ITEM = "listitem";
+    private static final String ORDERED_LIST = "orderedlist";
     private static final String PHRASE = "phrase";
     private static final String ROW = "row";
     private static final String SIMPLE_PARA = "simpara";
@@ -57,15 +63,17 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
     private MainDocumentPart mainDocumentPart;
     private String currentText = "";
     private int sectionLevel = 0;
-    private int listLevel = -1;
     private DocBookTableAdapter tableAdapter;
+    private DocBookListAdapter listAdapter;
     private TablePart curentTablePart;
     private TableHeader tableHeader;
     private TableBody tableBody;
     private TableFooter tableFooter;
     private Row currentRow;
     private Entry currentEntry;
+    private ListItem currentListItem;
     private final Stack<Object> docbookObjects = new Stack<>();
+    private final Stack<ListInfo> listInfos = new Stack<>();
 
     public DocBookUnmarshallerHandler(final DocumentContext documentContext) {
         this.documentContext = documentContext;
@@ -78,13 +86,12 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
 
     @Override
     public void setDocumentLocator(Locator locator) {
-
     }
 
     @Override
     public void startDocument() {
         ApplicationController.startContext(documentContext);
-        ApplicationController.getContext().setCurrentListLevel(listLevel);
+        ApplicationController.getContext().setCurrentListLevel(getCurrentListInfo().getLevel());
         try {
             wmlPackageBuilder = WmlPackageBuilder.createPackage(configurationUtils.getTemplate())
                     .styles(configurationUtils.getStyles());
@@ -110,7 +117,6 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
         } catch (Docx4JException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     @Override
@@ -186,6 +192,15 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
             case ENTRY:
                 startEntry(attributes);
                 break;
+            case ORDERED_LIST:
+                startOrderedList(id, attributes);
+                break;
+            case ITEMIZED_LIST:
+                startItemizedList(id, attributes);
+                break;
+            case LIST_ITEM:
+                currentListItem = new ListItem();
+                break;
             case PHRASE:
                 startPhrase(id, attributes);
                 break;
@@ -222,6 +237,12 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
             case INFORMAL_TABLE:
                 endInformalTable();
                 break;
+            case ORDERED_LIST:
+
+                break;
+            case ITEMIZED_LIST:
+
+                break;
             case PHRASE:
                 endPhrase();
                 break;
@@ -243,6 +264,8 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
             case ENTRY:
                 endEntry();
                 break;
+            case LIST_ITEM:
+                endListItem();
             case INFO:
             case DATE:
             case TABLE_GROUP:
@@ -337,10 +360,12 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
         pushText();
         var simplePara = (SimplePara) docbookObjects.pop();
         final var list = builderFactory.process(simplePara);
-        if (currentEntry == null) {
-            addProcessedContent(list);
-        } else {
+        if (currentEntry != null) {
             list.forEach(l -> currentEntry.getContent().add(l));
+        } else if (currentListItem != null) {
+            list.forEach(l -> currentListItem.getContent().add(l));
+        } else {
+            addProcessedContent(list);
         }
     }
 
@@ -362,7 +387,12 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
         if (!AppUtil.isInstanceOf(InformalTable.class, obj)) {
             throw new IllegalArgumentException("Invalid object: " + obj.getClass().getName());
         }
-        addProcessedContent(builderFactory.process(tableAdapter.getInformalTable()));
+        final var processedContent = builderFactory.process(tableAdapter.getInformalTable());
+        if (currentListItem != null) {
+            currentListItem.getContent().add(processedContent);
+        } else {
+            addProcessedContent(processedContent);
+        }
     }
 
     private void startTableGroup(Attributes attributes) {
@@ -446,6 +476,28 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
         currentEntry = null;
     }
 
+    private void startOrderedList(String id, Attributes attributes) {
+        final var numeration = UnmarshallerUtils.toNumeration(getAttributeValue("numeration", attributes), Numeration.ARABIC);
+        final var startingNumber = getAttributeValue("startingnumber", attributes);
+        final var orderedList = new OrderedList().withId(id).withNumeration(numeration).withStartigNumber(startingNumber);
+        listAdapter = DocBookListAdapter.fromOrderedList(orderedList);
+        docbookObjects.push(orderedList);
+        pushListInfo(numeration.value(), true);
+    }
+
+    private void startItemizedList(String id, Attributes attributes) {
+        final var mark = getAttributeValue("mark", attributes);
+        final var itemizedList = new ItemizedList().withId(id).withMark(mark);
+        listAdapter = DocBookListAdapter.fromItemizedList(itemizedList);
+        docbookObjects.push(itemizedList);
+        pushListInfo(mark, false);
+    }
+
+    private void endListItem() {
+
+        currentListItem = null;
+    }
+
     // inlines
     private void startPhrase(String id, Attributes attributes) {
         pushText();
@@ -517,6 +569,24 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
         content.forEach(mainDocumentPart::addObject);
     }
 
+    private void pushListInfo(String styleName, boolean ordered) {
+        final var listItem = getItemByName(styleName, ordered);
+        var level = 0L;
+        if (!listInfos.isEmpty()) {
+            level = listInfos.peek().getLevel() + 1L;
+        }
+        listInfos.push(new ListInfo(listItem.getNumberId(), level));
+    }
+
+    private ListInfo getCurrentListInfo() {
+        var listInfo = new ListInfo(0L, -1);
+        var level = -1L;
+        if (!listInfos.isEmpty()) {
+            listInfo = listInfos.peek();
+        }
+        return listInfo;
+    }
+
     private static String getId(Attributes attributes) {
         var id = getAttributeValue("id", attributes);
         return id == null ? IdGenerator.nextId() : id;
@@ -524,6 +594,14 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
 
     private static String getAttributeValue(String attributeName, Attributes attributes) {
         return attributes.getValue(attributeName);
+    }
+
+    private static com.alphasystem.openxml.builder.wml.ListItem<?> getItemByName(String styleName, boolean ordered) {
+        if (ordered) {
+            return com.alphasystem.openxml.builder.wml.OrderedList.getByStyleName(styleName);
+        } else {
+            return UnorderedList.getByStyleName(styleName);
+        }
     }
 
     private enum TablePart {

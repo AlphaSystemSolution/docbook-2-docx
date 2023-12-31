@@ -34,6 +34,11 @@ public class UnmarshallerUtils {
         return convert(value, VerticalAlign::fromValue);
     }
 
+    public static Numeration toNumeration(String value, Numeration defaultValue) {
+        final var numeration = convert(value, Numeration::fromValue);
+        return numeration == null ? defaultValue : numeration;
+    }
+
     private static <T> T convert(String value, Function<String, T> toTarget) {
         if (value == null) {
             return null;
