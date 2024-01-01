@@ -497,110 +497,155 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         final var parent = docbookObjects.pop();
         logger.info("Processing end element of \"{}\" of \"{}\".", child.getClass().getName(), parent.getClass().getName());
         if (isPhraseType(parent)) {
-            final var obj = (Phrase) parent;
-            obj.getContent().add(child);
-            docbookObjects.push(obj);
+            handlePhrase((Phrase) parent, child);
         } else if (isEmphasisType(parent)) {
-            final var obj = (Emphasis) parent;
-            obj.getContent().add(child);
-            docbookObjects.push(obj);
+            handleEmphasis((Emphasis) parent, child);
         } else if (isSimpleParaType(parent)) {
-            final var obj = (SimplePara) parent;
-            obj.getContent().add(child);
-            docbookObjects.push(obj);
+            handleSimplePara((SimplePara) parent, child);
         } else if (isTitleType(parent)) {
-            final var obj = (Title) parent;
-            obj.getContent().add(child);
-            docbookObjects.push(obj);
+            handleTitle((Title) parent, child);
         } else if (isInformalTableType(parent)) {
-            final var obj = (InformalTable) parent;
-            if (isTableGroupType(child)) {
-                obj.getTableGroup().add((TableGroup) child);
-            } else {
-                throw new NotImplementedException(parent, child);
-            }
-            docbookObjects.push(obj);
+            handleInformalTable((InformalTable) parent, child);
         } else if (isTableGroupType(parent)) {
-            final var obj = (TableGroup) parent;
-            if (isTableHeaderType(child)) {
-                obj.setTableHeader((TableHeader) child);
-            } else if (isTableBodyType(child)) {
-                obj.setTableBody((TableBody) child);
-            } else if (isTableFooterType(child)) {
-                obj.setTableFooter((TableFooter) child);
-            } else {
-                throw new NotImplementedException(parent, child);
-            }
-            docbookObjects.push(obj);
+            handleTableGroup((TableGroup) parent, child);
         } else if (isTableHeaderType(parent)) {
-            final var obj = (TableHeader) parent;
-            if (isRowType(child)) {
-                obj.getRow().add((Row) child);
-            } else if (isColumnSpecType(child)) {
-                obj.getColSpec().add((ColumnSpec) child);
-            } else if (isTrType(child)) {
-                throw new NotImplementedException(parent, child);
-            }
-            docbookObjects.push(obj);
+            handleTableHeader((TableHeader) parent, child);
         } else if (isTableBodyType(parent)) {
-            final var obj = (TableBody) parent;
-            if (isRowType(child)) {
-                obj.getRow().add((Row) child);
-            } else if (isTrType(child)) {
-                throw new IllegalArgumentException("\"Tr\" is not implemented yet");
-            }
-            docbookObjects.push(obj);
+            handleTableBody( (TableBody) parent, child);
         } else if (isTableFooterType(parent)) {
-            final var obj = (TableFooter) parent;
-            if (isRowType(child)) {
-                obj.getRow().add((Row) child);
-            } else if (isColumnSpecType(child)) {
-                obj.getColSpec().add((ColumnSpec) child);
-            } else if (isTrType(child)) {
-                throw new IllegalArgumentException("\"Tr\" is not implemented yet");
-            }
-            docbookObjects.push(obj);
+            handleTableFooter((TableFooter) parent, child);
         } else if (isRowType(parent)) {
-            final var obj = (Row) parent;
-            obj.getContent().add(child);
-            docbookObjects.push(obj);
+            handleRow((Row) parent, child);
         } else if (isEntryType(parent)) {
-            final var obj = (Entry) parent;
-            obj.getContent().add(child);
-            docbookObjects.push(obj);
+            handleEntry((Entry) parent, child);
         } else if (isOrderedListType(parent)) {
-            final var obj = (OrderedList) parent;
-            if (isListItemType(child)) {
-                obj.getListItem().add((ListItem) child);
-            } else {
-                throw new NotImplementedException(parent, child);
-            }
-            docbookObjects.push(obj);
+            handleOrderedList((OrderedList) parent, child);
         } else if (isItemizedListType(parent)) {
-            final var obj = (ItemizedList) parent;
-            if (isListItemType(child)) {
-                obj.getListItem().add((ListItem) child);
-            } else {
-                throw new NotImplementedException(parent, child);
-            }
-            docbookObjects.push(obj);
+            handleItemizedList((ItemizedList) parent, child);
         } else if (isListItemType(parent)) {
-            final var obj = (ListItem) parent;
-            obj.getContent().add(child);
-            docbookObjects.push(obj);
+            handleListItem((ListItem) parent, child);
         } else if (isSectionType(parent)) {
             // now process the content add it to document
-            processContent(child);
-            docbookObjects.push(parent);
+            handleArticleOrSection(parent, child);
         } else if (isArticleType(parent)) {
             if (isSectionType(child)) {
                 logger.warn("Not sure how to handle section");
             }
-            processContent(child);
-            docbookObjects.push(parent);
+            handleArticleOrSection(parent, child);
         } else {
             throw new NotImplementedException(parent, child);
         }
+    }
+
+    private void handleArticleOrSection(Object child, Object parent) {
+        processContent(child);
+        docbookObjects.push(parent);
+    }
+
+    private void handleListItem(ListItem obj, Object child) {
+        obj.getContent().add(child);
+        docbookObjects.push(obj);
+    }
+
+    private void handleItemizedList(ItemizedList obj, Object child) {
+        if (isListItemType(child)) {
+            obj.getListItem().add((ListItem) child);
+        } else {
+            throw new NotImplementedException(obj, child);
+        }
+        docbookObjects.push(obj);
+    }
+
+    private void handleOrderedList(OrderedList obj, Object child) {
+        if (isListItemType(child)) {
+            obj.getListItem().add((ListItem) child);
+        } else {
+            throw new NotImplementedException(obj, child);
+        }
+        docbookObjects.push(obj);
+    }
+
+    private void handleEntry(Entry obj, Object child) {
+        obj.getContent().add(child);
+        docbookObjects.push(obj);
+    }
+
+    private void handleRow(Row obj, Object child) {
+        obj.getContent().add(child);
+        docbookObjects.push(obj);
+    }
+
+    private void handleTableFooter(TableFooter obj, Object child) {
+        if (isRowType(child)) {
+            obj.getRow().add((Row) child);
+        } else if (isColumnSpecType(child)) {
+            obj.getColSpec().add((ColumnSpec) child);
+        } else if (isTrType(child)) {
+            throw new NotImplementedException(obj, child);
+        }
+        docbookObjects.push(obj);
+    }
+
+    private void handleTableBody(TableBody obj, Object child) {
+        if (isRowType(child)) {
+            obj.getRow().add((Row) child);
+        } else if (isTrType(child)) {
+            throw new NotImplementedException(obj, child);
+        }
+        docbookObjects.push(obj);
+    }
+
+    private void handleTableHeader(TableHeader obj, Object child) {
+        if (isRowType(child)) {
+            obj.getRow().add((Row) child);
+        } else if (isColumnSpecType(child)) {
+            obj.getColSpec().add((ColumnSpec) child);
+        } else if (isTrType(child)) {
+            throw new NotImplementedException(obj, child);
+        }
+        docbookObjects.push(obj);
+    }
+
+    private void handleTableGroup(TableGroup obj, Object child) {
+        if (isTableHeaderType(child)) {
+            obj.setTableHeader((TableHeader) child);
+        } else if (isTableBodyType(child)) {
+            obj.setTableBody((TableBody) child);
+        } else if (isTableFooterType(child)) {
+            obj.setTableFooter((TableFooter) child);
+        } else {
+            throw new NotImplementedException(obj, child);
+        }
+        docbookObjects.push(obj);
+    }
+
+    private void handleInformalTable(InformalTable obj, Object child) {
+        if (isTableGroupType(child)) {
+            obj.getTableGroup().add((TableGroup) child);
+        } else {
+            throw new NotImplementedException(obj, child);
+        }
+        docbookObjects.push(obj);
+    }
+
+    private void handleTitle(Title obj, Object child) {
+        obj.getContent().add(child);
+        docbookObjects.push(obj);
+    }
+
+    private void handleSimplePara(SimplePara obj, Object child) {
+        obj.getContent().add(child);
+        docbookObjects.push(obj);
+    }
+
+    private void handleEmphasis(Emphasis obj, Object child) {
+        obj.getContent().add(child);
+        docbookObjects.push(obj);
+    }
+
+    private void handlePhrase(Phrase obj, Object child) {
+        obj.getContent().add(child);
+        docbookObjects.push(obj);
     }
 
     private void processContent(Object content) {
