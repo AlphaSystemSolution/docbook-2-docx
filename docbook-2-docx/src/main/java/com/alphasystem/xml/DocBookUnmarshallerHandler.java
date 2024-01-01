@@ -27,6 +27,8 @@ import javax.xml.bind.UnmarshallerHandler;
 import java.util.Arrays;
 import java.util.Stack;
 
+import static com.alphasystem.xml.UnmarshallerConstants.*;
+
 
 public class DocBookUnmarshallerHandler implements UnmarshallerHandler, UnmarshallerConstants {
 
@@ -525,7 +527,6 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         } else if (isListItemType(parent)) {
             handleListItem((ListItem) parent, child);
         } else if (isSectionType(parent)) {
-            // now process the content add it to document
             handleArticleOrSection(parent, child);
         } else if (isArticleType(parent)) {
             if (isSectionType(child)) {
@@ -537,13 +538,52 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         }
     }
 
-    private void handleArticleOrSection(Object child, Object parent) {
+    /*
+     * For Article or Section types we process the content.
+     */
+    private void handleArticleOrSection(Object parent, Object child) {
         processContent(child);
         docbookObjects.push(parent);
     }
 
     private void handleListItem(ListItem obj, Object child) {
-        obj.getContent().add(child);
+        var contents = obj.getContent();
+
+        // if role is not defined then we need to set to default list style.
+        String role = null;
+        if (isSimpleParaType(child)) {
+            var simplePara = (SimplePara) child;
+            role = simplePara.getRole();
+        } else if (isParaType(child)) {
+            var para = (Para) child;
+            role = para.getRole();
+        }
+
+        // if role is not defined, we need to set appropriate
+        if (role == null) {
+            role = configurationUtils.getDefaultListStyle();
+        }
+
+        // if there are multiple paras in the list item, only the first one will need to define "NumPr" property.
+        // we will inspect this suffix in the builder if exists then we will not set "NumPr" property.
+        final var hasPreviousParaObjects = contents.stream().anyMatch(UnmarshallerConstants::isParaTypes);
+        final var suffix = hasPreviousParaObjects ? "$" : "";
+        role = "list_" + role + suffix;
+
+        Object updatedChild = null;
+        if (isSimpleParaType(child)) {
+            var simplePara = (SimplePara) child;
+            simplePara.setRole(role);
+            updatedChild = simplePara;
+        } else if (isParaType(child)) {
+            var para = (Para) child;
+            para.setRole(role);
+            updatedChild = para;
+        } else {
+            updatedChild = child;
+        }
+
+        contents.add(updatedChild);
         docbookObjects.push(obj);
     }
 
@@ -659,10 +699,14 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     private void pushListInfo(String styleName, boolean ordered) {
         final var listItem = getItemByName(styleName, ordered);
         var level = 0L;
-        if (!listInfos.isEmpty()) {
+        var numberId = listItem.getNumberId();
+        if (listInfos.isEmpty()) {
+            numberId = (int) ApplicationController.getContext().getListNumber(numberId, level);
+        } else {
+            // nested list
             level = listInfos.peek().getLevel() + 1L;
         }
-        final var listInfo = new ListInfo(listItem.getNumberId(), level);
+        final var listInfo = new ListInfo(numberId, level);
         ApplicationController.getContext().setCurrentListInfo(listInfo);
         listInfos.push(listInfo);
     }

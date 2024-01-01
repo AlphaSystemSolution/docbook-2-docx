@@ -206,7 +206,7 @@ public abstract class AbstractTableBuilder<S> extends AbstractBuilder<S> {
                         nextColumnInfoMap.remove(updatedValue.getCurrentColumnIndex());
                     }
                 }
-                var nextColumnInfo = ColumnBuilder.build(this, (Entry) content, columnIndex, verticalAlign);
+                var nextColumnInfo = ColumnBuilder.build(this, builderFactory, (Entry) content, columnIndex, verticalAlign);
                 if (nextColumnInfo.getMoreRows() > 0) {
                     nextColumnInfoMap.put(nextColumnInfo.getCurrentColumnIndex(), nextColumnInfo);
                 }

@@ -1,9 +1,6 @@
 package com.alphasystem.xml;
 
-import com.alphasystem.util.AppUtil;
 import org.docbook.model.*;
-
-import java.util.function.Function;
 
 import static com.alphasystem.util.AppUtil.isInstanceOf;
 
@@ -29,75 +26,87 @@ public interface UnmarshallerConstants {
     String TABLE_HEAD = "thead";
     String TITLE = "title";
 
-    default boolean isArticleType(Object o) {
+    static boolean isArticleType(Object o) {
         return isInstanceOf(Article.class, o);
     }
 
-    default boolean isColumnSpecType(Object o) {
+    static boolean isColumnSpecType(Object o) {
         return isInstanceOf(ColumnSpec.class, o);
     }
 
-    default boolean isEmphasisType(Object o) {
+    static boolean isEmphasisType(Object o) {
         return isInstanceOf(Emphasis.class, o);
     }
 
-    default boolean isEntryType(Object o) {
+    static boolean isEntryType(Object o) {
         return isInstanceOf(Entry.class, o);
     }
 
-    default boolean isInformalTableType(Object o) {
+    static boolean isInformalTableType(Object o) {
         return isInstanceOf(InformalTable.class, o);
     }
 
-    default boolean isItemizedListType(Object o) {
+    static boolean isItemizedListType(Object o) {
         return isInstanceOf(ItemizedList.class, o);
     }
 
-    default boolean isListItemType(Object o) {
+    static boolean isListItemType(Object o) {
         return isInstanceOf(ListItem.class, o);
     }
 
-    default boolean isOrderedListType(Object o) {
+    static boolean isOrderedListType(Object o) {
         return isInstanceOf(OrderedList.class, o);
     }
 
-    default boolean isPhraseType(Object o) {
+    static boolean isParaType(Object o) {
+        return isInstanceOf(Para.class, o);
+    }
+
+    static boolean isPhraseType(Object o) {
         return isInstanceOf(Phrase.class, o);
     }
 
-    default boolean isRowType(Object o) {
+    static boolean isRowType(Object o) {
         return isInstanceOf(Row.class, o);
     }
 
-    default boolean isSectionType(Object o) {
+    static boolean isSectionType(Object o) {
         return isInstanceOf(Section.class, o);
     }
 
-    default boolean isSimpleParaType(Object o) {
+    static boolean isStringType(Object o) {
+        return isInstanceOf(String.class, o);
+    }
+
+    static boolean isSimpleParaType(Object o) {
         return isInstanceOf(SimplePara.class, o);
     }
 
-    default boolean isTableBodyType(Object o) {
+    static boolean isTableBodyType(Object o) {
         return isInstanceOf(TableBody.class, o);
     }
 
-    default boolean isTableFooterType(Object o) {
+    static boolean isTableFooterType(Object o) {
         return isInstanceOf(TableFooter.class, o);
     }
 
-    default boolean isTableHeaderType(Object o) {
+    static boolean isTableHeaderType(Object o) {
         return isInstanceOf(TableHeader.class, o);
     }
 
-    default boolean isTableGroupType(Object o) {
+    static boolean isTableGroupType(Object o) {
         return isInstanceOf(TableGroup.class, o);
     }
 
-    default boolean isTitleType(Object o) {
+    static boolean isTitleType(Object o) {
         return isInstanceOf(Title.class, o);
     }
 
-    default boolean isTrType(Object o) {
+    static boolean isTrType(Object o) {
         return isInstanceOf(Tr.class, o);
+    }
+
+    static boolean isParaTypes(Object o) {
+        return isSimpleParaType(o) || isParaType(o);
     }
 }

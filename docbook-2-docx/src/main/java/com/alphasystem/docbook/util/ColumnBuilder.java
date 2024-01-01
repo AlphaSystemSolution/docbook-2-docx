@@ -1,18 +1,20 @@
 package com.alphasystem.docbook.util;
 
+import com.alphasystem.docbook.builder2.BuilderFactory;
 import com.alphasystem.docbook.builder2.impl.block.AbstractTableBuilder;
 import com.alphasystem.openxml.builder.wml.PPrBuilder;
 import com.alphasystem.openxml.builder.wml.WmlBuilderFactory;
 import com.alphasystem.openxml.builder.wml.table.ColumnData;
 import com.alphasystem.openxml.builder.wml.table.VerticalMergeType;
-import com.alphasystem.util.AppUtil;
+import com.alphasystem.xml.UnmarshallerConstants;
 import com.alphasystem.xml.UnmarshallerUtils;
-import org.docbook.model.*;
+import org.docbook.model.Align;
+import org.docbook.model.BasicVerticalAlign;
+import org.docbook.model.Entry;
+import org.docbook.model.VerticalAlign;
 import org.docx4j.wml.JcEnumeration;
 import org.docx4j.wml.P;
 import org.docx4j.wml.STVerticalJc;
-
-import java.util.Collections;
 
 public class ColumnBuilder {
 
@@ -26,7 +28,8 @@ public class ColumnBuilder {
      * @param parentVerticalAlign Table VerticalAlign
      * @return next column info
      */
-    public static NextColumnInfo build(AbstractTableBuilder<?> parentBuilder, Entry entry, int columnIndex, VerticalAlign parentVerticalAlign) {
+    public static NextColumnInfo build(AbstractTableBuilder<?> parentBuilder, BuilderFactory builderFactory,
+                                       Entry entry, int columnIndex, VerticalAlign parentVerticalAlign) {
         final var tcPr = WmlBuilderFactory.getTcPrBuilder().withVAlign(getVerticalAlign(entry.getValign(), parentVerticalAlign))
                 .getObject();
         final var gridSpan = parentBuilder.getGridSpan(entry.getNameStart(), entry.getNameEnd());
@@ -35,13 +38,13 @@ public class ColumnBuilder {
 
         final var columnContent = entry.getContent().stream().map(content -> {
             var align = getAlign(entry.getAlign());
-            if (AppUtil.isInstanceOf(P.class, content)) {
-                final var p = (P) content;
+            if (UnmarshallerConstants.isParaTypes(content)){
+                var p = (P) builderFactory.process(content).get(0);
                 final var ppr = new PPrBuilder(WmlBuilderFactory.getPPrBuilder().withJc(align).getObject(), p.getPPr()).getObject();
                 p.setPPr(ppr);
                 return p;
             } else {
-                throw new IllegalArgumentException("Type \"" + content.getClass().getName() + "\" is not supported yet");
+                return builderFactory.process(content);
             }
         }).toArray();
 
