@@ -21,6 +21,8 @@ public interface UnmarshallerConstants {
     String ROW = "row";
     String SIMPLE_PARA = "simpara";
     String SECTION = "section";
+    String SUBSCRIPT = "subscript";
+    String SUPERSCRIPT = "superscript";
     String TABLE_BODY = "tbody";
     String TERM = "term";
     String TABLE_FOOTER = "tfoot";
@@ -82,6 +84,14 @@ public interface UnmarshallerConstants {
 
     static boolean isStringType(Object o) {
         return isInstanceOf(String.class, o);
+    }
+
+    static boolean isSubscriptType(Object o) {
+        return isInstanceOf(Subscript.class, o);
+    }
+
+    static boolean isSuperscriptType(Object o) {
+        return isInstanceOf(Superscript.class, o);
     }
 
     static boolean isSimpleParaType(Object o) {

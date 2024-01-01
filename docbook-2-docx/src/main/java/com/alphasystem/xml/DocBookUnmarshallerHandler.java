@@ -181,6 +181,12 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
             case LITERAL:
                 startLiteral(id, attributes);
                 break;
+            case SUBSCRIPT:
+                startSubscript(id, attributes);
+                break;
+            case SUPERSCRIPT:
+                startSuperscript(id, attributes);
+                break;
             case TERM:
                 startTerm(id, attributes);
                 break;
@@ -219,6 +225,12 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
                 break;
             case LITERAL:
                 endLiteral();
+                break;
+            case SUBSCRIPT:
+                endSubscript();
+                break;
+            case SUPERSCRIPT:
+                endSuperscript();
                 break;
             case TERM:
                 endTerm();
@@ -497,6 +509,28 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         processEndElement();
     }
 
+    private void startSubscript(String id, Attributes attributes) {
+        pushText();
+        final var subscript = new Subscript().withId(id).withRole(getAttributeValue("role", attributes));
+        docbookObjects.push(subscript);
+    }
+
+    private void endSubscript() {
+        endInline();
+        processEndElement();
+    }
+
+    private void startSuperscript(String id, Attributes attributes) {
+        pushText();
+        final var superscript = new Superscript().withId(id).withRole(getAttributeValue("role", attributes));
+        docbookObjects.push(superscript);
+    }
+
+    private void endSuperscript() {
+        endInline();
+        processEndElement();
+    }
+
     private void startTerm(String id, Attributes attributes) {
         pushText();
         final var term = new Term().withId(id).withRole(getAttributeValue("role", attributes));
@@ -523,6 +557,14 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
                 final var literal = (Literal) obj;
                 literal.getContent().add(currentText);
                 docbookObjects.push(literal);
+            } else if (isSubscriptType(obj)) {
+                final var subscript = (Subscript) obj;
+                subscript.getContent().add(currentText);
+                docbookObjects.push(subscript);
+            } else if (isSuperscriptType(obj)) {
+                final var superscript = (Superscript) obj;
+                superscript.getContent().add(currentText);
+                docbookObjects.push(superscript);
             } else if (isTermType(obj)) {
                 final var term = (Term) obj;
                 term.getContent().add(currentText);

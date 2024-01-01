@@ -21,6 +21,8 @@ public class BuilderFactory {
     private final OrderedListBuilder orderedListBuilder = new OrderedListBuilder();
     private final PhraseBuilder phraseBuilder = new PhraseBuilder();
     private final SimpleParaBuilder simpleParaBuilder = new SimpleParaBuilder();
+    private final SubscriptBuilder subscriptBuilder = new SubscriptBuilder();
+    private final SuperscriptBuilder superscriptBuilder = new SuperscriptBuilder();
     private final TermBuilder termBuilder = new TermBuilder();
     private final TextBuilder textBuilder = new TextBuilder();
     private final TitleBuilder titleBuilder = new TitleBuilder();
@@ -59,6 +61,10 @@ public class BuilderFactory {
             return simpleParaBuilder.process((SimplePara) o);
         } else if (UnmarshallerConstants.isStringType(o)) {
             return textBuilder.process((String) o);
+        } else if (UnmarshallerConstants.isSubscriptType(o)) {
+            return subscriptBuilder.process((Subscript) o);
+        } else if (UnmarshallerConstants.isSuperscriptType(o)) {
+            return superscriptBuilder.process((Superscript) o);
         } else if (UnmarshallerConstants.isTermType(o)) {
             return termBuilder.process((Term) o);
         } else if (UnmarshallerConstants.isTitleType(o)) {
