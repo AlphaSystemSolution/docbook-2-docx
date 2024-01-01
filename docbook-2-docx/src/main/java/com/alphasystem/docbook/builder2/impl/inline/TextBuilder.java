@@ -8,7 +8,7 @@ import com.alphasystem.util.IdGenerator;
 public class TextBuilder extends InlineBuilder<String> {
 
     public TextBuilder() {
-        super(null);
+        super(null,null);
         this.id = IdGenerator.nextId();
     }
 

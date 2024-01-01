@@ -65,6 +65,10 @@ public abstract class AbstractBuilder<S> implements Builder<S> {
         }
     }
 
+    protected String getRole() {
+        return (String) Utils.invokeMethod(source, "getRole");
+    }
+
     protected List<Object> processChildContent(List<Object> childContent) {
         return childContent.stream().map(builderFactory::process).flatMap(Collection::stream).collect(Collectors.toList());
     }

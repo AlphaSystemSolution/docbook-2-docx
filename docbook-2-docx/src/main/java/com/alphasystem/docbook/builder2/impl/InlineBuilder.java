@@ -14,19 +14,30 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public abstract class InlineBuilder<S> extends AbstractBuilder<S> {
 
     protected String[] styles = null;
+    private String defaultStyle = null;
     protected RBuilder runBuilder;
     protected InlineHandlerFactory handlerFactory = InlineHandlerFactory.getInstance();
 
-    protected InlineBuilder() {
+    protected InlineBuilder(String defaultStyle) {
         super();
+        this.defaultStyle = defaultStyle;
     }
 
-    protected InlineBuilder(String childContentMethodName) {
+    protected InlineBuilder(String childContentMethodName, String defaultStyle) {
         super(childContentMethodName);
+        this.defaultStyle = defaultStyle;
+    }
+
+    @Override
+    protected void doInit(S source) {
+        super.doInit(source);
+        final var role = getRole();
+        styles = isBlank(role) ? new String[]{defaultStyle} : role.split(" ");
     }
 
     protected RPr handleStyles() {
