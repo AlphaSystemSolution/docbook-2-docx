@@ -15,9 +15,4 @@ public class TitleBuilder extends AbstractParaBuilder<Title> {
         WmlAdapter.addBookMark((P) result.get(0), getId());
         return result;
     }
-
-    @Override
-    protected List<Object> getChildContent() {
-        return source.getContent();
-    }
 }

@@ -21,6 +21,14 @@ public abstract class InlineBuilder<S> extends AbstractBuilder<S> {
     protected RBuilder runBuilder;
     protected InlineHandlerFactory handlerFactory = InlineHandlerFactory.getInstance();
 
+    protected InlineBuilder() {
+        super();
+    }
+
+    protected InlineBuilder(String childContentMethodName) {
+        super(childContentMethodName);
+    }
+
     protected RPr handleStyles() {
         if (isEmpty(styles)) {
             return WmlBuilderFactory.getRPrBuilder().getObject();

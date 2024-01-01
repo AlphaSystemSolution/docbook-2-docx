@@ -3,8 +3,6 @@ package com.alphasystem.docbook.builder2.impl.inline;
 import com.alphasystem.docbook.builder2.impl.InlineBuilder;
 import org.docbook.model.Term;
 
-import java.util.List;
-
 import static com.alphasystem.docbook.builder.DocumentBuilderHelper.STRONG;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -15,10 +13,5 @@ public class TermBuilder extends InlineBuilder<Term> {
         super.doInit(source);
         final var role = source.getRole();
         styles = isBlank(role) ? new String[]{STRONG} : role.split(" ");
-    }
-
-    @Override
-    protected List<Object> getChildContent() {
-        return source.getContent();
     }
 }

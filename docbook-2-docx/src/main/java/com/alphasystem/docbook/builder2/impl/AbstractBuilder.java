@@ -4,10 +4,12 @@ import com.alphasystem.docbook.builder2.Builder;
 import com.alphasystem.docbook.builder2.BuilderFactory;
 import com.alphasystem.docbook.util.ConfigurationUtils;
 import com.alphasystem.docbook.util.Utils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,6 +21,15 @@ public abstract class AbstractBuilder<S> implements Builder<S> {
     protected BuilderFactory builderFactory;
     protected String id;
     protected S source;
+    private final String childContentMethodName;
+
+    protected AbstractBuilder() {
+        this("getContent");
+    }
+
+    protected AbstractBuilder(String childContentMethodName) {
+        this.childContentMethodName = childContentMethodName;
+    }
 
     @Override
     public String getId() {
@@ -45,7 +56,14 @@ public abstract class AbstractBuilder<S> implements Builder<S> {
         this.id = Utils.getId(source);
     }
 
-    protected abstract List<Object> getChildContent();
+    @SuppressWarnings("unchecked")
+    protected List<Object> getChildContent() {
+        if (StringUtils.isNotBlank(childContentMethodName)) {
+            return (List<Object>) Utils.invokeMethod(source, childContentMethodName);
+        } else {
+            return Collections.emptyList();
+        }
+    }
 
     protected List<Object> processChildContent(List<Object> childContent) {
         return childContent.stream().map(builderFactory::process).flatMap(Collection::stream).collect(Collectors.toList());

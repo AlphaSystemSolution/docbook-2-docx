@@ -5,13 +5,12 @@ import java.util.List;
 
 public abstract class NullBuilder<S> extends AbstractParaBuilder<S> {
 
-    @Override
-    public List<Object> process(S source) {
-        return Collections.emptyList();
+    protected NullBuilder() {
+        super(null);
     }
 
     @Override
-    protected List<Object> getChildContent() {
+    public List<Object> process(S source) {
         return Collections.emptyList();
     }
 }

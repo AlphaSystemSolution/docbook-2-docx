@@ -31,13 +31,16 @@ public abstract class AbstractTableBuilder<S> extends AbstractBuilder<S> {
     private static final int HEADER = 1;
     private static final int FOOTER = 2;
 
-
     private int level = -1;
     private final Map<Integer, ColumnBuilder.NextColumnInfo> nextColumnInfoMap = new HashMap<>();
     private List<ColumnInfo> columnInfoList;
     protected TableType tableType;
     protected TableAdapter tableAdapter;
     protected DocBookTableAdapter docBookTableAdapter;
+
+    protected AbstractTableBuilder() {
+        super(null);
+    }
 
     public TableAdapter getTableAdapter() {
         return tableAdapter;

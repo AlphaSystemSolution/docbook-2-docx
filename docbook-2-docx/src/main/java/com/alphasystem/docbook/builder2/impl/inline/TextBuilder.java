@@ -5,12 +5,10 @@ import com.alphasystem.openxml.builder.wml.WmlAdapter;
 import com.alphasystem.openxml.builder.wml.WmlBuilderFactory;
 import com.alphasystem.util.IdGenerator;
 
-import java.util.Collections;
-import java.util.List;
-
 public class TextBuilder extends InlineBuilder<String> {
 
     public TextBuilder() {
+        super(null);
         this.id = IdGenerator.nextId();
     }
 
@@ -28,10 +26,5 @@ public class TextBuilder extends InlineBuilder<String> {
                     .addContent(WmlAdapter.getText(lines[i], "preserve"));
         }
 
-    }
-
-    @Override
-    protected List<Object> getChildContent() {
-        return Collections.emptyList();
     }
 }

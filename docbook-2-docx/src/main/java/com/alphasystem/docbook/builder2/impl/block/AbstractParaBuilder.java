@@ -18,6 +18,14 @@ public abstract class AbstractParaBuilder<S> extends AbstractBuilder<S> {
     protected String role;
     protected PPr paraProperties;
 
+    protected AbstractParaBuilder() {
+        super();
+    }
+
+    protected AbstractParaBuilder(String childContentMethodName) {
+        super(childContentMethodName);
+    }
+
     @Override
     protected void doInit(S source) {
         super.doInit(source);

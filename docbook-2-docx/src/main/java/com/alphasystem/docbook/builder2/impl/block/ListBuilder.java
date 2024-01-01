@@ -11,6 +11,10 @@ import java.util.stream.Collectors;
 
 public abstract class ListBuilder<S> extends AbstractBuilder<S> {
 
+    protected ListBuilder() {
+        super(null);
+    }
+
     @Override
     protected List<Object> processChildContent(List<Object> childContent) {
         return childContent.stream().map(content -> {
