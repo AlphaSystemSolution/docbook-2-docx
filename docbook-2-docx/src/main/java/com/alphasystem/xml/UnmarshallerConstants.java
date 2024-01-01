@@ -15,6 +15,7 @@ public interface UnmarshallerConstants {
     String INFORMAL_TABLE = "informaltable";
     String ITEMIZED_LIST = "itemizedlist";
     String LIST_ITEM = "listitem";
+    String LITERAL = "literal";
     String ORDERED_LIST = "orderedlist";
     String PHRASE = "phrase";
     String ROW = "row";
@@ -52,6 +53,10 @@ public interface UnmarshallerConstants {
 
     static boolean isListItemType(Object o) {
         return isInstanceOf(ListItem.class, o);
+    }
+
+    static boolean isLiteralType(Object o) {
+        return isInstanceOf(Literal.class, o);
     }
 
     static boolean isOrderedListType(Object o) {

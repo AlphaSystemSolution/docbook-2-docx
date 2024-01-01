@@ -178,6 +178,9 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
             case EMPHASIS:
                 starEmphasis(id, attributes);
                 break;
+            case LITERAL:
+                startLiteral(id, attributes);
+                break;
             case INFO:
             case DATE:
                 // ignored
@@ -210,6 +213,9 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
                 break;
             case EMPHASIS:
                 endEmphasis();
+                break;
+            case LITERAL:
+                endLiteral();
                 break;
             case INFORMAL_TABLE:
                 endInformalTable();
@@ -474,6 +480,17 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         processEndElement();
     }
 
+    private void startLiteral(String id, Attributes attributes) {
+        pushText();
+        final var literal = new Literal().withId(id).withRole(getAttributeValue("role", attributes));
+        docbookObjects.push(literal);
+    }
+
+    private void endLiteral() {
+        endInline();
+        processEndElement();
+    }
+
     private void endInline() {
         if (StringUtils.isNotBlank(currentText)) {
             final var obj = docbookObjects.pop();
@@ -485,6 +502,10 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
                 final var emphasis = (Emphasis) obj;
                 emphasis.getContent().add(currentText);
                 docbookObjects.push(emphasis);
+            } else if (isLiteralType(obj)) {
+                final var literal = (Literal) obj;
+                literal.getContent().add(currentText);
+                docbookObjects.push(literal);
             } else {
                 throw new IllegalArgumentException("Unhandled object: " + obj.getClass().getName());
             }

@@ -2,6 +2,7 @@ package com.alphasystem.docbook.builder2;
 
 import com.alphasystem.docbook.builder2.impl.block.*;
 import com.alphasystem.docbook.builder2.impl.inline.EmphasisBuilder;
+import com.alphasystem.docbook.builder2.impl.inline.LiteralBuilder;
 import com.alphasystem.docbook.builder2.impl.inline.PhraseBuilder;
 import com.alphasystem.docbook.builder2.impl.inline.TextBuilder;
 import com.alphasystem.xml.UnmarshallerConstants;
@@ -18,9 +19,8 @@ public class BuilderFactory {
 
     private final EmphasisBuilder emphasisBuilder = new EmphasisBuilder();
     private final InformalTableBuilder informalTableBuilder = new InformalTableBuilder();
-
     private final ItemizedListBuilder itemizedListBuilder = new ItemizedListBuilder();
-
+    private final LiteralBuilder literalBuilder = new LiteralBuilder();
     private final OrderedListBuilder orderedListBuilder = new OrderedListBuilder();
     private final PhraseBuilder phraseBuilder = new PhraseBuilder();
     private final SimpleParaBuilder simpleParaBuilder = new SimpleParaBuilder();
@@ -45,22 +45,24 @@ public class BuilderFactory {
             return null;
         }
 
-        if (UnmarshallerConstants.isSimpleParaType(o)) {
-            return simpleParaBuilder.process((SimplePara) o);
-        } else if (UnmarshallerConstants.isPhraseType(o)) {
-            return phraseBuilder.process((Phrase) o);
-        } else if (UnmarshallerConstants.isEmphasisType(o)) {
+        if (UnmarshallerConstants.isEmphasisType(o)) {
             return emphasisBuilder.process((Emphasis) o);
-        } else if (UnmarshallerConstants.isStringType(o)) {
-            return textBuilder.process((String) o);
         } else if (UnmarshallerConstants.isInformalTableType(o)) {
             return informalTableBuilder.process((InformalTable) o);
-        } else if (UnmarshallerConstants.isTitleType(o)) {
-            return titleBuilder.process((Title) o);
-        } else if (UnmarshallerConstants.isOrderedListType(o)) {
-           return orderedListBuilder.process((OrderedList) o);
         } else if (UnmarshallerConstants.isItemizedListType(o)) {
             return itemizedListBuilder.process((ItemizedList) o);
+        } else if (UnmarshallerConstants.isLiteralType(o)) {
+            return literalBuilder.process((Literal) o);
+        } else if (UnmarshallerConstants.isOrderedListType(o)) {
+            return orderedListBuilder.process((OrderedList) o);
+        } else if (UnmarshallerConstants.isPhraseType(o)) {
+            return phraseBuilder.process((Phrase) o);
+        } else if (UnmarshallerConstants.isSimpleParaType(o)) {
+            return simpleParaBuilder.process((SimplePara) o);
+        } else if (UnmarshallerConstants.isStringType(o)) {
+            return textBuilder.process((String) o);
+        } else if (UnmarshallerConstants.isTitleType(o)) {
+            return titleBuilder.process((Title) o);
         } else {
             logger.warn("Builder not defined for class: " + o.getClass().getName());
             return null;
