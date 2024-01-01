@@ -181,6 +181,9 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
             case LITERAL:
                 startLiteral(id, attributes);
                 break;
+            case TERM:
+                startTerm(id, attributes);
+                break;
             case INFO:
             case DATE:
                 // ignored
@@ -216,6 +219,9 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
                 break;
             case LITERAL:
                 endLiteral();
+                break;
+            case TERM:
+                endTerm();
                 break;
             case INFORMAL_TABLE:
                 endInformalTable();
@@ -491,6 +497,17 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         processEndElement();
     }
 
+    private void startTerm(String id, Attributes attributes) {
+        pushText();
+        final var term = new Term().withId(id).withRole(getAttributeValue("role", attributes));
+        docbookObjects.push(term);
+    }
+
+    private void endTerm() {
+        endInline();
+        processEndElement();
+    }
+
     private void endInline() {
         if (StringUtils.isNotBlank(currentText)) {
             final var obj = docbookObjects.pop();
@@ -506,6 +523,10 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
                 final var literal = (Literal) obj;
                 literal.getContent().add(currentText);
                 docbookObjects.push(literal);
+            } else if (isTermType(obj)) {
+                final var term = (Term) obj;
+                term.getContent().add(currentText);
+                docbookObjects.push(term);
             } else {
                 throw new IllegalArgumentException("Unhandled object: " + obj.getClass().getName());
             }
@@ -534,7 +555,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         } else if (isTableHeaderType(parent)) {
             handleTableHeader((TableHeader) parent, child);
         } else if (isTableBodyType(parent)) {
-            handleTableBody( (TableBody) parent, child);
+            handleTableBody((TableBody) parent, child);
         } else if (isTableFooterType(parent)) {
             handleTableFooter((TableFooter) parent, child);
         } else if (isRowType(parent)) {
@@ -591,7 +612,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         final var suffix = hasPreviousParaObjects ? "$" : "";
         role = "list_" + role + suffix;
 
-        Object updatedChild = null;
+        Object updatedChild;
         if (isSimpleParaType(child)) {
             var simplePara = (SimplePara) child;
             simplePara.setRole(role);

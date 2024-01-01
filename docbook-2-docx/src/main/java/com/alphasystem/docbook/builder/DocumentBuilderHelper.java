@@ -6,6 +6,7 @@ package com.alphasystem.docbook.builder;
 public final class DocumentBuilderHelper {
 
     public static final String ITALIC = "italic";
+    public static final String STRONG = "strong";
     public static final String LITERAL = "literal";
     public static final String SUBSCRIPT = "subscript";
     public static final String SUPERSCRIPT = "superscript";

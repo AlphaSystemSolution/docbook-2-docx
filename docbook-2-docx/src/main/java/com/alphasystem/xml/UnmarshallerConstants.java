@@ -22,6 +22,7 @@ public interface UnmarshallerConstants {
     String SIMPLE_PARA = "simpara";
     String SECTION = "section";
     String TABLE_BODY = "tbody";
+    String TERM = "term";
     String TABLE_FOOTER = "tfoot";
     String TABLE_GROUP = "tgroup";
     String TABLE_HEAD = "thead";
@@ -101,6 +102,10 @@ public interface UnmarshallerConstants {
 
     static boolean isTableGroupType(Object o) {
         return isInstanceOf(TableGroup.class, o);
+    }
+
+    static boolean isTermType(Object o) {
+        return isInstanceOf(Term.class, o);
     }
 
     static boolean isTitleType(Object o) {
