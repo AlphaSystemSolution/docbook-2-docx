@@ -12,7 +12,6 @@ import com.alphasystem.openxml.builder.wml.TocGenerator;
 import com.alphasystem.openxml.builder.wml.UnorderedList;
 import com.alphasystem.openxml.builder.wml.WmlAdapter;
 import com.alphasystem.openxml.builder.wml.WmlPackageBuilder;
-import com.alphasystem.util.AppUtil;
 import com.alphasystem.util.IdGenerator;
 import org.apache.commons.lang3.StringUtils;
 import org.docbook.model.*;
@@ -29,28 +28,9 @@ import java.util.Arrays;
 import java.util.Stack;
 
 
-public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
+public class DocBookUnmarshallerHandler implements UnmarshallerHandler, UnmarshallerConstants {
 
     private final static String NEW_LINE = System.lineSeparator();
-    private static final String ARTICLE = "article";
-    private static final String COLUMN_SPEC = "colspec";
-    private static final String DATE = "date";
-    private static final String EMPHASIS = "emphasis";
-    private static final String ENTRY = "entry";
-    private static final String INFO = "info";
-    private static final String INFORMAL_TABLE = "informaltable";
-    private static final String ITEMIZED_LIST = "itemizedlist";
-    private static final String LIST_ITEM = "listitem";
-    private static final String ORDERED_LIST = "orderedlist";
-    private static final String PHRASE = "phrase";
-    private static final String ROW = "row";
-    private static final String SIMPLE_PARA = "simpara";
-    private static final String SECTION = "section";
-    private static final String TABLE_BODY = "tbody";
-    private static final String TABLE_FOOTER = "tfoot";
-    private static final String TABLE_GROUP = "tgroup";
-    private static final String TABLE_HEAD = "thead";
-    private static final String TITLE = "title";
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final BuilderFactory builderFactory = BuilderFactory.getInstance();
@@ -495,11 +475,11 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
     private void endInline() {
         if (StringUtils.isNotBlank(currentText)) {
             final var obj = docbookObjects.pop();
-            if (AppUtil.isInstanceOf(Phrase.class, obj)) {
+            if (isPhraseType(obj)) {
                 final var phrase = (Phrase) obj;
                 phrase.getContent().add(currentText);
                 docbookObjects.push(phrase);
-            } else if (AppUtil.isInstanceOf(Emphasis.class, obj)) {
+            } else if (isEmphasisType(obj)) {
                 final var emphasis = (Emphasis) obj;
                 emphasis.getContent().add(currentText);
                 docbookObjects.push(emphasis);
@@ -516,104 +496,104 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler {
         final var child = docbookObjects.pop();
         final var parent = docbookObjects.pop();
         logger.info("Processing end element of \"{}\" of \"{}\".", child.getClass().getName(), parent.getClass().getName());
-        if (AppUtil.isInstanceOf(Phrase.class, parent)) {
+        if (isPhraseType(parent)) {
             final var obj = (Phrase) parent;
             obj.getContent().add(child);
             docbookObjects.push(obj);
-        } else if (AppUtil.isInstanceOf(Emphasis.class, parent)) {
+        } else if (isEmphasisType(parent)) {
             final var obj = (Emphasis) parent;
             obj.getContent().add(child);
             docbookObjects.push(obj);
-        } else if (AppUtil.isInstanceOf(SimplePara.class, parent)) {
+        } else if (isSimpleParaType(parent)) {
             final var obj = (SimplePara) parent;
             obj.getContent().add(child);
             docbookObjects.push(obj);
-        } else if (AppUtil.isInstanceOf(Title.class, parent)) {
+        } else if (isTitleType(parent)) {
             final var obj = (Title) parent;
             obj.getContent().add(child);
             docbookObjects.push(obj);
-        } else if (AppUtil.isInstanceOf(InformalTable.class, parent)) {
+        } else if (isInformalTableType(parent)) {
             final var obj = (InformalTable) parent;
-            if (AppUtil.isInstanceOf(TableGroup.class, child)) {
+            if (isTableGroupType(child)) {
                 obj.getTableGroup().add((TableGroup) child);
             } else {
                 throw new NotImplementedException(parent, child);
             }
             docbookObjects.push(obj);
-        } else if (AppUtil.isInstanceOf(TableGroup.class, parent)) {
+        } else if (isTableGroupType(parent)) {
             final var obj = (TableGroup) parent;
-            if (AppUtil.isInstanceOf(TableHeader.class, child)) {
+            if (isTableHeaderType(child)) {
                 obj.setTableHeader((TableHeader) child);
-            } else if (AppUtil.isInstanceOf(TableBody.class, child)) {
+            } else if (isTableBodyType(child)) {
                 obj.setTableBody((TableBody) child);
-            } else if (AppUtil.isInstanceOf(TableFooter.class, child)) {
+            } else if (isTableFooterType(child)) {
                 obj.setTableFooter((TableFooter) child);
             } else {
                 throw new NotImplementedException(parent, child);
             }
             docbookObjects.push(obj);
-        } else if (AppUtil.isInstanceOf(TableHeader.class, parent)) {
+        } else if (isTableHeaderType(parent)) {
             final var obj = (TableHeader) parent;
-            if (AppUtil.isInstanceOf(Row.class, child)) {
+            if (isRowType(child)) {
                 obj.getRow().add((Row) child);
-            } else if (AppUtil.isInstanceOf(ColumnSpec.class, child)) {
+            } else if (isColumnSpecType(child)) {
                 obj.getColSpec().add((ColumnSpec) child);
-            } else if (AppUtil.isInstanceOf(Tr.class, child)) {
+            } else if (isTrType(child)) {
                 throw new NotImplementedException(parent, child);
             }
             docbookObjects.push(obj);
-        } else if (AppUtil.isInstanceOf(TableBody.class, parent)) {
+        } else if (isTableBodyType(parent)) {
             final var obj = (TableBody) parent;
-            if (AppUtil.isInstanceOf(Row.class, child)) {
+            if (isRowType(child)) {
                 obj.getRow().add((Row) child);
-            } else if (AppUtil.isInstanceOf(Tr.class, child)) {
+            } else if (isTrType(child)) {
                 throw new IllegalArgumentException("\"Tr\" is not implemented yet");
             }
             docbookObjects.push(obj);
-        } else if (AppUtil.isInstanceOf(TableFooter.class, parent)) {
+        } else if (isTableFooterType(parent)) {
             final var obj = (TableFooter) parent;
-            if (AppUtil.isInstanceOf(Row.class, child)) {
+            if (isRowType(child)) {
                 obj.getRow().add((Row) child);
-            } else if (AppUtil.isInstanceOf(ColumnSpec.class, child)) {
+            } else if (isColumnSpecType(child)) {
                 obj.getColSpec().add((ColumnSpec) child);
-            } else if (AppUtil.isInstanceOf(Tr.class, child)) {
+            } else if (isTrType(child)) {
                 throw new IllegalArgumentException("\"Tr\" is not implemented yet");
             }
             docbookObjects.push(obj);
-        } else if (AppUtil.isInstanceOf(Row.class, parent)) {
+        } else if (isRowType(parent)) {
             final var obj = (Row) parent;
             obj.getContent().add(child);
             docbookObjects.push(obj);
-        } else if (AppUtil.isInstanceOf(Entry.class, parent)) {
+        } else if (isEntryType(parent)) {
             final var obj = (Entry) parent;
             obj.getContent().add(child);
             docbookObjects.push(obj);
-        } else if (AppUtil.isInstanceOf(OrderedList.class, parent)) {
+        } else if (isOrderedListType(parent)) {
             final var obj = (OrderedList) parent;
-            if (AppUtil.isInstanceOf(ListItem.class, child)) {
+            if (isListItemType(child)) {
                 obj.getListItem().add((ListItem) child);
             } else {
                 throw new NotImplementedException(parent, child);
             }
             docbookObjects.push(obj);
-        } else if (AppUtil.isInstanceOf(ItemizedList.class, parent)) {
+        } else if (isItemizedListType(parent)) {
             final var obj = (ItemizedList) parent;
-            if (AppUtil.isInstanceOf(ListItem.class, child)) {
+            if (isListItemType(child)) {
                 obj.getListItem().add((ListItem) child);
             } else {
                 throw new NotImplementedException(parent, child);
             }
             docbookObjects.push(obj);
-        } else if (AppUtil.isInstanceOf(ListItem.class, parent)) {
+        } else if (isListItemType(parent)) {
             final var obj = (ListItem) parent;
             obj.getContent().add(child);
             docbookObjects.push(obj);
-        } else if (AppUtil.isInstanceOf(Section.class, parent)) {
+        } else if (isSectionType(parent)) {
             // now process the content add it to document
             processContent(child);
             docbookObjects.push(parent);
-        } else if (AppUtil.isInstanceOf(Article.class, parent)) {
-            if (AppUtil.isInstanceOf(Section.class, child)) {
+        } else if (isArticleType(parent)) {
+            if (isSectionType(child)) {
                 logger.warn("Not sure how to handle section");
             }
             processContent(child);
