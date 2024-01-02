@@ -8,12 +8,14 @@ public interface UnmarshallerConstants {
 
     String ARTICLE = "article";
     String COLUMN_SPEC = "colspec";
+    String CROSS_REFERENCE = "xref";
     String DATE = "date";
     String EMPHASIS = "emphasis";
     String ENTRY = "entry";
     String INFO = "info";
     String INFORMAL_TABLE = "informaltable";
     String ITEMIZED_LIST = "itemizedlist";
+    String LINK = "link";
     String LIST_ITEM = "listitem";
     String LITERAL = "literal";
     String ORDERED_LIST = "orderedlist";
@@ -38,6 +40,10 @@ public interface UnmarshallerConstants {
         return isInstanceOf(ColumnSpec.class, o);
     }
 
+    static boolean isCrossReferenceType(Object o) {
+        return isInstanceOf(CrossReference.class, o);
+    }
+
     static boolean isEmphasisType(Object o) {
         return isInstanceOf(Emphasis.class, o);
     }
@@ -52,6 +58,10 @@ public interface UnmarshallerConstants {
 
     static boolean isItemizedListType(Object o) {
         return isInstanceOf(ItemizedList.class, o);
+    }
+
+    static boolean isLinkType(Object o) {
+        return isInstanceOf(Link.class, o);
     }
 
     static boolean isListItemType(Object o) {
@@ -82,6 +92,10 @@ public interface UnmarshallerConstants {
         return isInstanceOf(Section.class, o);
     }
 
+    static boolean isSimpleParaType(Object o) {
+        return isInstanceOf(SimplePara.class, o);
+    }
+
     static boolean isStringType(Object o) {
         return isInstanceOf(String.class, o);
     }
@@ -92,10 +106,6 @@ public interface UnmarshallerConstants {
 
     static boolean isSuperscriptType(Object o) {
         return isInstanceOf(Superscript.class, o);
-    }
-
-    static boolean isSimpleParaType(Object o) {
-        return isInstanceOf(SimplePara.class, o);
     }
 
     static boolean isTableBodyType(Object o) {

@@ -73,16 +73,18 @@ public abstract class InlineBuilder<S> extends AbstractBuilder<S> {
 
     protected void createRunBuilder() {
         runBuilder = WmlBuilderFactory.getRBuilder().withRsidR(getId());
+        final var rPr = new RPrBuilder(handleStyles(), runBuilder.getObject().getRPr()).getObject();
+        runBuilder.withRPr(rPr);
     }
 
     @Override
     protected List<Object> doProcess(List<Object> processedChildContent) {
         createRunBuilder();
-        final var rPr = new RPrBuilder(handleStyles(), runBuilder.getObject().getRPr()).getObject();
-        final var r = runBuilder.withRPr(rPr).getObject();
+        final var r = runBuilder.getObject();
         final var result = new ArrayList<>();
         result.add(r);
 
+        final var rPr = r.getRPr();
         final var updatedChildContent =
                 processedChildContent.stream().map(content -> {
                     final var childR = (R) content;

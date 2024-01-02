@@ -14,9 +14,11 @@ public class BuilderFactory {
     private static BuilderFactory instance;
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    private final CrossReferenceBuilder crossReferenceBuilder = new CrossReferenceBuilder();
     private final EmphasisBuilder emphasisBuilder = new EmphasisBuilder();
     private final InformalTableBuilder informalTableBuilder = new InformalTableBuilder();
     private final ItemizedListBuilder itemizedListBuilder = new ItemizedListBuilder();
+    private final LinkBuilder linkBuilder = new LinkBuilder();
     private final LiteralBuilder literalBuilder = new LiteralBuilder();
     private final OrderedListBuilder orderedListBuilder = new OrderedListBuilder();
     private final PhraseBuilder phraseBuilder = new PhraseBuilder();
@@ -45,12 +47,16 @@ public class BuilderFactory {
             return null;
         }
 
-        if (UnmarshallerConstants.isEmphasisType(o)) {
+        if (UnmarshallerConstants.isCrossReferenceType(o)) {
+            return crossReferenceBuilder.process((CrossReference) o);
+        } else if (UnmarshallerConstants.isEmphasisType(o)) {
             return emphasisBuilder.process((Emphasis) o);
         } else if (UnmarshallerConstants.isInformalTableType(o)) {
             return informalTableBuilder.process((InformalTable) o);
         } else if (UnmarshallerConstants.isItemizedListType(o)) {
             return itemizedListBuilder.process((ItemizedList) o);
+        } else if (UnmarshallerConstants.isLinkType(o)) {
+            return linkBuilder.process((Link) o);
         } else if (UnmarshallerConstants.isLiteralType(o)) {
             return literalBuilder.process((Literal) o);
         } else if (UnmarshallerConstants.isOrderedListType(o)) {

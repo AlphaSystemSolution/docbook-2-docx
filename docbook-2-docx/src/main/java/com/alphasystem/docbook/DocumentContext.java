@@ -2,6 +2,7 @@ package com.alphasystem.docbook;
 
 import com.alphasystem.asciidoc.model.DocumentInfo;
 import com.alphasystem.docbook.model.ListInfo;
+import org.apache.commons.lang3.StringUtils;
 import org.docbook.model.Article;
 import org.docx4j.jaxb.Context;
 import org.docx4j.openpackaging.parts.WordprocessingML.DocumentSettingsPart;
@@ -27,6 +28,7 @@ public final class DocumentContext {
     private static final Object DUMMY = new Object();
 
     private final Map<Long, Object> listNumbersMap = new HashMap<>();
+    private final Map<String, String> idToTitleMap = new HashMap<>();
     private final List<String> documentStyles;
     private final Object document;
     private final DocumentInfo documentInfo;
@@ -84,6 +86,19 @@ public final class DocumentContext {
 
     public long getCurrentListLevel() {
         return getCurrentListInfo().getLevel();
+    }
+
+    public void putTitle(String id, String title) {
+        idToTitleMap.put(id, title);
+    }
+
+    public String getTitle(String id) {
+        var title = idToTitleMap.get(id);
+        if (StringUtils.isBlank(title)) {
+            // if no id -> title mapping is defined, then word "here" will be return for link display.
+            title = "here";
+        }
+        return title
     }
 
     @Deprecated

@@ -112,12 +112,12 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
 
     @Override
     public void startPrefixMapping(String prefix, String uri) {
-        logger.info("startPrefixMapping: prefix = {}, uri = {}", prefix, uri);
+        logger.trace("startPrefixMapping: prefix = {}, uri = {}", prefix, uri);
     }
 
     @Override
     public void endPrefixMapping(String prefix) {
-        logger.info("startPrefixMapping: prefix = {}", prefix);
+        logger.trace("endPrefixMapping: prefix = {}", prefix);
     }
 
     @Override
@@ -129,57 +129,48 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
                 sectionLevel = 0;
                 docbookObjects.push(new Article().withId(id));
                 break;
-            case SECTION:
-                sectionLevel += 1;
-                docbookObjects.push(new Section().withId(id));
-                break;
-            case TITLE:
-                startTitle();
-                break;
-            case SIMPLE_PARA:
-                startSimplePara(id, attributes);
-                break;
-            case INFORMAL_TABLE:
-                startInformalTable(id, attributes);
-                break;
-            case TABLE_GROUP:
-                startTableGroup(attributes);
-                break;
             case COLUMN_SPEC:
                 startColumnSpec(attributes);
                 break;
-            case TABLE_HEAD:
-                startTableHeader(attributes);
-                break;
-            case TABLE_BODY:
-                startTableBody(attributes);
-                break;
-            case TABLE_FOOTER:
-                startTableFooter(attributes);
-                break;
-            case ROW:
-                docbookObjects.push(new Row());
-                break;
-            case ENTRY:
-                startEntry(attributes);
-                break;
-            case ORDERED_LIST:
-                startOrderedList(id, attributes);
-                break;
-            case ITEMIZED_LIST:
-                startItemizedList(id, attributes);
-                break;
-            case LIST_ITEM:
-                startListItem();
-                break;
-            case PHRASE:
-                startPhrase(id, attributes);
+            case CROSS_REFERENCE:
+                startCrossReference(id, attributes);
                 break;
             case EMPHASIS:
                 starEmphasis(id, attributes);
                 break;
+            case ENTRY:
+                startEntry(attributes);
+                break;
+            case INFORMAL_TABLE:
+                startInformalTable(id, attributes);
+                break;
+            case ITEMIZED_LIST:
+                startItemizedList(id, attributes);
+                break;
+            case LINK:
+                startLink(id, attributes);
+                break;
+            case LIST_ITEM:
+                startListItem();
+                break;
             case LITERAL:
                 startLiteral(id, attributes);
+                break;
+            case ORDERED_LIST:
+                startOrderedList(id, attributes);
+                break;
+            case PHRASE:
+                startPhrase(id, attributes);
+                break;
+            case ROW:
+                docbookObjects.push(new Row());
+                break;
+            case SECTION:
+                sectionLevel += 1;
+                docbookObjects.push(new Section().withId(id));
+                break;
+            case SIMPLE_PARA:
+                startSimplePara(id, attributes);
                 break;
             case SUBSCRIPT:
                 startSubscript(id, attributes);
@@ -187,8 +178,23 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
             case SUPERSCRIPT:
                 startSuperscript(id, attributes);
                 break;
+            case TABLE_BODY:
+                startTableBody(attributes);
+                break;
+            case TABLE_FOOTER:
+                startTableFooter(attributes);
+                break;
+            case TABLE_GROUP:
+                startTableGroup(attributes);
+                break;
+            case TABLE_HEAD:
+                startTableHeader(attributes);
+                break;
             case TERM:
                 startTerm(id, attributes);
+                break;
+            case TITLE:
+                startTitle();
                 break;
             case INFO:
             case DATE:
@@ -211,20 +217,39 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
                 sectionLevel -= 1;
                 docbookObjects.pop();
                 break;
-            case TITLE:
-                endTitle();
-                break;
-            case SIMPLE_PARA:
-                endSimplePara();
-                break;
-            case PHRASE:
-                endPhrase();
+            case CROSS_REFERENCE:
+                endCrossReference();
                 break;
             case EMPHASIS:
                 endEmphasis();
                 break;
+            case ENTRY:
+                endEntry();
+                break;
+            case INFORMAL_TABLE:
+                endInformalTable();
+                break;
+            case ITEMIZED_LIST:
+            case ORDERED_LIST:
+                endList();
+                break;
+            case LINK:
+                endLink();
+                break;
+            case LIST_ITEM:
+                endListItem();
+                break;
             case LITERAL:
                 endLiteral();
+                break;
+            case PHRASE:
+                endPhrase();
+                break;
+            case ROW:
+                endRow();
+                break;
+            case SIMPLE_PARA:
+                endSimplePara();
                 break;
             case SUBSCRIPT:
                 endSubscript();
@@ -232,11 +257,11 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
             case SUPERSCRIPT:
                 endSuperscript();
                 break;
-            case TERM:
-                endTerm();
+            case TABLE_BODY:
+                endTableBody();
                 break;
-            case INFORMAL_TABLE:
-                endInformalTable();
+            case TABLE_FOOTER:
+                endTableFooter();
                 break;
             case TABLE_GROUP:
                 endTableGroup();
@@ -244,24 +269,12 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
             case TABLE_HEAD:
                 endTableHeader();
                 break;
-            case TABLE_BODY:
-                endTableBody();
+            case TERM:
+                endTerm();
                 break;
-            case TABLE_FOOTER:
-                endTableFooter();
+            case TITLE:
+                endTitle();
                 break;
-            case ROW:
-                endRow();
-                break;
-            case ENTRY:
-                endEntry();
-                break;
-            case ORDERED_LIST:
-            case ITEMIZED_LIST:
-                endList();
-                break;
-            case LIST_ITEM:
-                endListItem();
             case INFO:
             case DATE:
             case COLUMN_SPEC:
@@ -531,6 +544,34 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         processEndElement();
     }
 
+    private void startCrossReference(String id, Attributes attributes) {
+        pushText();
+        final var xref = new CrossReference().withId(id).withRole(getAttributeValue("role", attributes))
+                .withLinkend(getAttributeValue("linkend", attributes))
+                .withHref(getAttributeValue("href", attributes))
+                .withEndterm(getAttributeValue("endterm", attributes));
+        docbookObjects.push(xref);
+    }
+
+    private void endCrossReference() {
+        endInline();
+        processEndElement();
+    }
+
+    private void startLink(String id, Attributes attributes) {
+        pushText();
+        final var link = new Link().withId(id).withRole(getAttributeValue("role", attributes))
+                .withLinkend(getAttributeValue("linkend", attributes))
+                .withHref(getAttributeValue("href", attributes))
+                .withEndterm(getAttributeValue("endterm", attributes));
+        docbookObjects.push(link);
+    }
+
+    private void endLink() {
+        endInline();
+        processEndElement();
+    }
+
     private void startTerm(String id, Attributes attributes) {
         pushText();
         final var term = new Term().withId(id).withRole(getAttributeValue("role", attributes));
@@ -545,18 +586,24 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     private void endInline() {
         if (StringUtils.isNotBlank(currentText)) {
             final var obj = docbookObjects.pop();
-            if (isPhraseType(obj)) {
-                final var phrase = (Phrase) obj;
-                phrase.getContent().add(currentText);
-                docbookObjects.push(phrase);
+            if (isCrossReferenceType(obj)) {
+                docbookObjects.push(obj);
             } else if (isEmphasisType(obj)) {
                 final var emphasis = (Emphasis) obj;
                 emphasis.getContent().add(currentText);
                 docbookObjects.push(emphasis);
+            } else if (isLinkType(obj)) {
+                final var link = (Link) obj;
+                link.getContent().add(currentText);
+                docbookObjects.push(link);
             } else if (isLiteralType(obj)) {
                 final var literal = (Literal) obj;
                 literal.getContent().add(currentText);
                 docbookObjects.push(literal);
+            } else if (isPhraseType(obj)) {
+                final var phrase = (Phrase) obj;
+                phrase.getContent().add(currentText);
+                docbookObjects.push(phrase);
             } else if (isSubscriptType(obj)) {
                 final var subscript = (Subscript) obj;
                 subscript.getContent().add(currentText);
@@ -582,41 +629,52 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         final var child = docbookObjects.pop();
         final var parent = docbookObjects.pop();
         logger.info("Processing end element of \"{}\" of \"{}\".", child.getClass().getName(), parent.getClass().getName());
-        if (isPhraseType(parent)) {
-            handlePhrase((Phrase) parent, child);
-        } else if (isEmphasisType(parent)) {
-            handleEmphasis((Emphasis) parent, child);
-        } else if (isSimpleParaType(parent)) {
-            handleSimplePara((SimplePara) parent, child);
-        } else if (isTitleType(parent)) {
-            handleTitle((Title) parent, child);
-        } else if (isInformalTableType(parent)) {
-            handleInformalTable((InformalTable) parent, child);
-        } else if (isTableGroupType(parent)) {
-            handleTableGroup((TableGroup) parent, child);
-        } else if (isTableHeaderType(parent)) {
-            handleTableHeader((TableHeader) parent, child);
-        } else if (isTableBodyType(parent)) {
-            handleTableBody((TableBody) parent, child);
-        } else if (isTableFooterType(parent)) {
-            handleTableFooter((TableFooter) parent, child);
-        } else if (isRowType(parent)) {
-            handleRow((Row) parent, child);
-        } else if (isEntryType(parent)) {
-            handleEntry((Entry) parent, child);
-        } else if (isOrderedListType(parent)) {
-            handleOrderedList((OrderedList) parent, child);
-        } else if (isItemizedListType(parent)) {
-            handleItemizedList((ItemizedList) parent, child);
-        } else if (isListItemType(parent)) {
-            handleListItem((ListItem) parent, child);
-        } else if (isSectionType(parent)) {
-            handleArticleOrSection(parent, child);
-        } else if (isArticleType(parent)) {
+
+        if (isArticleType(parent)) {
             if (isSectionType(child)) {
                 logger.warn("Not sure how to handle section");
             }
             handleArticleOrSection(parent, child);
+        } else if (isEmphasisType(parent)) {
+            handleEmphasis((Emphasis) parent, child);
+        } else if (isEntryType(parent)) {
+            handleEntry((Entry) parent, child);
+        } else if (isInformalTableType(parent)) {
+            handleInformalTable((InformalTable) parent, child);
+        } else if (isItemizedListType(parent)) {
+            handleItemizedList((ItemizedList) parent, child);
+        } else if (isLinkType(parent)) {
+            handleLink((Link) parent, child);
+        } else if (isListItemType(parent)) {
+            handleListItem((ListItem) parent, child);
+        } else if (isLiteralType(parent)) {
+            handleLiteral((Literal) parent, child);
+        } else if (isOrderedListType(parent)) {
+            handleOrderedList((OrderedList) parent, child);
+        } else if (isParaType(parent)) {
+            // TODO:
+        } else if (isPhraseType(parent)) {
+            handlePhrase((Phrase) parent, child);
+        } else if (isRowType(parent)) {
+            handleRow((Row) parent, child);
+        } else if (isSectionType(parent)) {
+            handleArticleOrSection(parent, child);
+        } else if (isSimpleParaType(parent)) {
+            handleSimplePara((SimplePara) parent, child);
+        } else if (isSubscriptType(parent)) {
+            handleSubscript((Subscript) parent, child);
+        } else if (isSuperscriptType(parent)) {
+            handleSuperscript((Superscript) parent, child);
+        } else if (isTableBodyType(parent)) {
+            handleTableBody((TableBody) parent, child);
+        } else if (isTableFooterType(parent)) {
+            handleTableFooter((TableFooter) parent, child);
+        } else if (isTableGroupType(parent)) {
+            handleTableGroup((TableGroup) parent, child);
+        } else if (isTableHeaderType(parent)) {
+            handleTableHeader((TableHeader) parent, child);
+        } else if (isTitleType(parent)) {
+            handleTitle((Title) parent, child);
         } else {
             throw new NotImplementedException(parent, child);
         }
@@ -686,6 +744,26 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         } else {
             throw new NotImplementedException(obj, child);
         }
+        docbookObjects.push(obj);
+    }
+
+    private void handleLiteral(Literal obj, Object child) {
+        obj.getContent().add(child);
+        docbookObjects.push(obj);
+    }
+
+    private void handleLink(Link obj, Object child) {
+        obj.getContent().add(child);
+        docbookObjects.push(obj);
+    }
+
+    private void handleSubscript(Subscript obj, Object child) {
+        obj.getContent().add(child);
+        docbookObjects.push(obj);
+    }
+
+    private void handleSuperscript(Superscript obj, Object child) {
+        obj.getContent().add(child);
         docbookObjects.push(obj);
     }
 
