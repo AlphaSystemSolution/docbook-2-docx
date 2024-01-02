@@ -36,7 +36,7 @@ public abstract class LinkSupportBuilder<S> extends InlineBuilder<S> {
         createRunBuilder();
         var text = (String) Utils.invokeMethod(source, "getEndterm");
         if (StringUtils.isBlank(text)) {
-            text = ApplicationController.getContext().getTitle(href);
+            text = ApplicationController.getContext().getLabel(href);
         }
 
         if (StringUtils.isNotBlank(text)) {

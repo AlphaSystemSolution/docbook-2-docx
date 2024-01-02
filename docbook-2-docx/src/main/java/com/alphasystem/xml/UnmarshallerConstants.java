@@ -52,6 +52,10 @@ public interface UnmarshallerConstants {
         return isInstanceOf(Entry.class, o);
     }
 
+    static boolean isFormalParaType(Object o) {
+        return isInstanceOf(FormalPara.class, o);
+    }
+
     static boolean isInformalTableType(Object o) {
         return isInstanceOf(InformalTable.class, o);
     }
@@ -137,6 +141,6 @@ public interface UnmarshallerConstants {
     }
 
     static boolean isParaTypes(Object o) {
-        return isSimpleParaType(o) || isParaType(o);
+        return isSimpleParaType(o) || isParaType(o) || isFormalParaType(o);
     }
 }

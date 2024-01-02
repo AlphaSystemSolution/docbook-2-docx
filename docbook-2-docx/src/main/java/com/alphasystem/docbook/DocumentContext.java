@@ -28,7 +28,7 @@ public final class DocumentContext {
     private static final Object DUMMY = new Object();
 
     private final Map<Long, Object> listNumbersMap = new HashMap<>();
-    private final Map<String, String> idToTitleMap = new HashMap<>();
+    private final Map<String, String> idToLinkMap = new HashMap<>();
     private final List<String> documentStyles;
     private final Object document;
     private final DocumentInfo documentInfo;
@@ -88,17 +88,20 @@ public final class DocumentContext {
         return getCurrentListInfo().getLevel();
     }
 
-    public void putTitle(String id, String title) {
-        idToTitleMap.put(id, title);
+    public void putLabel(String id, String label) {
+        final var value = idToLinkMap.get(id);
+        if (StringUtils.isBlank(value)) {
+            idToLinkMap.put(id, label);
+        }
     }
 
-    public String getTitle(String id) {
-        var title = idToTitleMap.get(id);
-        if (StringUtils.isBlank(title)) {
-            // if no id -> title mapping is defined, then word "here" will be return for link display.
-            title = "here";
+    public String getLabel(String id) {
+        var label = idToLinkMap.get(id);
+        if (StringUtils.isBlank(label)) {
+            // if no id -> label mapping is defined, then word "here" will be return for link display.
+            label = "here";
         }
-        return title
+        return label;
     }
 
     @Deprecated

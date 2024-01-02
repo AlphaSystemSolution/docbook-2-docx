@@ -25,7 +25,10 @@ import org.xml.sax.Locator;
 
 import javax.xml.bind.UnmarshallerHandler;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import java.util.Stack;
+import java.util.stream.Collectors;
 
 import static com.alphasystem.xml.UnmarshallerConstants.*;
 
@@ -124,6 +127,10 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     public void startElement(String uri, String localName, String qName, Attributes attributes) {
         logger.debug("Start of element: localName = {}, qName = {}", localName, qName);
         final var id = getId(attributes);
+        final var xreflabel = getXrefLabel(attributes);
+        if (StringUtils.isNotBlank(xreflabel)) {
+            ApplicationController.getContext().putLabel(id, xreflabel);
+        }
         switch (localName) {
             case ARTICLE:
                 sectionLevel = 0;
@@ -356,7 +363,32 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     private void endTitle() {
         pushText();
         // title is handled differently
-        processContent(docbookObjects.pop());
+        final var title = (Title) docbookObjects.pop();
+        final var linkText = getLinkText("", title.getContent());
+        if (StringUtils.isNotBlank(linkText)) {
+            ApplicationController.getContext().putLabel(title.getId(), linkText);
+        }
+        processContent(title);
+    }
+
+    private String getLinkText(String result, List<Object> contents) {
+        if (Objects.isNull(contents) || contents.isEmpty()) {
+            return result;
+        }
+        final var collectedText = contents.stream().map(content -> {
+            if (isStringType(content)) {
+                return (String) content;
+            } else if (isEmphasisType(content)) {
+                return getLinkText(result, ((Emphasis) content).getContent());
+            } else if (isPhraseType(content)) {
+                return getLinkText(result, ((Phrase) content).getContent());
+            } else {
+                logger.warn("Not sure how to get text from: ");
+                return "";
+            }
+        }).collect(Collectors.joining(" "));
+
+        return result + " " + collectedText;
     }
 
     private void startSimplePara(String id, Attributes attributes) {
@@ -884,6 +916,10 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     private static String getId(Attributes attributes) {
         var id = getAttributeValue("id", attributes);
         return id == null ? IdGenerator.nextId() : id;
+    }
+
+    private static String getXrefLabel(Attributes attributes) {
+        return getAttributeValue("xreflabel", attributes);
     }
 
     private static String getAttributeValue(String attributeName, Attributes attributes) {
