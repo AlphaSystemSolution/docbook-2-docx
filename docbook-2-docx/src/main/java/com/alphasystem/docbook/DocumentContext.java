@@ -34,10 +34,6 @@ public final class DocumentContext {
     private MainDocumentPart mainDocumentPart;
     private NumberingDefinitionsPart numberingDefinitionsPart;
 
-    /*
-     * If there are multiple paras in the list then after first para this flag will be true and "NumPr" will be set to null.
-     */
-    private boolean successiveParaInList = false;
     private ListInfo currentListInfo;
 
     public DocumentContext(final DocumentInfo documentInfo, final Object document) {
@@ -84,14 +80,6 @@ public final class DocumentContext {
             numberId = numberingDefinitionsPart.restart(numberId, level, 1);
         }
         return numberId;
-    }
-
-    public boolean isSuccessiveParaInList() {
-        return successiveParaInList;
-    }
-
-    public void setSuccessiveParaInList(boolean successiveParaInList) {
-        this.successiveParaInList = successiveParaInList;
     }
 
     public long getCurrentListLevel() {
