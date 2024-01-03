@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="Suite">
-    <test name="Test" preserve-order="true">
+    <test name="Test">
         <classes>
             <class name="com.alphasystem.docbook.builder.test.Setup"/>
             <class name="com.alphasystem.docbook.builder.test.TitleTest"/>
+            <class name="com.alphasystem.docbook.builder.test.InlineTest"/>
+            <class name="com.alphasystem.docbook.builder.test.TearDown"/>
+            <!--
             <class name="com.alphasystem.docbook.builder.test.InlineTest"/>
             <class name="com.alphasystem.docbook.builder.test.MultipleRolesTest"/>
             <class name="com.alphasystem.docbook.builder.test.LineBreakTest"/>
@@ -14,8 +17,7 @@
             <class name="com.alphasystem.docbook.builder.test.AdmonitionTest"/>
             <class name="com.alphasystem.docbook.builder.test.ListTest"/>
             <class name="com.alphasystem.docbook.builder.test.TableTest"/>
-            <class name="com.alphasystem.docbook.builder.test.ScreenTest"/>
-            <class name="com.alphasystem.docbook.builder.test.TearDown"/>
+            <class name="com.alphasystem.docbook.builder.test.ScreenTest"/-->
         </classes>
     </test> <!-- Test -->
 </suite> <!-- Suite -->

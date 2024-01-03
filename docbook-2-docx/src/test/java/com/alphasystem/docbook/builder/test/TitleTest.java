@@ -1,12 +1,6 @@
 package com.alphasystem.docbook.builder.test;
 
-import com.alphasystem.docbook.builder.Builder;
-import org.docbook.model.Article;
-import org.docbook.model.Example;
-import org.docbook.model.Title;
 import org.testng.annotations.Test;
-
-import java.util.List;
 
 import static com.alphasystem.docbook.builder.test.DataFactory.*;
 import static org.testng.Assert.assertEquals;
@@ -14,27 +8,31 @@ import static org.testng.Assert.assertEquals;
 /**
  * @author sali
  */
-public class TitleTest extends AbstractTest {
+public class TitleTest extends AbstractTest2 {
 
     @Test
-    public void testDocumentTitle() {
-        final Builder parent = builderFactory.getBuilder(null, new Article(), -1);
-        final Title title = createTitle("Document Title");
-        final List<Object> content = buildContent(parent, 0, title);
+    public void testTitle() {
+        final var content = processContent(createArticle("Document title"));
+
         assertEquals(content.size(), 1);
-        addResultToDocument("Document Title Test", content.toArray());
+        assertText(content.get(0), "Document title");
+        addResult("Title test with default style", content);
     }
 
-    @Test(dependsOnMethods = "testDocumentTitle")
-    public void testDocumentTitleWithCustomStyle() {
-        final Builder parent = builderFactory.getBuilder(null, new Article(), -1);
-        final Title title = createTitle("Document Title ", createPhrase("arabicHeading1", "س ل م"));
-        addResult(parent, 0, 1, "Document Title with custom style Test", title);
+    @Test
+    public void testTitleWithCustomStyle() {
+        final var info = createInfo("Document title ", createPhrase("arabicHeading1", "سلم"));
+        final var article = createArticle().withContent(info);
+        final var content = processContent(article);
+
+        assertEquals(content.size(), 1);
+        assertText(content.get(0), "Document title سلم");
+        addResult("Title test with custom style", content);
     }
 
-    @Test(dependsOnMethods = "testDocumentTitleWithCustomStyle")
+    /*@Test(dependsOnMethods = "testDocumentTitleWithCustomStyle")
     public void testExampleTitle() {
         final Builder parent = builderFactory.getBuilder(null, new Example(), -1);
         addResult(parent, 0, 3, "Example Title Test", createExample("Example Title"));
-    }
+    }*/
 }

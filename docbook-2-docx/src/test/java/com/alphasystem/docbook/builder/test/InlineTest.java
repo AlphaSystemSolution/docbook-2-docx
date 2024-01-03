@@ -1,95 +1,146 @@
 package com.alphasystem.docbook.builder.test;
 
-import com.alphasystem.docbook.builder.Builder;
-import org.docbook.model.Article;
-import org.docbook.model.Literal;
-import org.docbook.model.Phrase;
+import com.alphasystem.SystemException;
+import com.alphasystem.util.IdGenerator;
 import org.docbook.model.SimplePara;
-import org.docx4j.wml.P;
-import org.docx4j.wml.R;
 import org.testng.annotations.Test;
 
-import java.util.List;
-
 import static com.alphasystem.docbook.builder.test.DataFactory.*;
-import static com.alphasystem.util.IdGenerator.nextId;
 import static org.testng.Assert.assertEquals;
 
-/**
- * @author sali
- */
-public class InlineTest extends AbstractTest {
+public class InlineTest extends AbstractTest2 {
+
+    private final SimplePara paraWithXrefLabel = createSimplePara(IdGenerator.nextId(),
+            "A paragraph with ",
+            createLiteral(IdGenerator.nextId(), "xreflabel"),
+            " (",
+            createEmphasis(null, "Text to display"),
+            ").")
+            .withXreflabel("Text to display");
 
     @Test
-    public void testBold() {
-        final List<Object> content = buildContent(null, -1, createBold("Bold Text"));
+    public void testBasicInline() throws SystemException {
+        final var simplePara =
+                createSimplePara(
+                        IdGenerator.nextId(),
+                        "This paragraph contains some ",
+                        createBold("bold text"),
+                        ", some ",
+                        createEmphasis(null, "italic text"),
+                        ", and some ",
+                        createEmphasis("marked", "highlighted text"),
+                        "."
+                );
+
+        final var article = createArticle(simplePara);
+        final var content = processContent(article);
+
+        // validate
         assertEquals(content.size(), 1);
-        final R r = (R) content.get(0);
-        assertEquals(r.getClass().getName(), R.class.getName());
-        addResult("Bold Test", r);
+        assertText(content.get(0), "This paragraph contains some bold text, some italic text, and some highlighted text.");
+        addResult("Basic inline test", content);
     }
 
-    @Test(dependsOnMethods = "testBold")
-    public void testItalic() {
-        final List<Object> content = buildContent(null, -1, createItalic("Italic Text"));
+    @Test(dependsOnMethods = "testBasicInline")
+    public void testLiteralAndSubscriptTest() {
+        final var subscript = createSubscript(IdGenerator.nextId(), "2");
+        final var literal = createLiteral(IdGenerator.nextId(), "H", subscript, "O");
+        final var article = createArticle(
+                createSimplePara(
+                        IdGenerator.nextId(),
+                        "Chemical formula for water is ",
+                        literal,
+                        "."
+                )
+        );
+        final var content = processContent(article);
+
+        // validate
         assertEquals(content.size(), 1);
-        final R r = (R) content.get(0);
-        assertEquals(r.getClass().getName(), R.class.getName());
-        addResult("Italic Test", r);
+        assertText(content.get(0), "Chemical formula for water is H2O.");
+        addResult("Literal with subscript Test", content);
     }
 
-    @Test(dependsOnMethods = "testItalic")
-    public void testHighlight() {
-        final var parent = builderFactory.getBuilder(null, new Article(), 0);
-        final var content = buildContent(parent, -1, createHighlight(nextId(), "highlighted text"));
+    @Test(dependsOnMethods = "testBasicInline")
+    public void testParaWithXrefLabel() {
+        final var content = processContent(createArticle(paraWithXrefLabel));
+
+        // validate
         assertEquals(content.size(), 1);
-        final var p = (P) content.get(0);
-        addResultToDocument("Highlight Test", p);
+        assertText(content.get(0), "A paragraph with xreflabel (Text to display).");
+
+        addResult("Simple Paragraph with \"XREFLABEL\" Test", content);
     }
 
-    @Test(dependsOnMethods = "testHighlight")
-    public void testTermBuilder() {
-        final List<Object> content = buildContent(null, -1, createTerm("Term Title"));
+    @Test(dependsOnMethods = "testParaWithXrefLabel")
+    public void testSuperscriptTest() {
+        final var superscript = createSuperscript(IdGenerator.nextId(), "2");
+        final var phrase = createPhrase("strong", "E = mc", superscript);
+        final var article = createArticle(
+                createSimplePara(
+                        IdGenerator.nextId(),
+                        "Einstein's theory of relativity is ",
+                        phrase,
+                        "."
+                )
+        );
+        final var content = processContent(article);
+
+        // validate
         assertEquals(content.size(), 1);
-        final R r = (R) content.get(0);
-        assertEquals(r.getClass().getName(), R.class.getName());
-        addResult("Term Test", r);
+        assertText(content.get(0), "Einstein's theory of relativity is E = mc2.");
+
+        addResult("Superscript Test", content);
     }
 
-    @Test(dependsOnMethods = "testTermBuilder")
-    public void testSubscript() {
-        final Literal literal = createLiteral(null, "H", createSubscript(null, "2"), "O");
-        final Phrase phrase = createPhrase("bold", literal);
-        final List<Object> content = buildContent(null, -1, "Chemical formula for water is ", phrase);
-        assertEquals(content.size(), 4);
-        addResult("Subscript Test", convertToRuns(content));
-    }
-
-    @Test(dependsOnMethods = "testSubscript")
-    public void testSuperscript() {
-        final Literal literal = createLiteral(null, "E = mc", createSuperscript(null, "2"));
-        final Phrase phrase = createPhrase("bold", literal);
-        final List<Object> content = buildContent(null, -1, "Einstein's theory of relativity is ", phrase);
-        assertEquals(content.size(), 3);
-        addResult("Superscript Test", convertToRuns(content));
-    }
-
-    @Test(dependsOnMethods = "testSuperscript")
-    public void testMixedArabicEnglishText() {
-        final SimplePara simplePara = createSimplePara(nextId(), "This text has mixed English and Arabic (",
-                createPhrase("arabicNormal", "س ل م"), ") text.");
-        final Builder parent = builderFactory.getBuilder(null, new Article(), 0);
-        final List<Object> content = buildContent(parent, -1, simplePara);
+    @Test(dependsOnMethods = "testSuperscriptTest")
+    public void mixedContentTest() {
+        final var article = createArticle(
+                createSimplePara(
+                        IdGenerator.nextId(),
+                        "This paragraph contains mixed of English and Arabic text (",
+                        createPhrase("arabicNormal", "سلم"),
+                        ")."
+                )
+        );
+        final var content = processContent(article);
         assertEquals(content.size(), 1);
-        addResultToDocument("Mixed Text", content.toArray());
+        assertText(content.get(0), "This paragraph contains mixed of English and Arabic text (سلم).");
+        addResult("Mixed contents Test", content);
     }
 
-    @Test(dependsOnMethods = "testMixedArabicEnglishText")
-    public void testArabicPara() {
-        final SimplePara simplePara = createSimplePara(nextId(), "س ل م").withRole("Style1");
-        final Builder parent = builderFactory.getBuilder(null, new Article(), 0);
-        final List<Object> content = buildContent(parent, -1, simplePara);
+    @Test(dependsOnMethods = "mixedContentTest")
+    public void multipleRolesTest() {
+        final var article = createArticle(
+                createSimplePara(IdGenerator.nextId(),
+                        createPhrase("literal line-through green", "This text has multiple roles."),
+                        " (literal, line-through, and green).")
+        );
+        final var content = processContent(article);
         assertEquals(content.size(), 1);
-        addResultToDocument("Arabic Para", content.toArray());
+        assertText(content.get(0), "This text has multiple roles. (literal, line-through, and green).");
+        addResult("Multiple roles Test", content);
+    }
+
+    @Test(dependsOnMethods = "multipleRolesTest")
+    public void customParaStyleTest() {
+        final var article = createArticle(
+                createSimplePara(IdGenerator.nextId(), "Paragraph with custom style.").withRole("Style1")
+        );
+        final var content = processContent(article);
+        assertEquals(content.size(), 1);
+        assertText(content.get(0), "Paragraph with custom style.");
+        addResult("Custom para style Test", content);
+    }
+
+    @Test(dependsOnMethods = "customParaStyleTest")
+    public void xrefWithXrefLabel() {
+        final var article = createArticle(
+                createSimplePara(IdGenerator.nextId(), "Link to ", createCrossReference(paraWithXrefLabel), ".")
+        );
+        final var content = processContent(article);
+        assertEquals(content.size(), 1);
+        assertText(content.get(0), "Link to Text to display.");
+        addResult("XREF with xreflabel test", content);
     }
 }
