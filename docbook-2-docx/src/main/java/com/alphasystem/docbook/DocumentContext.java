@@ -38,6 +38,10 @@ public final class DocumentContext {
 
     private ListInfo currentListInfo;
 
+    public DocumentContext(final DocumentInfo documentInfo) {
+        this(documentInfo, null);
+    }
+
     public DocumentContext(final DocumentInfo documentInfo, final Object document) {
         this.documentInfo = documentInfo;
         this.document = document;

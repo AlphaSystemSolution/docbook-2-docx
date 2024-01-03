@@ -1,14 +1,13 @@
 package com.alphasystem.docbook;
 
-import com.alphasystem.docbook.model.Admonition;
+import com.alphasystem.asciidoc.model.DocumentInfo;
 import com.alphasystem.docbook.handler.BlockHandlerFactory;
 import com.alphasystem.docbook.handler.BlockHandlerService;
 import com.alphasystem.docbook.handler.BuilderHandlerService;
 import com.alphasystem.docbook.handler.InlineHandlerService;
+import com.alphasystem.docbook.model.Admonition;
 import com.alphasystem.docbook.util.ConfigurationUtils;
 import org.docx4j.wml.Tbl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.util.ServiceLoader;
@@ -28,11 +27,17 @@ public final class ApplicationController {
     private static final Path CONF_PATH = get(CONF_DIR, CONF);
     public static final String CONF_PATH_VALUE = CONF_PATH.toString();
     private static final ThreadLocal<DocumentContext> CONTEXT = new ThreadLocal<>();
-    private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationController.class);
+
+    private static final ConfigurationUtils configurationUtils = ConfigurationUtils.getInstance();
     private static ApplicationController instance;
 
+    @Deprecated
     public static void startContext(DocumentContext documentContext) {
         CONTEXT.set(documentContext);
+    }
+
+    public static void startContext(final DocumentInfo documentInfo) {
+        CONTEXT.set(new DocumentContext(createDocumentInfo(documentInfo)));
     }
 
     public static DocumentContext getContext() {
@@ -41,6 +46,19 @@ public final class ApplicationController {
 
     public static void endContext() {
         CONTEXT.remove();
+    }
+
+    private static DocumentInfo createDocumentInfo(final DocumentInfo src) {
+        var documentInfo = new DocumentInfo(src);
+        documentInfo.setTocTitle(configurationUtils.getTableOfContentCaption());
+        documentInfo.setCautionCaption(configurationUtils.getAdmonitionCaption(Admonition.CAUTION));
+        documentInfo.setImportantCaption(configurationUtils.getAdmonitionCaption(Admonition.IMPORTANT));
+        documentInfo.setNoteCaption(configurationUtils.getAdmonitionCaption(Admonition.NOTE));
+        documentInfo.setTipCaption(configurationUtils.getAdmonitionCaption(Admonition.TIP));
+        documentInfo.setWarningCaption(configurationUtils.getAdmonitionCaption(Admonition.WARNING));
+        documentInfo.setExampleCaption(configurationUtils.getExampleCaption());
+        documentInfo.setTableCaption(configurationUtils.getTableCaption());
+        return documentInfo;
     }
 
     public static synchronized ApplicationController getInstance() {
@@ -56,9 +74,6 @@ public final class ApplicationController {
      * Do not let anyone instantiate this class
      */
     private ApplicationController() {
-        // initialize singletons
-        ConfigurationUtils.getInstance();
-
         ServiceLoader<BlockHandlerService> blockHandlerServices = load(BlockHandlerService.class);
         blockHandlerServices.forEach(BlockHandlerService::initializeHandlers);
 

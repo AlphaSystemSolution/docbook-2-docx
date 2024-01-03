@@ -64,7 +64,6 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
 
     @Override
     public void startDocument() {
-        ApplicationController.startContext(documentContext);
         ApplicationController.getContext().setCurrentListInfo(getCurrentListInfo());
         try {
             wmlPackageBuilder = WmlPackageBuilder.createPackage(configurationUtils.getTemplate())
@@ -100,7 +99,6 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
             new TocGenerator().level(5).tocHeading(documentInfo.getTocTitle()).level(5)
                     .mainDocumentPart(mainDocumentPart).generateToc();
         }
-        ApplicationController.endContext();
         if (!docbookObjects.isEmpty()) {
             logger.warn("===================================");
             logger.warn("Docbook objects are non empty");
@@ -127,9 +125,12 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     public void startElement(String uri, String localName, String qName, Attributes attributes) {
         logger.debug("Start of element: localName = {}, qName = {}", localName, qName);
         final var id = getId(attributes);
-        final var xreflabel = getXrefLabel(attributes);
-        if (StringUtils.isNotBlank(xreflabel)) {
-            ApplicationController.getContext().putLabel(id, xreflabel);
+        final var xrefLabel = getXrefLabel(attributes);
+        if (StringUtils.isNotBlank(xrefLabel)) {
+            ApplicationController.getContext().putLabel(id, xrefLabel);
+        }
+        if (StringUtils.isWhitespace(currentText)) {
+            currentText = "";
         }
         switch (localName) {
             case ARTICLE:
@@ -334,7 +335,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
                 mainDocumentPart.addObject(WmlAdapter.getPageBreak());
                 break;
             default:
-                logger.info("Unhandled processing instruction: target = {}", target);
+                logger.warn("Unhandled processing instruction: target = {}", target);
                 break;
         }
     }
@@ -382,13 +383,15 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
                 return getLinkText(result, ((Emphasis) content).getContent());
             } else if (isPhraseType(content)) {
                 return getLinkText(result, ((Phrase) content).getContent());
+            } else if (isSuperscriptType(content)) {
+                return getLinkText(result, ((Superscript) content).getContent());
             } else {
                 logger.warn("Not sure how to get text from: ");
                 return "";
             }
-        }).collect(Collectors.joining(" "));
+        }).collect(Collectors.joining(""));
 
-        return result + " " + collectedText;
+        return result + collectedText;
     }
 
     private void startSimplePara(String id, Attributes attributes) {
@@ -660,7 +663,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     private void processEndElement() {
         final var child = docbookObjects.pop();
         final var parent = docbookObjects.pop();
-        logger.info("Processing end element of \"{}\" of \"{}\".", child.getClass().getName(), parent.getClass().getName());
+        logger.debug("Processing end element of \"{}\" of \"{}\".", child.getClass().getName(), parent.getClass().getName());
 
         if (isArticleType(parent)) {
             if (isSectionType(child)) {
@@ -705,6 +708,8 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
             handleTableGroup((TableGroup) parent, child);
         } else if (isTableHeaderType(parent)) {
             handleTableHeader((TableHeader) parent, child);
+        } else if (isTermType(parent)) {
+            handleTerm((Term) parent, child);
         } else if (isTitleType(parent)) {
             handleTitle((Title) parent, child);
         } else {
@@ -867,6 +872,11 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         docbookObjects.push(obj);
     }
 
+    private void handleTerm(Term obj, Object child) {
+        obj.getContent().add(child);
+        docbookObjects.push(obj);
+    }
+
     private void handleSimplePara(SimplePara obj, Object child) {
         obj.getContent().add(child);
         docbookObjects.push(obj);
@@ -883,7 +893,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     }
 
     private void processContent(Object content) {
-        logger.info("Processing content: {}", content.getClass().getName());
+        logger.debug("Processing content: {}", content.getClass().getName());
         final var processedContent = builderFactory.process(content);
         if (processedContent != null) {
             processedContent.forEach(mainDocumentPart::addObject);
@@ -914,8 +924,8 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     }
 
     private static String getId(Attributes attributes) {
-        var id = getAttributeValue("id", attributes);
-        return id == null ? IdGenerator.nextId() : id;
+        var id = getAttributeValue("xml:id", attributes);
+        return StringUtils.isBlank(id) ? IdGenerator.nextId() : id;
     }
 
     private static String getXrefLabel(Attributes attributes) {
