@@ -13,11 +13,10 @@ import java.io.ByteArrayInputStream;
  * @author sali
  */
 public class UnmarshallerTool {
+    private final DocBookUnmarshallerHandler handler = new DocBookUnmarshallerHandler();
 
     public WordprocessingMLPackage unmarshal(String source) throws SystemException {
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(source.getBytes())) {
-            final var handler = new DocBookUnmarshallerHandler(ApplicationController.getContext());
-
             SAXParserFactory spf = SAXParserFactory.newInstance();
             spf.setNamespaceAware(true);
 

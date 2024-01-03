@@ -21,4 +21,12 @@ public class ListInfo {
     public long getLevel() {
         return level;
     }
+
+    @Override
+    public String toString() {
+        return "ListInfo {" +
+                "number=" + number +
+                ", level=" + level +
+                " }";
+    }
 }

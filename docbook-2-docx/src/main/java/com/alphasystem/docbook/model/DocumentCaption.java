@@ -1,6 +1,6 @@
 package com.alphasystem.docbook.model;
 
-import com.alphasystem.docbook.ApplicationController;
+import com.alphasystem.docbook.util.ConfigurationUtils;
 import com.alphasystem.openxml.builder.wml.HeadingList;
 import org.docbook.model.Example;
 import org.docbook.model.Table;
@@ -13,29 +13,30 @@ import static java.lang.String.format;
  */
 public abstract class DocumentCaption extends HeadingList<DocumentCaption> {
 
-    public static final DocumentCaption EXAMPLE = new DocumentCaption(Example.class) {
+    public static final DocumentCaption EXAMPLE = new DocumentCaption(Example.class, ConfigurationUtils.getInstance().getExampleCaption()) {
 
         @Override
         public String getValue(int i) {
-            final var documentInfo = ApplicationController.getContext().getDocumentInfo();
-            return format("%s %%%s.", documentInfo.getExampleCaption(), i);
+            return format("%s %%%s.", caption, i);
         }
 
     }; // Example
 
-    public static final DocumentCaption TABLE = new DocumentCaption(Table.class) {
+    public static final DocumentCaption TABLE = new DocumentCaption(Table.class, ConfigurationUtils.getInstance().getTableCaption()) {
 
         @Override
         public String getValue(int i) {
-            final var documentInfo = ApplicationController.getContext().getDocumentInfo();
-            return format("%s %%%s.", documentInfo.getTableCaption(), i);
+            return format("%s %%%s.", caption, i);
         }
 
     }; // Table
 
-    DocumentCaption(Class<?> titleType) {
+    protected final String caption;
+
+    DocumentCaption(Class<?> titleType, String caption) {
         super(getInstance().getString(format("%s.title", titleType.getName())));
         setName(titleType.getSimpleName());
+        this.caption = caption;
     }
 
     @Override

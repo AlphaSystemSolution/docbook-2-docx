@@ -3,21 +3,16 @@ package com.alphasystem.xml;
 import com.alphasystem.docbook.ApplicationController;
 import com.alphasystem.docbook.DocumentContext;
 import com.alphasystem.docbook.builder2.BuilderFactory;
-import com.alphasystem.docbook.model.DocumentCaption;
 import com.alphasystem.docbook.model.ListInfo;
 import com.alphasystem.docbook.model.NotImplementedException;
 import com.alphasystem.docbook.util.ConfigurationUtils;
 import com.alphasystem.docbook.util.Utils;
+import com.alphasystem.openxml.builder.wml.NumberingHelper;
 import com.alphasystem.openxml.builder.wml.TocGenerator;
-import com.alphasystem.openxml.builder.wml.UnorderedList;
 import com.alphasystem.openxml.builder.wml.WmlAdapter;
-import com.alphasystem.openxml.builder.wml.WmlPackageBuilder;
 import com.alphasystem.util.IdGenerator;
 import org.apache.commons.lang3.StringUtils;
 import org.docbook.model.*;
-import org.docx4j.openpackaging.exceptions.Docx4JException;
-import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
-import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -38,24 +33,22 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     private final static String NEW_LINE = System.lineSeparator();
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final NumberingHelper numberingHelper = NumberingHelper.getInstance();
     private final BuilderFactory builderFactory = BuilderFactory.getInstance();
     private final ConfigurationUtils configurationUtils = ConfigurationUtils.getInstance();
     private final DocumentContext documentContext;
-    private WordprocessingMLPackage wordprocessingMLPackage;
-    private WmlPackageBuilder wmlPackageBuilder;
-    private MainDocumentPart mainDocumentPart;
     private String currentText = "";
     private int sectionLevel = 0;
     private final Stack<Object> docbookObjects = new Stack<>();
     private final Stack<ListInfo> listInfos = new Stack<>();
 
-    public DocBookUnmarshallerHandler(final DocumentContext documentContext) {
-        this.documentContext = documentContext;
+    public DocBookUnmarshallerHandler() {
+        this.documentContext = ApplicationController.getContext();
     }
 
     @Override
     public Object getResult() throws IllegalStateException {
-        return wordprocessingMLPackage;
+        return ApplicationController.getContext().getWordprocessingMLPackage();
     }
 
     @Override
@@ -65,31 +58,6 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     @Override
     public void startDocument() {
         ApplicationController.getContext().setCurrentListInfo(getCurrentListInfo());
-        try {
-            wmlPackageBuilder = WmlPackageBuilder.createPackage(configurationUtils.getTemplate())
-                    .styles(configurationUtils.getStyles());
-            wordprocessingMLPackage = wmlPackageBuilder.getPackage();
-            mainDocumentPart = wordprocessingMLPackage.getMainDocumentPart();
-
-            final var styleDefinitionsPart = mainDocumentPart.getStyleDefinitionsPart();
-            final var styles = styleDefinitionsPart.getContents();
-            final var list = styles.getStyle();
-            list.forEach(style -> documentContext.getDocumentStyles().add(style.getStyleId()));
-
-            final var documentInfo = documentContext.getDocumentInfo();
-            if (documentInfo.isSectionNumbers()) {
-                wmlPackageBuilder.multiLevelHeading();
-            }
-            if (documentInfo.getExampleCaption() != null) {
-                wmlPackageBuilder.multiLevelHeading(DocumentCaption.EXAMPLE);
-            }
-            if (documentInfo.getTableCaption() != null) {
-                wmlPackageBuilder.multiLevelHeading(DocumentCaption.TABLE);
-            }
-            documentContext.setMainDocumentPart(mainDocumentPart);
-        } catch (Docx4JException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Override
@@ -97,7 +65,8 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         final var documentInfo = documentContext.getDocumentInfo();
         if (documentInfo.isToc() && documentInfo.isSectionNumbers()) {
             new TocGenerator().level(5).tocHeading(documentInfo.getTocTitle()).level(5)
-                    .mainDocumentPart(mainDocumentPart).generateToc();
+                    .mainDocumentPart(ApplicationController.getContext().getMainDocumentPart())
+                    .generateToc();
         }
         if (!docbookObjects.isEmpty()) {
             logger.warn("===================================");
@@ -329,10 +298,10 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
                 break;
             case "asciidoc-numbered":
                 documentContext.getDocumentInfo().setSectionNumbers(true);
-                wmlPackageBuilder.multiLevelHeading();
+                ApplicationController.getContext().getWmlPackageBuilder().multiLevelHeading();
                 break;
             case "asciidoc-pagebreak":
-                mainDocumentPart.addObject(WmlAdapter.getPageBreak());
+                ApplicationController.getContext().getMainDocumentPart().addObject(WmlAdapter.getPageBreak());
                 break;
             default:
                 logger.warn("Unhandled processing instruction: target = {}", target);
@@ -496,13 +465,13 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         final var startingNumber = getAttributeValue("startingnumber", attributes);
         final var orderedList = new OrderedList().withId(id).withNumeration(numeration).withStartigNumber(startingNumber);
         docbookObjects.push(orderedList);
-        pushListInfo(numeration.value(), true);
+        pushListInfo(numeration.value());
     }
 
     private void startItemizedList(String id, Attributes attributes) {
         final var mark = getAttributeValue("mark", attributes);
         docbookObjects.push(new ItemizedList().withId(id).withMark(mark));
-        pushListInfo(mark, false);
+        pushListInfo(mark);
     }
 
     private void endList() {
@@ -512,6 +481,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         if (!listInfos.isEmpty()) {
             listInfo = listInfos.peek();
         }
+        logger.info("Resetting LI: {}", listInfo);
         ApplicationController.getContext().setCurrentListInfo(listInfo);
     }
 
@@ -896,21 +866,27 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         logger.debug("Processing content: {}", content.getClass().getName());
         final var processedContent = builderFactory.process(content);
         if (processedContent != null) {
-            processedContent.forEach(mainDocumentPart::addObject);
+            processedContent.forEach(obj -> ApplicationController.getContext().getMainDocumentPart().addObject(obj));
         }
     }
 
-    private void pushListInfo(String styleName, boolean ordered) {
-        final var listItem = getItemByName(styleName, ordered);
+    private void pushListInfo(String styleName) {
+        final var listItem = getItemByName(styleName);
+        System.out.println("==========================");
+        listInfos.forEach(System.out::println);
+        System.out.println("==========================");
+        System.out.printf("StyleName: %s, NumId: %s%n", listItem.getStyleName(), listItem.getNumberId());
         var level = 0L;
         var numberId = listItem.getNumberId();
         if (listInfos.isEmpty()) {
-            numberId = (int) ApplicationController.getContext().getListNumber(numberId, level);
+            numberId = ApplicationController.getContext().getListNumber(listItem.getStyleName(), level);
         } else {
             // nested list
             level = listInfos.peek().getLevel() + 1L;
+            System.out.printf("Nested list: %s:%s", numberId, level);
         }
         final var listInfo = new ListInfo(numberId, level);
+        logger.info("Setting LI: {}", listInfo);
         ApplicationController.getContext().setCurrentListInfo(listInfo);
         listInfos.push(listInfo);
     }
@@ -936,11 +912,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         return attributes.getValue(attributeName);
     }
 
-    private static com.alphasystem.openxml.builder.wml.ListItem<?> getItemByName(String styleName, boolean ordered) {
-        if (ordered) {
-            return com.alphasystem.openxml.builder.wml.OrderedList.getByStyleName(styleName);
-        } else {
-            return UnorderedList.getByStyleName(styleName);
-        }
+    private com.alphasystem.openxml.builder.wml.ListItem<?> getItemByName(String styleName) {
+        return numberingHelper.getListItem(styleName);
     }
 }

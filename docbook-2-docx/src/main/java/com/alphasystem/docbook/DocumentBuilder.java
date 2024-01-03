@@ -117,7 +117,7 @@ public class DocumentBuilder {
             if (documentInfo.getTableCaption() != null) {
                 wmlPackageBuilder.multiLevelHeading(TABLE);
             }
-            documentContext.setMainDocumentPart(mainDocumentPart);
+            //documentContext.setMainDocumentPart(mainDocumentPart);
 
             final List<Object> content = BuilderFactory.getInstance().buildDocument();
             if (content == null || content.isEmpty()) {
