@@ -20,7 +20,7 @@ public abstract class ListBuilder<S> extends AbstractBuilder<S> {
         return childContent.stream().map(content -> {
             if (UnmarshallerConstants.isListItemType(content)) {
                 final var listItem = (ListItem) content;
-                return listItem.getContent().stream().map(builderFactory::process).flatMap(Collection::stream)
+                return listItem.getContent().stream().map(obj -> builderFactory.process(obj, this)).flatMap(Collection::stream)
                         .collect(Collectors.toList());
             } else {
                 throw new NotImplementedException(source, content);

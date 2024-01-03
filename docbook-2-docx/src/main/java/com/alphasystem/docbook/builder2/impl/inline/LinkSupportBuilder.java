@@ -1,6 +1,7 @@
 package com.alphasystem.docbook.builder2.impl.inline;
 
 import com.alphasystem.docbook.ApplicationController;
+import com.alphasystem.docbook.builder2.Builder;
 import com.alphasystem.docbook.builder2.impl.InlineBuilder;
 import com.alphasystem.docbook.util.Utils;
 import com.alphasystem.openxml.builder.wml.WmlAdapter;
@@ -56,8 +57,8 @@ public abstract class LinkSupportBuilder<S> extends InlineBuilder<S> {
     }
 
     @Override
-    protected void doInit(S source) {
-        super.doInit(source);
+    protected void doInit(S source, Builder<?> parent) {
+        super.doInit(source, parent);
         initHref();
     }
 

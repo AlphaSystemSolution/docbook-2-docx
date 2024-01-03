@@ -42,39 +42,39 @@ public class BuilderFactory {
     private BuilderFactory() {
     }
 
-    public List<Object> process(Object o) {
+    public List<Object> process(Object o, Builder<?> parent) {
         if (o == null) {
             return null;
         }
 
         if (UnmarshallerConstants.isCrossReferenceType(o)) {
-            return crossReferenceBuilder.process((CrossReference) o);
+            return crossReferenceBuilder.process((CrossReference) o, parent);
         } else if (UnmarshallerConstants.isEmphasisType(o)) {
-            return emphasisBuilder.process((Emphasis) o);
+            return emphasisBuilder.process((Emphasis) o, parent);
         } else if (UnmarshallerConstants.isInformalTableType(o)) {
-            return informalTableBuilder.process((InformalTable) o);
+            return informalTableBuilder.process((InformalTable) o, parent);
         } else if (UnmarshallerConstants.isItemizedListType(o)) {
-            return itemizedListBuilder.process((ItemizedList) o);
+            return itemizedListBuilder.process((ItemizedList) o, parent);
         } else if (UnmarshallerConstants.isLinkType(o)) {
-            return linkBuilder.process((Link) o);
+            return linkBuilder.process((Link) o, parent);
         } else if (UnmarshallerConstants.isLiteralType(o)) {
-            return literalBuilder.process((Literal) o);
+            return literalBuilder.process((Literal) o, parent);
         } else if (UnmarshallerConstants.isOrderedListType(o)) {
-            return orderedListBuilder.process((OrderedList) o);
+            return orderedListBuilder.process((OrderedList) o, parent);
         } else if (UnmarshallerConstants.isPhraseType(o)) {
-            return phraseBuilder.process((Phrase) o);
+            return phraseBuilder.process((Phrase) o, parent);
         } else if (UnmarshallerConstants.isSimpleParaType(o)) {
-            return simpleParaBuilder.process((SimplePara) o);
+            return simpleParaBuilder.process((SimplePara) o, parent);
         } else if (UnmarshallerConstants.isStringType(o)) {
-            return textBuilder.process((String) o);
+            return textBuilder.process((String) o, parent);
         } else if (UnmarshallerConstants.isSubscriptType(o)) {
-            return subscriptBuilder.process((Subscript) o);
+            return subscriptBuilder.process((Subscript) o, parent);
         } else if (UnmarshallerConstants.isSuperscriptType(o)) {
-            return superscriptBuilder.process((Superscript) o);
+            return superscriptBuilder.process((Superscript) o, parent);
         } else if (UnmarshallerConstants.isTermType(o)) {
-            return termBuilder.process((Term) o);
+            return termBuilder.process((Term) o, parent);
         } else if (UnmarshallerConstants.isTitleType(o)) {
-            return titleBuilder.process((Title) o);
+            return titleBuilder.process((Title) o, parent);
         } else {
             logger.warn("Builder not defined for class: " + o.getClass().getName());
             return null;

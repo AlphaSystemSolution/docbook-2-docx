@@ -1,5 +1,6 @@
 package com.alphasystem.docbook.builder2.impl;
 
+import com.alphasystem.docbook.builder2.Builder;
 import com.alphasystem.docbook.handler.InlineHandlerFactory;
 import com.alphasystem.docbook.handler.InlineStyleHandler;
 import com.alphasystem.docbook.handler.impl.inline.NullHandler;
@@ -34,8 +35,8 @@ public abstract class InlineBuilder<S> extends AbstractBuilder<S> {
     }
 
     @Override
-    protected void doInit(S source) {
-        super.doInit(source);
+    protected void doInit(S source, Builder<?> parent) {
+        super.doInit(source, parent);
         final var role = getRole();
         styles = isBlank(role) ? new String[]{defaultStyle} : role.split(" ");
     }

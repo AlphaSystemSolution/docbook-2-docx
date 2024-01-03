@@ -864,7 +864,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
 
     private void processContent(Object content) {
         logger.debug("Processing content: {}", content.getClass().getName());
-        final var processedContent = builderFactory.process(content);
+        final var processedContent = builderFactory.process(content, null);
         if (processedContent != null) {
             processedContent.forEach(obj -> ApplicationController.getContext().getMainDocumentPart().addObject(obj));
         }

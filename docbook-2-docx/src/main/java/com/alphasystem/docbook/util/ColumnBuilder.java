@@ -39,12 +39,12 @@ public class ColumnBuilder {
         final var columnContent = entry.getContent().stream().map(content -> {
             var align = getAlign(entry.getAlign());
             if (UnmarshallerConstants.isParaTypes(content)){
-                var p = (P) builderFactory.process(content).get(0);
+                var p = (P) builderFactory.process(content, parentBuilder).get(0);
                 final var ppr = new PPrBuilder(WmlBuilderFactory.getPPrBuilder().withJc(align).getObject(), p.getPPr()).getObject();
                 p.setPPr(ppr);
                 return p;
             } else {
-                return builderFactory.process(content);
+                return builderFactory.process(content, parentBuilder);
             }
         }).toArray();
 

@@ -1,6 +1,7 @@
 package com.alphasystem.docbook.builder2.impl.block;
 
 import com.alphasystem.docbook.ApplicationController;
+import com.alphasystem.docbook.builder2.Builder;
 import com.alphasystem.docbook.builder2.impl.AbstractBuilder;
 import com.alphasystem.docbook.util.Utils;
 import com.alphasystem.openxml.builder.wml.WmlAdapter;
@@ -27,8 +28,8 @@ public abstract class AbstractParaBuilder<S> extends AbstractBuilder<S> {
     }
 
     @Override
-    protected void doInit(S source) {
-        super.doInit(source);
+    protected void doInit(S source, Builder<?> parent) {
+        super.doInit(source, parent);
         this.role = (String) Utils.invokeMethod(source,"getRole");
         var listTypeWithPreviousParaObjects = false;
         var listType = false;
@@ -55,6 +56,7 @@ public abstract class AbstractParaBuilder<S> extends AbstractBuilder<S> {
             final var number = currentListInfo.getNumber();
             final var level = currentListInfo.getLevel();
             final var numPr = ((number < 0) || (level < 0) || listTypeWithPreviousParaObjects) ? null : WmlAdapter.getNumPr(number, level);
+            logger.info("PprBuilder, {}, {}:{}, {}", currentListInfo, number, level, numPr);
             pprBuilder.withNumPr(numPr);
         }
 

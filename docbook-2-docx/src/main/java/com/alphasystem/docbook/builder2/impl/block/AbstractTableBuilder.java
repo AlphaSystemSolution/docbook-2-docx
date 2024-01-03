@@ -1,6 +1,7 @@
 package com.alphasystem.docbook.builder2.impl.block;
 
 import com.alphasystem.docbook.ApplicationController;
+import com.alphasystem.docbook.builder2.Builder;
 import com.alphasystem.docbook.builder2.impl.AbstractBuilder;
 import com.alphasystem.docbook.model.DocBookTableAdapter;
 import com.alphasystem.docbook.util.ColumnBuilder;
@@ -52,8 +53,8 @@ public abstract class AbstractTableBuilder<S> extends AbstractBuilder<S> {
     }
 
     @Override
-    protected void doInit(S source) {
-        super.doInit(source);
+    protected void doInit(S source, Builder<?> parent) {
+        super.doInit(source, parent);
         this.level = Long.valueOf(ApplicationController.getContext().getCurrentListLevel()).intValue();
     }
 

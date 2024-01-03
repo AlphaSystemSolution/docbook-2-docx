@@ -20,6 +20,7 @@ public abstract class AbstractBuilder<S> implements Builder<S> {
     protected final ConfigurationUtils configurationUtils = ConfigurationUtils.getInstance();
     protected BuilderFactory builderFactory;
     protected String id;
+    protected Builder<?> parent;
     protected S source;
     private final String childContentMethodName;
 
@@ -37,22 +38,28 @@ public abstract class AbstractBuilder<S> implements Builder<S> {
     }
 
     @Override
+    public Builder<?> getParent() {
+        return parent;
+    }
+
+    @Override
     public S getSource() {
         return source;
     }
 
     @Override
-    public List<Object> process(S source) {
+    public List<Object> process(S source, Builder<?> parent) {
         if (source == null) {
             throw new NullPointerException(String.format("Source object is null in \"%s\"", getClass().getName()));
         }
-        doInit(source);
+        doInit(source, parent);
         return doProcess(processChildContent(getChildContent()));
     }
 
-    protected void doInit(S source) {
+    protected void doInit(S source, Builder<?> parent) {
         builderFactory = BuilderFactory.getInstance();
         this.source = source;
+        this.parent = parent;
         this.id = Utils.getId(source);
     }
 
@@ -70,7 +77,8 @@ public abstract class AbstractBuilder<S> implements Builder<S> {
     }
 
     protected List<Object> processChildContent(List<Object> childContent) {
-        return childContent.stream().map(builderFactory::process).flatMap(Collection::stream).collect(Collectors.toList());
+        return childContent.stream().map(content -> builderFactory.process(content, this))
+                .flatMap(Collection::stream).collect(Collectors.toList());
     }
 
     protected abstract List<Object> doProcess(List<Object> processedChildContent);
