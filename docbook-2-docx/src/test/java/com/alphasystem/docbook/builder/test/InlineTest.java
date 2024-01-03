@@ -1,6 +1,5 @@
 package com.alphasystem.docbook.builder.test;
 
-import com.alphasystem.SystemException;
 import com.alphasystem.util.IdGenerator;
 import org.docbook.model.SimplePara;
 import org.testng.annotations.Test;
@@ -19,7 +18,7 @@ public class InlineTest extends AbstractTest2 {
             .withXreflabel("Text to display");
 
     @Test
-    public void testBasicInline() throws SystemException {
+    public void testBasicInline() {
         final var simplePara =
                 createSimplePara(
                         IdGenerator.nextId(),
@@ -32,13 +31,14 @@ public class InlineTest extends AbstractTest2 {
                         "."
                 );
 
-        final var article = createArticle(simplePara);
-        final var content = processContent(article);
+        addTestTitle("Basic inline test");
+        processContent(createArticle(simplePara));
+        final var content = mainDocumentPart.getContent();
 
         // validate
-        assertEquals(content.size(), 1);
-        assertText(content.get(0), "This paragraph contains some bold text, some italic text, and some highlighted text.");
-        addResult("Basic inline test", content);
+        assertEquals(content.size(), previousSize + 2);
+        assertText(content.get(content.size() - 1), "This paragraph contains some bold text, some italic text, and some highlighted text.");
+        addHorizontalLine();
     }
 
     @Test(dependsOnMethods = "testBasicInline")
@@ -53,23 +53,27 @@ public class InlineTest extends AbstractTest2 {
                         "."
                 )
         );
-        final var content = processContent(article);
+
+        addTestTitle("Literal with subscript Test");
+        processContent(article);
+        final var content = mainDocumentPart.getContent();
 
         // validate
-        assertEquals(content.size(), 1);
-        assertText(content.get(0), "Chemical formula for water is H2O.");
-        addResult("Literal with subscript Test", content);
+        assertEquals(content.size(), previousSize + 2);
+        assertText(content.get(content.size() - 1), "Chemical formula for water is H2O.");
+        addHorizontalLine();
     }
 
     @Test(dependsOnMethods = "testBasicInline")
     public void testParaWithXrefLabel() {
-        final var content = processContent(createArticle(paraWithXrefLabel));
+        addTestTitle("Simple Paragraph with \"XREFLABEL\" Test");
+        processContent(createArticle(paraWithXrefLabel));
+        final var content = mainDocumentPart.getContent();
 
         // validate
-        assertEquals(content.size(), 1);
-        assertText(content.get(0), "A paragraph with xreflabel (Text to display).");
-
-        addResult("Simple Paragraph with \"XREFLABEL\" Test", content);
+        assertEquals(content.size(), previousSize + 2);
+        assertText(content.get(content.size() - 1), "A paragraph with xreflabel (Text to display).");
+        addHorizontalLine();
     }
 
     @Test(dependsOnMethods = "testParaWithXrefLabel")
@@ -84,13 +88,15 @@ public class InlineTest extends AbstractTest2 {
                         "."
                 )
         );
-        final var content = processContent(article);
+
+        addTestTitle("Superscript Test");
+        processContent(article);
+        final var content = mainDocumentPart.getContent();
 
         // validate
-        assertEquals(content.size(), 1);
-        assertText(content.get(0), "Einstein's theory of relativity is E = mc2.");
-
-        addResult("Superscript Test", content);
+        assertEquals(content.size(), previousSize + 2);
+        assertText(content.get(content.size() - 1), "Einstein's theory of relativity is E = mc2.");
+        addHorizontalLine();
     }
 
     @Test(dependsOnMethods = "testSuperscriptTest")
@@ -103,10 +109,13 @@ public class InlineTest extends AbstractTest2 {
                         ")."
                 )
         );
-        final var content = processContent(article);
-        assertEquals(content.size(), 1);
-        assertText(content.get(0), "This paragraph contains mixed of English and Arabic text (سلم).");
-        addResult("Mixed contents Test", content);
+
+        addTestTitle("Mixed contents Test");
+        processContent(article);
+        final var content = mainDocumentPart.getContent();
+        assertEquals(content.size(), previousSize + 2);
+        assertText(content.get(content.size() - 1), "This paragraph contains mixed of English and Arabic text (سلم).");
+        addHorizontalLine();
     }
 
     @Test(dependsOnMethods = "mixedContentTest")
@@ -116,10 +125,13 @@ public class InlineTest extends AbstractTest2 {
                         createPhrase("literal line-through green", "This text has multiple roles."),
                         " (literal, line-through, and green).")
         );
-        final var content = processContent(article);
-        assertEquals(content.size(), 1);
-        assertText(content.get(0), "This text has multiple roles. (literal, line-through, and green).");
-        addResult("Multiple roles Test", content);
+
+        addTestTitle("Multiple roles Test");
+        processContent(article);
+        final var content = mainDocumentPart.getContent();
+        assertEquals(content.size(), previousSize + 2);
+        assertText(content.get(content.size() - 1), "This text has multiple roles. (literal, line-through, and green).");
+        addHorizontalLine();
     }
 
     @Test(dependsOnMethods = "multipleRolesTest")
@@ -127,10 +139,13 @@ public class InlineTest extends AbstractTest2 {
         final var article = createArticle(
                 createSimplePara(IdGenerator.nextId(), "Paragraph with custom style.").withRole("Style1")
         );
-        final var content = processContent(article);
-        assertEquals(content.size(), 1);
-        assertText(content.get(0), "Paragraph with custom style.");
-        addResult("Custom para style Test", content);
+
+        addTestTitle("Custom para style Test");
+        processContent(article);
+        final var content = mainDocumentPart.getContent();
+        assertEquals(content.size(), previousSize + 2);
+        assertText(content.get(content.size() - 1), "Paragraph with custom style.");
+        addHorizontalLine();
     }
 
     @Test(dependsOnMethods = "customParaStyleTest")
@@ -138,9 +153,12 @@ public class InlineTest extends AbstractTest2 {
         final var article = createArticle(
                 createSimplePara(IdGenerator.nextId(), "Link to ", createCrossReference(paraWithXrefLabel), ".")
         );
-        final var content = processContent(article);
-        assertEquals(content.size(), 1);
-        assertText(content.get(0), "Link to Text to display.");
-        addResult("XREF with xreflabel test", content);
+
+        addTestTitle("XREF with xreflabel test");
+        processContent(article);
+        final var content = mainDocumentPart.getContent();
+        assertEquals(content.size(), previousSize + 2);
+        assertText(content.get(content.size() - 1), "Link to Text to display.");
+        addHorizontalLine();
     }
 }

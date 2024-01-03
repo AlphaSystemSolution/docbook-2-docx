@@ -3,26 +3,28 @@ package com.alphasystem.docbook.builder.test;
 import com.alphasystem.SystemException;
 import com.alphasystem.asciidoc.model.DocumentInfo;
 import com.alphasystem.docbook.ApplicationController;
-import com.alphasystem.docbook.util.ConfigurationUtils;
 import com.alphasystem.openxml.builder.wml.WmlAdapter;
 import com.alphasystem.util.AppUtil;
 import com.alphasystem.util.IdGenerator;
 import com.alphasystem.xml.UnmarshallerTool;
 import jakarta.xml.bind.JAXBElement;
 import org.docbook.model.SimplePara;
-import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
+import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
 import org.docx4j.wml.CTBookmark;
 import org.docx4j.wml.P;
 import org.docx4j.wml.R;
 import org.docx4j.wml.Text;
+import org.testng.annotations.AfterMethod;
 
-import java.util.ArrayList;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.alphasystem.docbook.builder.test.DataFactory.createArticle;
 import static com.alphasystem.docbook.builder.test.DataFactory.toXml;
+import static java.lang.String.format;
+import static java.nio.file.Paths.get;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
@@ -30,59 +32,54 @@ public class AbstractTest2 {
 
     protected static final String DEFAULT_TITLE = "DefaultTitle";
     private static final String DATA_PATH = System.getProperty("data.path");
-    private static final String[] DATA_FILES = new String[]{};
     protected static final String FILE_NAME = "docbook_to_docx.docx";
 
-    protected final ConfigurationUtils configurationUtils = ConfigurationUtils.getInstance();
     private final UnmarshallerTool unmarshallerTool = new UnmarshallerTool();
     protected final String targetPath = System.getProperty("target.path");
-    protected static WordprocessingMLPackage wordprocessingMLPackage;
+    protected static int previousSize = 0;
+    protected static MainDocumentPart mainDocumentPart;
 
     static {
         ApplicationController.getInstance();
         ApplicationController.startContext(new DocumentInfo());
+        mainDocumentPart = ApplicationController.getContext().getMainDocumentPart();
     }
 
-    List<Object> processContent(Object obj) {
+  @AfterMethod
+    public void reset() {
+        previousSize = mainDocumentPart.getContent().size();
+    }
+
+    void processContent(Object obj) {
         try {
             final var xml = toXml(obj);
             System.out.println(xml);
-            final var wordprocessingMLPackage = unmarshallerTool.unmarshal(xml);
-            return wordprocessingMLPackage.getMainDocumentPart().getContent();
+            unmarshallerTool.unmarshal(xml);
         } catch (SystemException ex) {
             fail("Test failed", ex);
-            return new ArrayList<>();
         }
     }
 
-    void addResult(String title, List<Object> content) {
-        addTestTitle(createTestTitle(title));
-        addContent(content);
-        addHorizontalLine();
-        ;
+    void processContent(String xml) {
+        try {
+            System.out.println(xml);
+            unmarshallerTool.unmarshal(xml);
+        } catch (SystemException ex) {
+            fail("Test failed", ex);
+        }
     }
 
-    private void addTestTitle(SimplePara simplePara) {
-        addContent(processContent(createArticle(simplePara)));
+    void addTestTitle(String title) {
+        final var titlePara = new SimplePara().withId(IdGenerator.nextId()).withRole(DEFAULT_TITLE).withContent(title);
+        processContent(createArticle(titlePara));
     }
 
-    /*
-     * This method adds content to main document.
-     */
-    private void addContent(List<Object> contents) {
-        contents.forEach(content -> wordprocessingMLPackage.getMainDocumentPart().addObject(content));
-    }
-
-    private void addHorizontalLine() {
-        wordprocessingMLPackage.getMainDocumentPart().addObject(WmlAdapter.getHorizontalLine());
+    void addHorizontalLine() {
+        mainDocumentPart.addObject(WmlAdapter.getHorizontalLine());
     }
 
     void assertText(Object obj, String expected) {
         assertEquals(getRawText(obj), expected);
-    }
-
-    private static SimplePara createTestTitle(String title) {
-        return new SimplePara().withId(IdGenerator.nextId()).withRole(DEFAULT_TITLE).withContent(title);
     }
 
     private static String getRawText(Object content) {
@@ -116,5 +113,15 @@ public class AbstractTest2 {
                 return content.getClass().getName() + " ";
             }
         }).collect(Collectors.joining());
+    }
+
+    String readXml(String name) {
+        final var sourcePath = get(DATA_PATH, format("%s.xml", name));
+        try {
+            return new String(Files.readAllBytes(sourcePath));
+        } catch (Exception ex) {
+            fail(String.format("Fail to read file: %s", sourcePath.getFileName().toString()), ex);
+        }
+        return null;
     }
 }

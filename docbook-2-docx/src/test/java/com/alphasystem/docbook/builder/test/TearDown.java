@@ -18,13 +18,14 @@ public class TearDown extends AbstractTest2 {
 
     @AfterSuite
     public void tearDown() {
-        ApplicationController.endContext();
         try {
             final File file = get(targetPath, FILE_NAME).toFile();
-            WmlAdapter.save(file, wordprocessingMLPackage);
+            WmlAdapter.save(file, ApplicationController.getContext().getWordprocessingMLPackage());
             Desktop.getDesktop().open(file);
         } catch (Exception e) {
             fail(e.getMessage(), e);
+        } finally {
+            ApplicationController.endContext();
         }
     }
 }

@@ -12,22 +12,32 @@ public class TitleTest extends AbstractTest2 {
 
     @Test
     public void testTitle() {
-        final var content = processContent(createArticle("Document title"));
-
-        assertEquals(content.size(), 1);
-        assertText(content.get(0), "Document title");
-        addResult("Title test with default style", content);
+        addTestTitle("Title test with default style");
+        processContent(createArticle("Document title"));
+        final var content = mainDocumentPart.getContent();
+        assertEquals(content.size(), previousSize + 2);
+        assertText(content.get(content.size() - 1), "Document title");
+        addHorizontalLine();
     }
 
-    @Test
+    @Test(dependsOnMethods = "testTitle")
     public void testTitleWithCustomStyle() {
+        addTestTitle("Title test with custom style");
         final var info = createInfo("Document title ", createPhrase("arabicHeading1", "سلم"));
-        final var article = createArticle().withContent(info);
-        final var content = processContent(article);
+        processContent(createArticle().withContent(info));
+        final var content = mainDocumentPart.getContent();
+        assertEquals(content.size(), previousSize + 2);
+        assertText(content.get(content.size() - 1), "Document title سلم");
+        addHorizontalLine();
+    }
 
-        assertEquals(content.size(), 1);
-        assertText(content.get(0), "Document title سلم");
-        addResult("Title test with custom style", content);
+    @Test(dependsOnMethods = "testTitleWithCustomStyle")
+    public void testSectionLevelTitles() {
+        addTestTitle("Section Level title test");
+        processContent(readXml("sections"));
+        final var content = mainDocumentPart.getContent();
+        assertEquals(content.size(), previousSize + 11);
+        addHorizontalLine();
     }
 
     /*@Test(dependsOnMethods = "testDocumentTitleWithCustomStyle")
