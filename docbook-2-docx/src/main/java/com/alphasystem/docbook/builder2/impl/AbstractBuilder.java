@@ -4,6 +4,7 @@ import com.alphasystem.docbook.builder2.Builder;
 import com.alphasystem.docbook.builder2.BuilderFactory;
 import com.alphasystem.docbook.util.ConfigurationUtils;
 import com.alphasystem.docbook.util.Utils;
+import com.alphasystem.util.AppUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,4 +83,22 @@ public abstract class AbstractBuilder<S> implements Builder<S> {
     }
 
     protected abstract List<Object> doProcess(List<Object> processedChildContent);
+
+    protected <B extends Builder<B>> boolean hasParent(Class<B> parentBuilderClass) {
+        return getParent(parentBuilderClass) != null;
+    }
+
+    @SuppressWarnings({"unchecked"})
+    protected <B extends Builder<B>> B getParent(Class<B> parentBuilderClass) {
+        B result = null;
+        var currentParent = parent;
+        while (currentParent != null) {
+            if (AppUtil.isInstanceOf(parentBuilderClass, currentParent)) {
+                result = (B) currentParent;
+                break;
+            }
+            currentParent = currentParent.getParent();
+        }
+        return result;
+    }
 }
