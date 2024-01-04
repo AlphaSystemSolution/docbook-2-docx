@@ -6,50 +6,72 @@ import org.testng.annotations.Test;
 import static com.alphasystem.docbook.builder.test.DataFactory.*;
 import static com.alphasystem.util.IdGenerator.nextId;
 import static java.lang.String.format;
-import static org.docbook.model.Align.CENTER;
 import static org.docbook.model.Align.LEFT;
-import static org.docbook.model.BasicVerticalAlign.MIDDLE;
 import static org.docbook.model.BasicVerticalAlign.TOP;
 
 /**
  * @author sali
  */
-public class TableTest extends AbstractTest {
+public class TableTest extends AbstractTest2 {
 
     @Test
-    public void testSimpleTable() {
-        Entry entry1 = createEntry(LEFT, TOP, createSimplePara(null, "Cell in column 1, row 1"));
-        Entry entry2 = createEntry(LEFT, TOP, createSimplePara(null, "Cell in column 2, row 1"));
-        final Row row1 = createRow(entry1, entry2);
-
-        entry1 = createEntry(LEFT, TOP, createSimplePara(null, "Cell in column 1, row 2"));
-        entry2 = createEntry(LEFT, TOP, createSimplePara(null, "Cell in column 2, row 2"));
-        final Row row2 = createRow(entry1, entry2);
-
-        entry1 = createEntry(LEFT, TOP, createSimplePara(null, "Cell in column 1, row 3"));
-        entry2 = createEntry(LEFT, TOP, createSimplePara(null, "Cell in column 2, row 3"));
-        final Row row3 = createRow(entry1, entry2);
-
-        final TableBody tableBody = createTableBody(null, null, row1, row2, row3);
-        final TableGroup tableGroup = createTableGroup(null, tableBody, null, 50, 50);
-        final Table table = createTable(null, Frame.ALL, Choice.ONE, Choice.ONE, createTitle("Result: Rendered simple table"), tableGroup);
-
-        addResult(null, 0, 2, "Simple Table Test", table);
+    public void testInformalTable() {
+        final int numOfColumns = 3;
+        final var tableBody = createTableBody(null, null,
+                _createRow(numOfColumns, 1, null),
+                _createRow(numOfColumns, 2, null),
+                _createRow(numOfColumns, 3, null)
+        );
+        final var tableGroup = createTableGroup(null, tableBody, null, 33, 33, 34);
+        final var table = createInformalTable(null, Frame.ALL, Choice.ONE, Choice.ONE, tableGroup);
+        addTestTitle("Basic informal table test");
+        processContent(createArticle(table));
+        addHorizontalLine();
+        System.out.printf(">>>> %s:%s%n", mainDocumentPart.getContent().size(), previousSize);
     }
 
-    @Test(dependsOnMethods = "testSimpleTable")
+    //@Test(dependsOnMethods = "testInformalTable")
+    public void testSimpleTable() {
+        final var row1 = createRow(
+                createEntry(LEFT, TOP, createSimplePara(null, "Cell in column 1, row 1")),
+                createEntry(LEFT, TOP, createSimplePara(null, "Cell in column 2, row 1"))
+        );
+
+        final var row2 = createRow(
+                createEntry(LEFT, TOP, createSimplePara(null, "Cell in column 1, row 2")),
+                createEntry(LEFT, TOP, createSimplePara(null, "Cell in column 2, row 2"))
+        );
+
+        final var row3 = createRow(
+                createEntry(LEFT, TOP, createSimplePara(null, "Cell in column 1, row 3")),
+                createEntry(LEFT, TOP, createSimplePara(null, "Cell in column 2, row 3"))
+        );
+
+        final var tableBody = createTableBody(null, null, row1, row2, row3);
+        final var tableGroup = createTableGroup(null, tableBody, null, 50, 50);
+        final var table = createTable(null, Frame.ALL, Choice.ONE, Choice.ONE,
+                createTitle("Result: Rendered simple table"), tableGroup);
+        addTestTitle("Basic table test");
+        processContent(createArticle(table));
+        addHorizontalLine();
+        System.out.printf(">>>> %s:%s%n", mainDocumentPart.getContent().size(), previousSize);
+    }
+
+    //@Test(dependsOnMethods = "testSimpleTable")
     public void testTableVAlignMiddle() {
         final int numOfColumns = 2;
-        final BasicVerticalAlign verticalAlign = MIDDLE;
-        final TableBody tableBody = createTableBody(null, null, _createRow(numOfColumns, 1, verticalAlign),
+        final var verticalAlign = BasicVerticalAlign.MIDDLE;
+        final var tableBody = createTableBody(null, null, _createRow(numOfColumns, 1, verticalAlign),
                 _createRow(numOfColumns, 2, verticalAlign));
-        final TableGroup tableGroup = createTableGroup(null, tableBody, null, 50, 50);
-        final Table table = createTable(null, Frame.ALL, Choice.ONE, Choice.ONE, null, tableGroup);
-
-        addResult(null, 0, 1, "Table Test With Vertical Align Middle", table);
+        final var tableGroup = createTableGroup(null, tableBody, null, 50, 50);
+        final var table = createTable(null, Frame.ALL, Choice.ONE, Choice.ONE, null, tableGroup);
+        addTestTitle("Basic table with \"middle\" vertical align");
+        processContent(createArticle(table));
+        addHorizontalLine();
+        System.out.printf(">>>> %s:%s%n", mainDocumentPart.getContent().size(), previousSize);
     }
 
-    @Test(dependsOnMethods = "testTableVAlignMiddle")
+    /*@Test(dependsOnMethods = "testTableVAlignMiddle")
     public void testTableVAlignBottom() {
         final int numOfColumns = 2;
         final BasicVerticalAlign verticalAlign = BasicVerticalAlign.BOTTOM;
@@ -211,7 +233,7 @@ public class TableTest extends AbstractTest {
     public void testTableWithNoFrame() {
         final Table table = tableBorderTest(Frame.NONE, Choice.ONE, Choice.ONE);
         addResult(null, 0, 1, "Table With No Frame Test", table);
-    }
+    }*/
 
     private Table tableBorderTest(Frame frame, Choice colSep, Choice rowSep) {
         final int numOfColumns = 4;

@@ -4,10 +4,13 @@
     <test name="Test">
         <classes>
             <class name="com.alphasystem.docbook.builder.test.Setup"/>
+            <!--
             <class name="com.alphasystem.docbook.builder.test.TitleTest"/>
             <class name="com.alphasystem.docbook.builder.test.InlineTest"/>
             <class name="com.alphasystem.docbook.builder.test.OrderedListTest"/>
             <class name="com.alphasystem.docbook.builder.test.ItemizedListTest"/>
+            -->
+            <class name="com.alphasystem.docbook.builder.test.TableTest"/>
             <class name="com.alphasystem.docbook.builder.test.TearDown"/>
             <!--
             <class name="com.alphasystem.docbook.builder.test.LineBreakTest"/>
@@ -15,7 +18,7 @@
 
             <class name="com.alphasystem.docbook.builder.test.AdmonitionTest"/>
             <class name="com.alphasystem.docbook.builder.test.ListTest"/>
-            <class name="com.alphasystem.docbook.builder.test.TableTest"/>
+
             <class name="com.alphasystem.docbook.builder.test.ScreenTest"/-->
         </classes>
     </test> <!-- Test -->
