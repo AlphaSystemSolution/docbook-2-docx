@@ -6,15 +6,18 @@ import com.alphasystem.openxml.builder.wml.PPrBuilder;
 import com.alphasystem.openxml.builder.wml.WmlBuilderFactory;
 import com.alphasystem.openxml.builder.wml.table.ColumnData;
 import com.alphasystem.openxml.builder.wml.table.VerticalMergeType;
+import com.alphasystem.util.AppUtil;
 import com.alphasystem.xml.UnmarshallerConstants;
 import com.alphasystem.xml.UnmarshallerUtils;
+import jakarta.xml.bind.JAXBElement;
 import org.docbook.model.Align;
 import org.docbook.model.BasicVerticalAlign;
 import org.docbook.model.Entry;
 import org.docbook.model.VerticalAlign;
-import org.docx4j.wml.JcEnumeration;
-import org.docx4j.wml.P;
-import org.docx4j.wml.STVerticalJc;
+import org.docx4j.wml.*;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ColumnBuilder {
 
@@ -38,21 +41,22 @@ public class ColumnBuilder {
 
         final var columnContent = entry.getContent().stream().map(content -> {
             var align = getAlign(entry.getAlign());
-            if (UnmarshallerConstants.isParaTypes(content)){
-                var p = (P) builderFactory.process(content, parentBuilder).get(0);
+            final var processedContent = builderFactory.process(content, parentBuilder);
+            if (UnmarshallerConstants.isParaTypes(content)) {
+                var p = (P) (processedContent.get(0));
                 final var ppr = new PPrBuilder(WmlBuilderFactory.getPPrBuilder().withJc(align).getObject(), p.getPPr()).getObject();
                 p.setPPr(ppr);
-                return p;
+                return Collections.singletonList(p);
             } else {
-                return builderFactory.process(content, parentBuilder);
+                return processedContent;
             }
-        }).toArray();
+        }).flatMap(Collection::stream).toArray();
+
 
         var columnData = new ColumnData(columnIndex).withColumnProperties(tcPr).withGridSpanValue(gridSpan)
                 .withVerticalMergeType(vMergeType).withContent(columnContent);
-        parentBuilder.getTableAdapter().addColumn(columnData);
 
-        return new NextColumnInfo(moreRows, columnIndex, columnIndex + gridSpan);
+        return new NextColumnInfo(moreRows, columnIndex, columnIndex + gridSpan, columnData);
     }
 
     private static STVerticalJc getVerticalAlign(BasicVerticalAlign vAlign, VerticalAlign parentVerticalAlign) {
@@ -107,11 +111,13 @@ public class ColumnBuilder {
         private final int moreRows;
         private final int currentColumnIndex;
         private final int nextColumnIndex;
+        private final ColumnData columnData;
 
-        public NextColumnInfo(int moreRows, int currentColumnIndex, int nextColumnIndex) {
+        public NextColumnInfo(int moreRows, int currentColumnIndex, int nextColumnIndex, ColumnData columnData) {
             this.moreRows = Math.max(moreRows, 0);
             this.currentColumnIndex = Math.max(currentColumnIndex, 0);
             this.nextColumnIndex = Math.max(nextColumnIndex, 0);
+            this.columnData = columnData;
         }
 
         public int getMoreRows() {
@@ -126,8 +132,12 @@ public class ColumnBuilder {
             return nextColumnIndex;
         }
 
+        public ColumnData getColumnData() {
+            return columnData;
+        }
+
         public NextColumnInfo decrementMoreRows() {
-            return new NextColumnInfo(moreRows - 1, currentColumnIndex, nextColumnIndex);
+            return new NextColumnInfo(moreRows - 1, currentColumnIndex, nextColumnIndex, columnData);
         }
 
         @Override
@@ -139,4 +149,40 @@ public class ColumnBuilder {
                     ")";
         }
     }
+
+    // TODO: remove it
+
+    private static String getRawText(Object content) {
+        if (AppUtil.isInstanceOf(P.class, content)) {
+            final var p = (P) content;
+            return getRawText("", p.getContent());
+        } else {
+            return content.getClass().getName() + " ";
+        }
+    }
+
+    private static String getRawText(String result, List<Object> contents) {
+        if (Objects.isNull(contents) || contents.isEmpty()) {
+            return result;
+        }
+
+        return contents.stream().map(content -> {
+            if (AppUtil.isInstanceOf(R.class, content)) {
+                final var r = (R) content;
+                return getRawText(result, r.getContent());
+            } else if (AppUtil.isInstanceOf(Text.class, content)) {
+                final var text = (Text) content;
+                return result + text.getValue();
+            } else if (AppUtil.isInstanceOf(P.Hyperlink.class, content)) {
+                final var hyperlink = (P.Hyperlink) content;
+                return getRawText(result, hyperlink.getContent());
+            } else if (AppUtil.isInstanceOf(CTBookmark.class, content) ||
+                    AppUtil.isInstanceOf(JAXBElement.class, content)) {
+                return "";
+            } else {
+                return content.getClass().getName() + " ";
+            }
+        }).collect(Collectors.joining());
+    }
+    // TODO
 }

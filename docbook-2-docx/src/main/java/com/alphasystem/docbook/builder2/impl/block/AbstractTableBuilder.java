@@ -3,11 +3,9 @@ package com.alphasystem.docbook.builder2.impl.block;
 import com.alphasystem.docbook.builder2.Builder;
 import com.alphasystem.docbook.builder2.impl.AbstractBuilder;
 import com.alphasystem.docbook.model.DocBookTableAdapter;
+import com.alphasystem.docbook.model.NotImplementedException;
 import com.alphasystem.docbook.util.ColumnBuilder;
-import com.alphasystem.openxml.builder.wml.table.ColumnInfo;
-import com.alphasystem.openxml.builder.wml.table.ColumnInput;
-import com.alphasystem.openxml.builder.wml.table.TableAdapter;
-import com.alphasystem.openxml.builder.wml.table.TableType;
+import com.alphasystem.openxml.builder.wml.table.*;
 import com.alphasystem.util.AppUtil;
 import org.docbook.model.*;
 import org.docx4j.wml.CTBorder;
@@ -40,10 +38,6 @@ public abstract class AbstractTableBuilder<S> extends AbstractBuilder<S> {
 
     protected AbstractTableBuilder(S source, Builder<?> parent) {
         super(null, source, parent);
-    }
-
-    public TableAdapter getTableAdapter() {
-        return tableAdapter;
     }
 
     @Override
@@ -212,12 +206,13 @@ public abstract class AbstractTableBuilder<S> extends AbstractBuilder<S> {
                     }
                 }
                 var nextColumnInfo = ColumnBuilder.build(this, builderFactory, (Entry) content, columnIndex, verticalAlign);
+                tableAdapter.addColumn(nextColumnInfo.getColumnData());
                 if (nextColumnInfo.getMoreRows() > 0) {
                     nextColumnInfoMap.put(nextColumnInfo.getCurrentColumnIndex(), nextColumnInfo);
                 }
                 columnIndex = nextColumnInfo.getNextColumnIndex();
             } else {
-                throw new IllegalArgumentException(content.getClass().getName() + " is not implemented");
+                throw new NotImplementedException(row, content);
             }
         }
 
