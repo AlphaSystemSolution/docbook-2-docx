@@ -25,6 +25,7 @@ public interface UnmarshallerConstants {
     String SECTION = "section";
     String SUBSCRIPT = "subscript";
     String SUPERSCRIPT = "superscript";
+    String TABLE = "table";
     String TABLE_BODY = "tbody";
     String TERM = "term";
     String TABLE_FOOTER = "tfoot";
@@ -110,6 +111,10 @@ public interface UnmarshallerConstants {
 
     static boolean isSuperscriptType(Object o) {
         return isInstanceOf(Superscript.class, o);
+    }
+
+    static boolean isTableType(Object o) {
+        return isInstanceOf(Table.class, o);
     }
 
     static boolean isTableBodyType(Object o) {

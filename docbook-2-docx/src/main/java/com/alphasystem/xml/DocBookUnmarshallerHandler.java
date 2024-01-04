@@ -153,6 +153,9 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
             case SUPERSCRIPT:
                 startSuperscript(id, attributes);
                 break;
+            case TABLE:
+                startTable(id, attributes);
+                break;
             case TABLE_BODY:
                 startTableBody(attributes);
                 break;
@@ -231,6 +234,9 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
                 break;
             case SUPERSCRIPT:
                 endSuperscript();
+                break;
+            case TABLE:
+                endTable();
                 break;
             case TABLE_BODY:
                 endTableBody();
@@ -384,6 +390,22 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     }
 
     private void endInformalTable() {
+        processEndElement();
+    }
+
+    private void startTable(String id, Attributes attributes) {
+        final var role = getAttributeValue("role", attributes);
+        final var frame = UnmarshallerUtils.toFrame(getAttributeValue("frame", attributes));
+        final var rowSep = UnmarshallerUtils.toChoice(getAttributeValue("rowsep", attributes));
+        final var colSep = UnmarshallerUtils.toChoice(getAttributeValue("colsep", attributes));
+        final var tableStyle = getAttributeValue("tabstyle", attributes);
+        final var style = getAttributeValue("style", attributes);
+        final var table = new Table().withId(id).withRole(role).withFrame(frame).withRowSep(rowSep)
+                .withColSep(colSep).withTableStyle(tableStyle).withStyle(style);
+        docbookObjects.push(table);
+    }
+
+    private void endTable() {
         processEndElement();
     }
 
@@ -662,6 +684,8 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
             handleSubscript((Subscript) parent, child);
         } else if (isSuperscriptType(parent)) {
             handleSuperscript((Superscript) parent, child);
+        } else if (isTableType(parent)) {
+            handleTable((Table) parent, child);
         } else if (isTableBodyType(parent)) {
             handleTableBody((TableBody) parent, child);
         } else if (isTableFooterType(parent)) {
@@ -746,6 +770,15 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         } else if (isColumnSpecType(child)) {
             obj.getColSpec().add((ColumnSpec) child);
         } else if (isTrType(child)) {
+            throw new NotImplementedException(obj, child);
+        }
+        docbookObjects.push(obj);
+    }
+
+    private void handleTable(Table obj, Object child) {
+        if (isTableGroupType(child)) {
+            obj.getTableGroup().add((TableGroup) child);
+        } else {
             throw new NotImplementedException(obj, child);
         }
         docbookObjects.push(obj);

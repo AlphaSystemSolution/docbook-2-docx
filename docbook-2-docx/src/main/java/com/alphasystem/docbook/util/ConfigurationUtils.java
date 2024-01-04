@@ -63,7 +63,11 @@ public class ConfigurationUtils {
         final var className = o.getClass().getName();
         var clazz = buildersClassMap.get(className);
         if (Objects.isNull(clazz)) {
-            clazz = Class.forName(configuration.getString(String.format("%s.builder", className)));
+            final var configValue = configuration.getString(format("%s.builder", className));
+            if (Objects.isNull(configValue)) {
+                throw new RuntimeException(format("No builder found for: %s", className));
+            }
+            clazz = Class.forName(configValue);
             buildersClassMap.put(className, clazz);
         }
         return clazz;
