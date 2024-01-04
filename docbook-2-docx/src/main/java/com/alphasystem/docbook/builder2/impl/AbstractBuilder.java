@@ -19,9 +19,9 @@ public abstract class AbstractBuilder<S> implements Builder<S> {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
     protected final ConfigurationUtils configurationUtils = ConfigurationUtils.getInstance();
-    protected BuilderFactory builderFactory;
+    protected final BuilderFactory builderFactory = BuilderFactory.getInstance();;
     protected String id;
-    protected String role
+    protected String role;
     protected Builder<?> parent;
     protected S source;
     private final String childContentMethodName;
@@ -35,7 +35,6 @@ public abstract class AbstractBuilder<S> implements Builder<S> {
         doInit(source, parent);
     }
 
-    @Override
     public String getId() {
         return id;
     }
@@ -59,7 +58,6 @@ public abstract class AbstractBuilder<S> implements Builder<S> {
     }
 
     protected void doInit(S source, Builder<?> parent) {
-        builderFactory = BuilderFactory.getInstance();
         this.source = source;
         this.parent = parent;
         this.id = Utils.getId(source);
