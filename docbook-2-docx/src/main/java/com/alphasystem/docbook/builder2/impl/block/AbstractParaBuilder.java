@@ -3,7 +3,6 @@ package com.alphasystem.docbook.builder2.impl.block;
 import com.alphasystem.docbook.ApplicationController;
 import com.alphasystem.docbook.builder2.Builder;
 import com.alphasystem.docbook.builder2.impl.AbstractBuilder;
-import com.alphasystem.docbook.util.Utils;
 import com.alphasystem.openxml.builder.wml.WmlAdapter;
 import com.alphasystem.openxml.builder.wml.WmlBuilderFactory;
 import org.apache.commons.lang3.StringUtils;
@@ -16,7 +15,6 @@ public abstract class AbstractParaBuilder<S> extends AbstractBuilder<S> {
 
     private static final String LIST_TYPE_PREFIX = "list_";
     private static final String LIST_TYPE_SUFFIX = "$";
-    protected String role;
     protected PPr paraProperties;
 
     protected AbstractParaBuilder(S source, Builder<?> parent) {
@@ -30,7 +28,6 @@ public abstract class AbstractParaBuilder<S> extends AbstractBuilder<S> {
     @Override
     protected void doInit(S source, Builder<?> parent) {
         super.doInit(source, parent);
-        this.role = (String) Utils.invokeMethod(source,"getRole");
         var listTypeWithPreviousParaObjects = false;
         var listType = false;
         var pprBuilder = WmlBuilderFactory.getPPrBuilder();

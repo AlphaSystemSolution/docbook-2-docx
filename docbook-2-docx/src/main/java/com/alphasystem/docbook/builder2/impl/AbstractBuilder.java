@@ -21,6 +21,7 @@ public abstract class AbstractBuilder<S> implements Builder<S> {
     protected final ConfigurationUtils configurationUtils = ConfigurationUtils.getInstance();
     protected BuilderFactory builderFactory;
     protected String id;
+    protected String role
     protected Builder<?> parent;
     protected S source;
     private final String childContentMethodName;
@@ -62,6 +63,7 @@ public abstract class AbstractBuilder<S> implements Builder<S> {
         this.source = source;
         this.parent = parent;
         this.id = Utils.getId(source);
+        this.role = (String) Utils.invokeMethod(source, "getRole");
     }
 
     @SuppressWarnings("unchecked")
