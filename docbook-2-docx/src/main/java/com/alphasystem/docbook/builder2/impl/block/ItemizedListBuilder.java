@@ -13,6 +13,11 @@ public class ItemizedListBuilder extends ListBuilder<ItemizedList> {
     }
 
     @Override
+    protected void setListStyleName() {
+        this.listStyleName = source.getMark();
+    }
+
+    @Override
     protected List<Object> getChildContent() {
         return new ArrayList<>(source.getListItem());
     }

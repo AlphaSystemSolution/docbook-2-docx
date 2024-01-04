@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -25,6 +26,11 @@ public abstract class AbstractBuilder<S> implements Builder<S> {
     protected Builder<?> parent;
     protected S source;
     private final String childContentMethodName;
+
+    protected AbstractBuilder(S source, Builder<?> parent) {
+        this.childContentMethodName = "getContent";
+        doInit(source, parent);
+    }
 
     protected AbstractBuilder(String childContentMethodName, S source, Builder<?> parent) {
         this.childContentMethodName = childContentMethodName;
@@ -69,8 +75,12 @@ public abstract class AbstractBuilder<S> implements Builder<S> {
         }
     }
 
-    protected String getRole() {
-        return (String) Utils.invokeMethod(source, "getRole");
+    @Override
+    public String getRole() {
+        if (Objects.isNull(role)) {
+            role = (String) Utils.invokeMethod(source, "getRole");
+        }
+        return role;
     }
 
     protected List<Object> processChildContent(List<Object> childContent) {
@@ -78,10 +88,8 @@ public abstract class AbstractBuilder<S> implements Builder<S> {
                 .flatMap(Collection::stream).collect(Collectors.toList());
     }
 
-    protected abstract List<Object> doProcess(List<Object> processedChildContent);
-
-    protected <B extends Builder<B>> boolean hasParent(Class<B> parentBuilderClass) {
-        return getParent(parentBuilderClass) != null;
+    protected List<Object> doProcess(List<Object> processedChildContent) {
+        return  processedChildContent;
     }
 
     @SuppressWarnings({"unchecked"})

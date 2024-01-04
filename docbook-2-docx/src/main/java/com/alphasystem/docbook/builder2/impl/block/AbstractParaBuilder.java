@@ -1,20 +1,18 @@
 package com.alphasystem.docbook.builder2.impl.block;
 
-import com.alphasystem.docbook.ApplicationController;
 import com.alphasystem.docbook.builder2.Builder;
 import com.alphasystem.docbook.builder2.impl.AbstractBuilder;
 import com.alphasystem.openxml.builder.wml.WmlAdapter;
 import com.alphasystem.openxml.builder.wml.WmlBuilderFactory;
-import org.apache.commons.lang3.StringUtils;
+import com.alphasystem.util.AppUtil;
 import org.docx4j.wml.PPr;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public abstract class AbstractParaBuilder<S> extends AbstractBuilder<S> {
 
-    private static final String LIST_TYPE_PREFIX = "list_";
-    private static final String LIST_TYPE_SUFFIX = "$";
     protected PPr paraProperties;
 
     protected AbstractParaBuilder(S source, Builder<?> parent) {
@@ -28,36 +26,21 @@ public abstract class AbstractParaBuilder<S> extends AbstractBuilder<S> {
     @Override
     protected void doInit(S source, Builder<?> parent) {
         super.doInit(source, parent);
-        var listTypeWithPreviousParaObjects = false;
-        var listType = false;
-        var pprBuilder = WmlBuilderFactory.getPPrBuilder();
-        if (StringUtils.isNotBlank(this.role)) {
+        if (AppUtil.isInstanceOf(ListItemBuilder.class, parent)) {
+            // this para is within a list item
+            final var listItemBuilder = (ListItemBuilder) parent;
+            final var listBuilder = (ListBuilder<?>) listItemBuilder.getParent();
 
-            // prefix is to indicate that this role for list type
-            if (this.role.startsWith(LIST_TYPE_PREFIX)) {
-                listType = true;
-                final var index = this.role.indexOf(LIST_TYPE_PREFIX);
-                this.role = this.role.substring(index + LIST_TYPE_PREFIX.length());
+            final var listRole = listBuilder.getRole();
+            if (Objects.isNull(listRole)) {
+                this.role = configurationUtils.getDefaultListStyle();
             }
-
-            // suffix is to indicate that this para is successive para in the list, we need to set "numPr" to null
-            if (this.role.endsWith(LIST_TYPE_SUFFIX)) {
-                listTypeWithPreviousParaObjects = true;
-                this.role = this.role.substring(0, this.role.length() - 1);
-            }
-            pprBuilder = pprBuilder.withPStyle(this.role);
+            final var listInfo = listBuilder.listInfo;
+            paraProperties = WmlAdapter.getListParagraphProperties(listInfo.getNumber(), listInfo.getLevel(), role,
+                    id.equals(listItemBuilder.getFirstParaId()));
+        } else {
+            paraProperties = WmlBuilderFactory.getPPrBuilder().withPStyle(role).getObject();
         }
-
-        if (listType) {
-            final var currentListInfo = ApplicationController.getContext().getCurrentListInfo();
-            final var number = currentListInfo.getNumber();
-            final var level = currentListInfo.getLevel();
-            final var numPr = ((number < 0) || (level < 0) || listTypeWithPreviousParaObjects) ? null : WmlAdapter.getNumPr(number, level);
-            logger.info("PprBuilder, {}, {}:{}, {}", currentListInfo, number, level, numPr);
-            pprBuilder.withNumPr(numPr);
-        }
-
-        paraProperties = pprBuilder.getObject();
     }
 
     @Override

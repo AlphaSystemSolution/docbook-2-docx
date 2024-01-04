@@ -2,7 +2,6 @@ package com.alphasystem.docbook;
 
 import com.alphasystem.asciidoc.model.DocumentInfo;
 import com.alphasystem.docbook.model.DocumentCaption;
-import com.alphasystem.docbook.model.ListInfo;
 import com.alphasystem.docbook.util.ConfigurationUtils;
 import com.alphasystem.openxml.builder.wml.NumberingHelper;
 import com.alphasystem.openxml.builder.wml.WmlPackageBuilder;
@@ -41,8 +40,6 @@ public final class DocumentContext {
     private WordprocessingMLPackage wordprocessingMLPackage;
     private MainDocumentPart mainDocumentPart;
     private final NumberingHelper numberingHelper = NumberingHelper.getInstance();
-
-    private ListInfo currentListInfo;
 
     public DocumentContext(final DocumentInfo documentInfo) {
         this(documentInfo, null);
@@ -124,12 +121,16 @@ public final class DocumentContext {
             listNumbersMap.put(styleName, styleName);
         } else {
             numberId = mainDocumentPart.getNumberingDefinitionsPart().restart(numberId, level, 1);
+            numberingHelper.update(styleName, numberId);
         }
         return numberId;
     }
 
     public long getCurrentListLevel() {
-        return getCurrentListInfo().getLevel();
+        return -1;
+    }
+
+    public void setCurrentListLevel(long level) {
     }
 
     public void putLabel(String id, String label) {
@@ -146,21 +147,6 @@ public final class DocumentContext {
             label = "here";
         }
         return label;
-    }
-
-    @Deprecated
-    public void setCurrentListLevel(long level) {
-    }
-
-    public ListInfo getCurrentListInfo() {
-        if (currentListInfo == null) {
-            this.currentListInfo = new ListInfo(0, -1);
-        }
-        return currentListInfo;
-    }
-
-    public void setCurrentListInfo(ListInfo currentListInfo) {
-        this.currentListInfo = currentListInfo;
     }
 
     private void updateDocumentCompatibility() {

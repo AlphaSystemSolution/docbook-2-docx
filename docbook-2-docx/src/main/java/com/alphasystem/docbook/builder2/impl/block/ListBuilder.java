@@ -1,36 +1,37 @@
 package com.alphasystem.docbook.builder2.impl.block;
 
+import com.alphasystem.docbook.ApplicationController;
 import com.alphasystem.docbook.builder2.Builder;
 import com.alphasystem.docbook.builder2.impl.AbstractBuilder;
-import com.alphasystem.docbook.model.NotImplementedException;
-import com.alphasystem.xml.UnmarshallerConstants;
-import org.docbook.model.ListItem;
+import com.alphasystem.docbook.model.ListInfo;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 public abstract class ListBuilder<S> extends AbstractBuilder<S> {
+
+    protected ListInfo listInfo;
+    protected String listStyleName;
 
     protected ListBuilder(S source, Builder<?> parent) {
         super(null, source, parent);
     }
 
     @Override
-    protected List<Object> processChildContent(List<Object> childContent) {
-        return childContent.stream().map(content -> {
-            if (UnmarshallerConstants.isListItemType(content)) {
-                final var listItem = (ListItem) content;
-                return listItem.getContent().stream().map(obj -> builderFactory.process(obj, this)).flatMap(Collection::stream)
-                        .collect(Collectors.toList());
-            } else {
-                throw new NotImplementedException(source, content);
-            }
-        }).flatMap(Collection::stream).collect(Collectors.toList());
+    @SuppressWarnings({"unchecked"})
+    protected void doInit(S source, Builder<?> parent) {
+        super.doInit(source, parent);
+        setListStyleName();
+        final var parentListBuilder = getParent(ListBuilder.class);
+        if (Objects.isNull(parentListBuilder)) {
+            final var level = 0;
+            var numberId = ApplicationController.getContext().getListNumber(listStyleName, level);
+            this.listInfo = new ListInfo(numberId, level);
+        } else {
+            // we have nested list, get the current list info, update the level, and pass it down
+            final var pli = parentListBuilder.listInfo;
+            this.listInfo = new ListInfo(pli.getNumber(), pli.getLevel() + 1);
+        }
     }
 
-    @Override
-    protected List<Object> doProcess(List<Object> processedChildContent) {
-        return processedChildContent;
-    }
+    protected abstract void setListStyleName();
 }

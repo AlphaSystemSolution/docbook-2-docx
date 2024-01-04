@@ -3,7 +3,6 @@ package com.alphasystem.xml;
 import com.alphasystem.docbook.ApplicationController;
 import com.alphasystem.docbook.DocumentContext;
 import com.alphasystem.docbook.builder2.BuilderFactory;
-import com.alphasystem.docbook.model.ListInfo;
 import com.alphasystem.docbook.model.NotImplementedException;
 import com.alphasystem.docbook.util.ConfigurationUtils;
 import com.alphasystem.docbook.util.Utils;
@@ -40,7 +39,6 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     private String currentText = "";
     private int sectionLevel = 0;
     private final Stack<Object> docbookObjects = new Stack<>();
-    private final Stack<ListInfo> listInfos = new Stack<>();
 
     public DocBookUnmarshallerHandler() {
         this.documentContext = ApplicationController.getContext();
@@ -57,7 +55,6 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
 
     @Override
     public void startDocument() {
-        ApplicationController.getContext().setCurrentListInfo(getCurrentListInfo());
     }
 
     @Override
@@ -465,24 +462,15 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         final var startingNumber = getAttributeValue("startingnumber", attributes);
         final var orderedList = new OrderedList().withId(id).withNumeration(numeration).withStartigNumber(startingNumber);
         docbookObjects.push(orderedList);
-        pushListInfo(numeration.value());
     }
 
     private void startItemizedList(String id, Attributes attributes) {
         final var mark = getAttributeValue("mark", attributes);
         docbookObjects.push(new ItemizedList().withId(id).withMark(mark));
-        pushListInfo(mark);
     }
 
     private void endList() {
         processEndElement();
-        listInfos.pop();
-        var listInfo = new ListInfo();
-        if (!listInfos.isEmpty()) {
-            listInfo = listInfos.peek();
-        }
-        logger.info("Resetting LI: {}", listInfo);
-        ApplicationController.getContext().setCurrentListInfo(listInfo);
     }
 
     private void startListItem() {
@@ -696,43 +684,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     }
 
     private void handleListItem(ListItem obj, Object child) {
-        var contents = obj.getContent();
-
-        // if role is not defined then we need to set to default list style.
-        String role = null;
-        if (isSimpleParaType(child)) {
-            var simplePara = (SimplePara) child;
-            role = simplePara.getRole();
-        } else if (isParaType(child)) {
-            var para = (Para) child;
-            role = para.getRole();
-        }
-
-        // if role is not defined, we need to set appropriate
-        if (role == null) {
-            role = configurationUtils.getDefaultListStyle();
-        }
-
-        // if there are multiple paras in the list item, only the first one will need to define "NumPr" property.
-        // we will inspect this suffix in the builder if exists then we will not set "NumPr" property.
-        final var hasPreviousParaObjects = contents.stream().anyMatch(UnmarshallerConstants::isParaTypes);
-        final var suffix = hasPreviousParaObjects ? "$" : "";
-        role = "list_" + role + suffix;
-
-        Object updatedChild;
-        if (isSimpleParaType(child)) {
-            var simplePara = (SimplePara) child;
-            simplePara.setRole(role);
-            updatedChild = simplePara;
-        } else if (isParaType(child)) {
-            var para = (Para) child;
-            para.setRole(role);
-            updatedChild = para;
-        } else {
-            updatedChild = child;
-        }
-
-        contents.add(updatedChild);
+        obj.getContent().add(child);
         docbookObjects.push(obj);
     }
 
@@ -868,35 +820,6 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         if (processedContent != null) {
             processedContent.forEach(obj -> ApplicationController.getContext().getMainDocumentPart().addObject(obj));
         }
-    }
-
-    private void pushListInfo(String styleName) {
-        final var listItem = getItemByName(styleName);
-        System.out.println("==========================");
-        listInfos.forEach(System.out::println);
-        System.out.println("==========================");
-        System.out.printf("StyleName: %s, NumId: %s%n", listItem.getStyleName(), listItem.getNumberId());
-        var level = 0L;
-        var numberId = listItem.getNumberId();
-        if (listInfos.isEmpty()) {
-            numberId = ApplicationController.getContext().getListNumber(listItem.getStyleName(), level);
-        } else {
-            // nested list
-            level = listInfos.peek().getLevel() + 1L;
-            System.out.printf("Nested list: %s:%s", numberId, level);
-        }
-        final var listInfo = new ListInfo(numberId, level);
-        logger.info("Setting LI: {}", listInfo);
-        ApplicationController.getContext().setCurrentListInfo(listInfo);
-        listInfos.push(listInfo);
-    }
-
-    private ListInfo getCurrentListInfo() {
-        var listInfo = new ListInfo();
-        if (!listInfos.isEmpty()) {
-            listInfo = listInfos.peek();
-        }
-        return listInfo;
     }
 
     private static String getId(Attributes attributes) {

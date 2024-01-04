@@ -4,7 +4,8 @@ import java.util.List;
 
 public interface Builder<S> {
 
-    Builder<?> getParent();
     S getSource();
+    Builder<?> getParent();
+    String getRole();
     List<Object> process();
 }

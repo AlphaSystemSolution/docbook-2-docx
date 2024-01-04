@@ -13,6 +13,11 @@ public class OrderedListBuilder extends ListBuilder<OrderedList> {
     }
 
     @Override
+    protected void setListStyleName() {
+        this.listStyleName = source.getNumeration().value();
+    }
+
+    @Override
     protected List<Object> getChildContent() {
         return new ArrayList<>(source.getListItem());
     }
