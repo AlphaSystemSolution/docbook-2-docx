@@ -1,5 +1,6 @@
 package com.alphasystem.docbook.builder2.impl.inline;
 
+import com.alphasystem.docbook.builder2.Builder;
 import com.alphasystem.docbook.builder2.impl.InlineBuilder;
 import com.alphasystem.openxml.builder.wml.WmlAdapter;
 import com.alphasystem.openxml.builder.wml.WmlBuilderFactory;
@@ -7,8 +8,8 @@ import com.alphasystem.util.IdGenerator;
 
 public class TextBuilder extends InlineBuilder<String> {
 
-    public TextBuilder() {
-        super(null,null);
+    public TextBuilder(String source, Builder<?> parent) {
+        super(null,null, source, parent);
         this.id = IdGenerator.nextId();
     }
 

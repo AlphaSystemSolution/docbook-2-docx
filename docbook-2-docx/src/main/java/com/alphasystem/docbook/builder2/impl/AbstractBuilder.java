@@ -25,12 +25,13 @@ public abstract class AbstractBuilder<S> implements Builder<S> {
     protected S source;
     private final String childContentMethodName;
 
-    protected AbstractBuilder() {
-        this("getContent");
+    protected AbstractBuilder(S source, Builder<?> parent) {
+        this("getContent", source, parent);
     }
 
-    protected AbstractBuilder(String childContentMethodName) {
+    protected AbstractBuilder(String childContentMethodName, S source, Builder<?> parent) {
         this.childContentMethodName = childContentMethodName;
+        doInit(source, parent);
     }
 
     @Override
@@ -49,11 +50,10 @@ public abstract class AbstractBuilder<S> implements Builder<S> {
     }
 
     @Override
-    public List<Object> process(S source, Builder<?> parent) {
+    public List<Object> process() {
         if (source == null) {
             throw new NullPointerException(String.format("Source object is null in \"%s\"", getClass().getName()));
         }
-        doInit(source, parent);
         return doProcess(processChildContent(getChildContent()));
     }
 

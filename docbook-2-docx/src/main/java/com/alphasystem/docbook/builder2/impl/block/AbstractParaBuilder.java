@@ -19,12 +19,12 @@ public abstract class AbstractParaBuilder<S> extends AbstractBuilder<S> {
     protected String role;
     protected PPr paraProperties;
 
-    protected AbstractParaBuilder() {
-        super();
+    protected AbstractParaBuilder(S source, Builder<?> parent) {
+        this("getContent", source, parent);
     }
 
-    protected AbstractParaBuilder(String childContentMethodName) {
-        super(childContentMethodName);
+    protected AbstractParaBuilder(String childContentMethodName, S source, Builder<?> parent) {
+        super(childContentMethodName, source, parent);
     }
 
     @Override

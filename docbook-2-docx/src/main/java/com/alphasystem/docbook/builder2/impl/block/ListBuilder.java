@@ -1,5 +1,6 @@
 package com.alphasystem.docbook.builder2.impl.block;
 
+import com.alphasystem.docbook.builder2.Builder;
 import com.alphasystem.docbook.builder2.impl.AbstractBuilder;
 import com.alphasystem.docbook.model.NotImplementedException;
 import com.alphasystem.xml.UnmarshallerConstants;
@@ -11,8 +12,8 @@ import java.util.stream.Collectors;
 
 public abstract class ListBuilder<S> extends AbstractBuilder<S> {
 
-    protected ListBuilder() {
-        super(null);
+    protected ListBuilder(S source, Builder<?> parent) {
+        super(null, source, parent);
     }
 
     @Override

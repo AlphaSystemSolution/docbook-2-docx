@@ -39,8 +39,8 @@ public abstract class AbstractTableBuilder<S> extends AbstractBuilder<S> {
     protected TableAdapter tableAdapter;
     protected DocBookTableAdapter docBookTableAdapter;
 
-    protected AbstractTableBuilder() {
-        super(null);
+    protected AbstractTableBuilder(S source, Builder<?> parent) {
+        super(null, source, parent);
     }
 
     public TableAdapter getTableAdapter() {

@@ -24,13 +24,12 @@ public abstract class InlineBuilder<S> extends AbstractBuilder<S> {
     protected RBuilder runBuilder;
     protected InlineHandlerFactory handlerFactory = InlineHandlerFactory.getInstance();
 
-    protected InlineBuilder(String defaultStyle) {
-        super();
-        this.defaultStyle = defaultStyle;
+    protected InlineBuilder(String defaultStyle, S source, Builder<?> parent) {
+        this("getContent", defaultStyle, source, parent);
     }
 
-    protected InlineBuilder(String childContentMethodName, String defaultStyle) {
-        super(childContentMethodName);
+    protected InlineBuilder(String childContentMethodName, String defaultStyle, S source, Builder<?> parent) {
+        super(childContentMethodName, source, parent);
         this.defaultStyle = defaultStyle;
     }
 

@@ -7,5 +7,5 @@ public interface Builder<S> {
     String getId();
     Builder<?> getParent();
     S getSource();
-    List<Object> process(S source, Builder<?> parent);
+    List<Object> process();
 }

@@ -32,7 +32,7 @@ public abstract class ListBuilder<T> extends BlockBuilder<T> {
         } else {
             number = getItemByName(styleName).getNumberId();
             level = 0;
-            number = getContext().getListNumber(number, level);
+            number = getContext().getListNumber("", level);
         }
         ApplicationController.getContext().setCurrentListLevel(level);
     }

@@ -20,8 +20,8 @@ public abstract class LinkSupportBuilder<S> extends InlineBuilder<S> {
     protected boolean external = false;
     protected String href;
 
-    protected LinkSupportBuilder(String childContentMethodName) {
-        super(childContentMethodName, HYPER_LINK);
+    protected LinkSupportBuilder(String childContentMethodName, S source, Builder<?> parent) {
+        super(childContentMethodName, HYPER_LINK, source, parent);
     }
 
     protected void initHref() {

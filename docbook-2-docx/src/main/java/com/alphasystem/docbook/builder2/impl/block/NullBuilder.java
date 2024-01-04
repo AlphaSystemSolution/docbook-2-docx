@@ -7,12 +7,12 @@ import java.util.List;
 
 public abstract class NullBuilder<S> extends AbstractParaBuilder<S> {
 
-    protected NullBuilder() {
-        super(null);
+    protected NullBuilder(S source, Builder<?> parent) {
+        super(null, source, parent);
     }
 
     @Override
-    public List<Object> process(S source, Builder<?> parent) {
+    public List<Object> process() {
         return Collections.emptyList();
     }
 }

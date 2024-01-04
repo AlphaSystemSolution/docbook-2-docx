@@ -13,6 +13,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.docbook.model.Section;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 import static com.alphasystem.docbook.ApplicationController.CONF_PATH_VALUE;
 import static com.alphasystem.util.AppUtil.isInstanceOf;
@@ -39,11 +42,11 @@ public class ConfigurationUtils {
     }
 
     private final CompositeConfiguration configuration;
+    private final Map<String, Class<?>> buildersClassMap = new HashMap<>();
 
     /**
      * Do not let any one instantiate this class.
      *
-     * @throws ConfigurationException
      */
     private ConfigurationUtils() throws ConfigurationException {
         Parameters parameters = new Parameters();
@@ -54,6 +57,16 @@ public class ConfigurationUtils {
         configuration = new CompositeConfiguration();
         configuration.addConfiguration(new SystemConfiguration());
         configuration.addConfiguration(builder.getConfiguration());
+    }
+
+    public Class<?> getBuilderClass(Object o) throws ClassNotFoundException {
+        final var className = o.getClass().getName();
+        var clazz = buildersClassMap.get(className);
+        if (Objects.isNull(clazz)) {
+            clazz = Class.forName(configuration.getString(String.format("%s.builder", className)));
+            buildersClassMap.put(className, clazz);
+        }
+        return clazz;
     }
 
     public String getTitleStyle(int level, Class<?> parentClass) {
