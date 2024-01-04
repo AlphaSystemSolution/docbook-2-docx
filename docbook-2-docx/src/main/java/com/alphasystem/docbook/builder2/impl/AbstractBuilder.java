@@ -19,16 +19,12 @@ public abstract class AbstractBuilder<S> implements Builder<S> {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
     protected final ConfigurationUtils configurationUtils = ConfigurationUtils.getInstance();
-    protected final BuilderFactory builderFactory = BuilderFactory.getInstance();;
+    protected final BuilderFactory builderFactory = BuilderFactory.getInstance();
     protected String id;
     protected String role;
     protected Builder<?> parent;
     protected S source;
     private final String childContentMethodName;
-
-    protected AbstractBuilder(S source, Builder<?> parent) {
-        this("getContent", source, parent);
-    }
 
     protected AbstractBuilder(String childContentMethodName, S source, Builder<?> parent) {
         this.childContentMethodName = childContentMethodName;
