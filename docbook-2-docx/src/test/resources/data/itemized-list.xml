@@ -1,8 +1,7 @@
 <article xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en">
-    <orderedlist numeration="arabic">
+    <itemizedlist mark="diamond">
         <listitem>
             <simpara>First</simpara>
-            <simpara>Another para</simpara>
         </listitem>
         <listitem>
             <simpara>Second</simpara>
@@ -10,5 +9,5 @@
         <listitem>
             <simpara>Third</simpara>
         </listitem>
-    </orderedlist>
+    </itemizedlist>
 </article>

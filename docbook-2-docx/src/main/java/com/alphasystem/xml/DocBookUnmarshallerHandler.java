@@ -8,6 +8,7 @@ import com.alphasystem.docbook.util.ConfigurationUtils;
 import com.alphasystem.docbook.util.Utils;
 import com.alphasystem.openxml.builder.wml.NumberingHelper;
 import com.alphasystem.openxml.builder.wml.TocGenerator;
+import com.alphasystem.openxml.builder.wml.UnorderedList;
 import com.alphasystem.openxml.builder.wml.WmlAdapter;
 import com.alphasystem.util.IdGenerator;
 import org.apache.commons.lang3.StringUtils;
@@ -465,7 +466,10 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     }
 
     private void startItemizedList(String id, Attributes attributes) {
-        final var mark = getAttributeValue("mark", attributes);
+        var mark = getAttributeValue("mark", attributes);
+        if (Objects.isNull(mark)) {
+            mark = UnorderedList.values()[0].getStyleName();
+        }
         docbookObjects.push(new ItemizedList().withId(id).withMark(mark));
     }
 
