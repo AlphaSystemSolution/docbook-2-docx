@@ -6,7 +6,6 @@ import com.alphasystem.docbook.builder2.BuilderFactory;
 import com.alphasystem.docbook.model.NotImplementedException;
 import com.alphasystem.docbook.util.ConfigurationUtils;
 import com.alphasystem.docbook.util.Utils;
-import com.alphasystem.openxml.builder.wml.NumberingHelper;
 import com.alphasystem.openxml.builder.wml.TocGenerator;
 import com.alphasystem.openxml.builder.wml.UnorderedList;
 import com.alphasystem.openxml.builder.wml.WmlAdapter;
@@ -33,7 +32,6 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     private final static String NEW_LINE = System.lineSeparator();
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private final NumberingHelper numberingHelper = NumberingHelper.getInstance();
     private final BuilderFactory builderFactory = BuilderFactory.getInstance();
     private final ConfigurationUtils configurationUtils = ConfigurationUtils.getInstance();
     private final DocumentContext documentContext;
@@ -870,9 +868,5 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
 
     private static String getAttributeValue(String attributeName, Attributes attributes) {
         return attributes.getValue(attributeName);
-    }
-
-    private com.alphasystem.openxml.builder.wml.ListItem<?> getItemByName(String styleName) {
-        return numberingHelper.getListItem(styleName);
     }
 }
