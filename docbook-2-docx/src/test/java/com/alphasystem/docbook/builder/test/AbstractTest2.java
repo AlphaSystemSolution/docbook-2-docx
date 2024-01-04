@@ -124,4 +124,8 @@ public class AbstractTest2 {
         }
         return null;
     }
+
+    void assertSize(int expected) {
+        assertEquals(mainDocumentPart.getContent().size() - previousSize, expected);
+    }
 }

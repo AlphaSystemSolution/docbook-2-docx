@@ -36,7 +36,7 @@ public class InlineTest extends AbstractTest2 {
         final var content = mainDocumentPart.getContent();
 
         // validate
-        assertEquals(content.size(), previousSize + 2);
+        assertSize( 2);
         assertText(content.get(content.size() - 1), "This paragraph contains some bold text, some italic text, and some highlighted text.");
         addHorizontalLine();
     }
@@ -59,7 +59,7 @@ public class InlineTest extends AbstractTest2 {
         final var content = mainDocumentPart.getContent();
 
         // validate
-        assertEquals(content.size(), previousSize + 2);
+        assertSize( 2);
         assertText(content.get(content.size() - 1), "Chemical formula for water is H2O.");
         addHorizontalLine();
     }
@@ -71,7 +71,7 @@ public class InlineTest extends AbstractTest2 {
         final var content = mainDocumentPart.getContent();
 
         // validate
-        assertEquals(content.size(), previousSize + 2);
+        assertSize( 2);
         assertText(content.get(content.size() - 1), "A paragraph with xreflabel (Text to display).");
         addHorizontalLine();
     }
@@ -94,7 +94,7 @@ public class InlineTest extends AbstractTest2 {
         final var content = mainDocumentPart.getContent();
 
         // validate
-        assertEquals(content.size(), previousSize + 2);
+        assertSize( 2);
         assertText(content.get(content.size() - 1), "Einstein's theory of relativity is E = mc2.");
         addHorizontalLine();
     }
@@ -113,7 +113,7 @@ public class InlineTest extends AbstractTest2 {
         addTestTitle("Mixed contents Test");
         processContent(article);
         final var content = mainDocumentPart.getContent();
-        assertEquals(content.size(), previousSize + 2);
+        assertSize( 2);
         assertText(content.get(content.size() - 1), "This paragraph contains mixed of English and Arabic text (سلم).");
         addHorizontalLine();
     }
@@ -129,7 +129,7 @@ public class InlineTest extends AbstractTest2 {
         addTestTitle("Multiple roles Test");
         processContent(article);
         final var content = mainDocumentPart.getContent();
-        assertEquals(content.size(), previousSize + 2);
+        assertSize( 2);
         assertText(content.get(content.size() - 1), "This text has multiple roles. (literal, line-through, and green).");
         addHorizontalLine();
     }
@@ -143,7 +143,7 @@ public class InlineTest extends AbstractTest2 {
         addTestTitle("Custom para style Test");
         processContent(article);
         final var content = mainDocumentPart.getContent();
-        assertEquals(content.size(), previousSize + 2);
+        assertSize( 2);
         assertText(content.get(content.size() - 1), "Paragraph with custom style.");
         addHorizontalLine();
     }
@@ -157,7 +157,7 @@ public class InlineTest extends AbstractTest2 {
         addTestTitle("XREF with xreflabel test");
         processContent(article);
         final var content = mainDocumentPart.getContent();
-        assertEquals(content.size(), previousSize + 2);
+        assertSize( 2);
         assertText(content.get(content.size() - 1), "Link to Text to display.");
         addHorizontalLine();
     }

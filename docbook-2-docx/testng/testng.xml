@@ -9,7 +9,6 @@
             <class name="com.alphasystem.docbook.builder.test.OrderedListTest"/>
             <class name="com.alphasystem.docbook.builder.test.TearDown"/>
             <!--
-            <class name="com.alphasystem.docbook.builder.test.InlineTest"/>
             <class name="com.alphasystem.docbook.builder.test.MultipleRolesTest"/>
             <class name="com.alphasystem.docbook.builder.test.LineBreakTest"/>
             <class name="com.alphasystem.docbook.builder.test.SectionLevelTest"/>

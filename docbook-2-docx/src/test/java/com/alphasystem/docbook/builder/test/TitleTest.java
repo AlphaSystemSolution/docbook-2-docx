@@ -15,7 +15,7 @@ public class TitleTest extends AbstractTest2 {
         addTestTitle("Title test with default style");
         processContent(createArticle("Document title"));
         final var content = mainDocumentPart.getContent();
-        assertEquals(content.size(), previousSize + 2);
+        assertSize( 2);
         assertText(content.get(content.size() - 1), "Document title");
         addHorizontalLine();
     }
@@ -26,7 +26,7 @@ public class TitleTest extends AbstractTest2 {
         final var info = createInfo("Document title ", createPhrase("arabicHeading1", "سلم"));
         processContent(createArticle().withContent(info));
         final var content = mainDocumentPart.getContent();
-        assertEquals(content.size(), previousSize + 2);
+        assertSize( 2);
         assertText(content.get(content.size() - 1), "Document title سلم");
         addHorizontalLine();
     }
@@ -35,8 +35,7 @@ public class TitleTest extends AbstractTest2 {
     public void testSectionLevelTitles() {
         addTestTitle("Section Level title test");
         processContent(readXml("sections"));
-        final var content = mainDocumentPart.getContent();
-        assertEquals(content.size(), previousSize + 11);
+        assertSize( 11);
         addHorizontalLine();
     }
 

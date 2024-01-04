@@ -16,8 +16,7 @@ public class OrderedListTest extends AbstractTest2 {
     public void testOrderedList() {
         addTestTitle("Ordered list with \"arabic\" numeration.");
         processContent(readXml("ordered-list"));
-        final var content = mainDocumentPart.getContent();
-        assertEquals(content.size(), previousSize + 5);
+        assertSize(4);
 
         mainDocumentPart.addObject(WmlAdapter.getParagraph("Numbering in the following list will be restarted."));
         processContent(readXml("ordered-list"));
@@ -28,8 +27,7 @@ public class OrderedListTest extends AbstractTest2 {
     public void testOrderedListLowerAlpha() {
         addTestTitle("Ordered list with \"loweralpha\" numeration.");
         processContent(readXml("ordered-list-lower-alpha"));
-        final var content = mainDocumentPart.getContent();
-        assertEquals(content.size(), previousSize + 4);
+        assertSize(4);
         addHorizontalLine();
     }
 
@@ -37,8 +35,7 @@ public class OrderedListTest extends AbstractTest2 {
     public void testNestedOrderedList() {
         addTestTitle("Nested ordered list.");
         processContent(readXml("nested-ordered-list"));
-        final var content = mainDocumentPart.getContent();
-        assertEquals(content.size(), previousSize + 6);
+        assertSize(6);
         addHorizontalLine();
     }
 
@@ -46,8 +43,7 @@ public class OrderedListTest extends AbstractTest2 {
     public void testOrderedListMoreThenOnePara() {
         addTestTitle("Nested ordered list.");
         processContent(readXml("multi-para-ordered-list"));
-        final var content = mainDocumentPart.getContent();
-        assertEquals(content.size() - previousSize,4);
+        assertSize(4);
         addHorizontalLine();
     }
 }
