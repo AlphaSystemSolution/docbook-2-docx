@@ -2,6 +2,7 @@
     <orderedlist numeration="arabic" xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en">
         <listitem>
             <simpara>First</simpara>
+            <simpara>Another para</simpara>
         </listitem>
         <listitem>
             <simpara>Second</simpara>

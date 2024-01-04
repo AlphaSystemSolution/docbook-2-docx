@@ -17,7 +17,7 @@ public class OrderedListTest extends AbstractTest2 {
         addTestTitle("Ordered list with \"arabic\" numeration.");
         processContent(readXml("ordered-list"));
         final var content = mainDocumentPart.getContent();
-        assertEquals(content.size(), previousSize + 4);
+        assertEquals(content.size(), previousSize + 5);
 
         mainDocumentPart.addObject(WmlAdapter.getParagraph("Numbering in the following list will be restarted."));
         processContent(readXml("ordered-list"));
