@@ -10,10 +10,7 @@ import com.alphasystem.xml.UnmarshallerTool;
 import jakarta.xml.bind.JAXBElement;
 import org.docbook.model.SimplePara;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
-import org.docx4j.wml.CTBookmark;
-import org.docx4j.wml.P;
-import org.docx4j.wml.R;
-import org.docx4j.wml.Text;
+import org.docx4j.wml.*;
 import org.testng.annotations.AfterMethod;
 
 import java.nio.file.Files;
@@ -45,7 +42,7 @@ public class AbstractTest2 {
         mainDocumentPart = ApplicationController.getContext().getMainDocumentPart();
     }
 
-  @AfterMethod
+    @AfterMethod
     public void reset() {
         previousSize = mainDocumentPart.getContent().size();
     }
@@ -127,5 +124,32 @@ public class AbstractTest2 {
 
     void assertSize(int expected) {
         assertEquals(mainDocumentPart.getContent().size() - previousSize, expected);
+    }
+
+    long getTableContentSize(Tbl table) {
+        return extractContent(0, io.vavr.collection.List.ofAll(table.getContent()));
+    }
+
+    private static long extractContent(int result, io.vavr.collection.List<Object> contents) {
+        if (contents.isEmpty()) {
+            return result;
+        }
+        final var content = contents.head();
+        final var tail = contents.tail();
+        if (AppUtil.isInstanceOf(Tr.class, content)) {
+            return extractContent(result, tail.appendAll(((Tr) content).getContent()));
+        } else if (AppUtil.isInstanceOf(Tc.class, content)) {
+            return extractContent(result, tail.appendAll(((Tc) content).getContent()));
+        } else if (AppUtil.isInstanceOf(P.class, content)) {
+            return extractContent(result, tail.appendAll(((P) content).getContent()));
+        } else if (AppUtil.isInstanceOf(R.class, content)) {
+            return extractContent(result + 1, tail);
+        } else if (AppUtil.isInstanceOf(CTBookmark.class, content) ||
+                AppUtil.isInstanceOf(JAXBElement.class, content)) {
+            return extractContent(result, tail);
+        } else {
+            System.err.println("Unhandled type: " + content.getClass().getName());
+            return extractContent(result, tail);
+        }
     }
 }
