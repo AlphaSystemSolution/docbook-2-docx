@@ -89,7 +89,7 @@ public abstract class AbstractBuilder<S> implements Builder<S> {
     }
 
     protected List<Object> doProcess(List<Object> processedChildContent) {
-        return  processedChildContent;
+        return processedChildContent;
     }
 
     @SuppressWarnings({"unchecked"})

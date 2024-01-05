@@ -17,14 +17,6 @@ public class DocBookTableAdapter {
         this.informalTable = informalTable;
     }
 
-    public Table getTable() {
-        return table;
-    }
-
-    public InformalTable getInformalTable() {
-        return informalTable;
-    }
-
     public List<TableGroup> getTableGroup() {
         if (informalTable != null) {
             return informalTable.getTableGroup();
@@ -68,46 +60,6 @@ public class DocBookTableAdapter {
             return table.getTableStyle();
         }
         return null;
-    }
-
-    public void addTableGroup(TableGroup tableGroup) {
-        if (informalTable != null) {
-           informalTable.getTableGroup().add(tableGroup);
-        } else if (table != null) {
-           table.getTableGroup().add(tableGroup);
-        }
-    }
-
-    public void addColumnSpec(ColumnSpec columnSpec) {
-        if (informalTable != null) {
-            informalTable.getTableGroup().get(0).getColSpec().add(columnSpec);
-        } else if (table != null) {
-            table.getTableGroup().get(0).getColSpec().add(columnSpec);
-        }
-    }
-
-    public void addTableHeader(TableHeader tableHeader) {
-        if (informalTable != null) {
-            informalTable.getTableGroup().get(0).setTableHeader(tableHeader);
-        } else if (table != null) {
-            table.getTableGroup().get(0).setTableHeader(tableHeader);
-        }
-    }
-
-    public void addTableBody(TableBody tableBody) {
-        if (informalTable != null) {
-            informalTable.getTableGroup().get(0).setTableBody(tableBody);
-        } else if (table != null) {
-            table.getTableGroup().get(0).setTableBody(tableBody);
-        }
-    }
-
-    public void addTableFooter(TableFooter tableFooter) {
-        if (informalTable != null) {
-            informalTable.getTableGroup().get(0).setTableFooter(tableFooter);
-        } else if (table != null) {
-            table.getTableGroup().get(0).setTableFooter(tableFooter);
-        }
     }
 
     public static DocBookTableAdapter fromInformalTable(InformalTable informalTable) {
