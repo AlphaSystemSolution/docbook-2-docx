@@ -12,7 +12,7 @@ public class TableBuilder extends AbstractTableBuilder<Table> {
 
     @Override
     protected void doInit(Table source, Builder<?> parent) {
-        super.doInit(source, parent);
         this.docBookTableAdapter = DocBookTableAdapter.fromTable(source);
+        super.doInit(source, parent);
     }
 }

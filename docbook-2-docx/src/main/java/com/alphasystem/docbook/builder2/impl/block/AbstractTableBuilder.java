@@ -3,18 +3,23 @@ package com.alphasystem.docbook.builder2.impl.block;
 import com.alphasystem.docbook.builder2.Builder;
 import com.alphasystem.docbook.builder2.impl.AbstractBuilder;
 import com.alphasystem.docbook.model.DocBookTableAdapter;
-import com.alphasystem.docbook.model.NotImplementedException;
-import com.alphasystem.docbook.util.ColumnBuilder;
-import com.alphasystem.openxml.builder.wml.table.*;
+import com.alphasystem.openxml.builder.wml.table.ColumnInfo;
+import com.alphasystem.openxml.builder.wml.table.ColumnInput;
+import com.alphasystem.openxml.builder.wml.table.TableAdapter;
+import com.alphasystem.openxml.builder.wml.table.TableType;
 import com.alphasystem.util.AppUtil;
-import org.docbook.model.*;
+import org.docbook.model.Choice;
+import org.docbook.model.ColumnSpec;
+import org.docbook.model.Frame;
+import org.docbook.model.TableGroup;
 import org.docx4j.wml.CTBorder;
+import org.docx4j.wml.Tbl;
 import org.docx4j.wml.TblBorders;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.alphasystem.openxml.builder.wml.WmlAdapter.getDefaultBorder;
@@ -30,45 +35,68 @@ public abstract class AbstractTableBuilder<S> extends AbstractBuilder<S> {
     private static final int FOOTER = 2;
 
     private int level = -1;
-    private final Map<Integer, ColumnBuilder.NextColumnInfo> nextColumnInfoMap = new HashMap<>();
     private List<ColumnInfo> columnInfoList;
     protected TableType tableType;
-    protected TableAdapter tableAdapter;
+    private Tbl table;
+    private TableGroup tableGroup;
     protected DocBookTableAdapter docBookTableAdapter;
 
     protected AbstractTableBuilder(S source, Builder<?> parent) {
         super(null, source, parent);
     }
 
+    public TableType getTableType() {
+        return tableType;
+    }
+
+    public List<ColumnInfo> getColumnInfoList() {
+        return columnInfoList;
+    }
+
     @Override
     protected List<Object> getChildContent() {
-        return Collections.emptyList();
+        final var childContent = new ArrayList<>();
+
+        final var header = tableGroup.getTableHeader();
+        if (!Objects.isNull(header)) {
+            childContent.add(header);
+        }
+
+        final var body = tableGroup.getTableBody();
+        if (!Objects.isNull(body)) {
+            childContent.add(body);
+        }
+
+        final var footer = tableGroup.getTableFooter();
+        if (!Objects.isNull(footer)) {
+            childContent.add(footer);
+        }
+        return childContent;
     }
 
     @Override
     protected void doInit(S source, Builder<?> parent) {
         super.doInit(source, parent);
+        this.level = -1;
         if (AppUtil.isInstanceOf(ListBuilder.class, parent)) {
             this.level = (int) ((ListBuilder<?>) parent).listInfo.getLevel();
         }
+        final var tableGroups = docBookTableAdapter.getTableGroup();
+        tableGroup = ((tableGroups != null) && !tableGroups.isEmpty()) ? tableGroups.get(0) : null;
+        if (tableGroup == null) {
+            throw new IllegalArgumentException("tableGroup is null.");
+        }
+        initializeTable(tableGroup, docBookTableAdapter.getFrame(), docBookTableAdapter.getRowSep(),
+                docBookTableAdapter.getColSep(), docBookTableAdapter.getTableStyle());
     }
 
     @Override
     protected List<Object> doProcess(List<Object> processedChildContent) {
-        final var tableGroups = docBookTableAdapter.getTableGroup();
-        final var tableGroup = ((tableGroups != null) && !tableGroups.isEmpty()) ? tableGroups.get(0) : null;
-        if (tableGroup == null) {
-            throw new IllegalArgumentException("tableGroup is null.");
-        }
-        initializeTableAdapter(tableGroup, docBookTableAdapter.getFrame(), docBookTableAdapter.getRowSep(),
-                docBookTableAdapter.getColSep(), docBookTableAdapter.getTableStyle());
-        buildHeader(tableGroup.getTableHeader());
-        buildBody(tableGroup.getTableBody());
-        buildFooter(tableGroup.getTableFooter());
-        return Collections.singletonList(tableAdapter.getTable());
+        table.getContent().addAll(processedChildContent);
+        return Collections.singletonList(table);
     }
 
-    private void initializeTableAdapter(TableGroup tableGroup, Frame frame, Choice rowSep, Choice colSep, String styleName) {
+    private void initializeTable(TableGroup tableGroup, Frame frame, Choice rowSep, Choice colSep, String styleName) {
         int numOfColumns = Integer.parseInt(tableGroup.getCols());
         final List<ColumnSpec> colSpec = tableGroup.getColSpec();
         final boolean noColSpec = (colSpec == null) || colSpec.isEmpty();
@@ -82,14 +110,15 @@ public abstract class AbstractTableBuilder<S> extends AbstractBuilder<S> {
 
         var tblPrBuilder = getTblPrBuilder().withTblBorders(createFrame(frame, rowSep, colSep));
 
-        var tblPr = tblPrBuilder.getObject();
-        tableAdapter = new TableAdapter().withTableType(tableType)
+        final var tableAdapter = new TableAdapter()
+                .withTableType(tableType)
                 .withTableStyle(tableStyle)
                 .withIndentLevel(level)
-                .withTableProperties(tblPr)
+                .withTableProperties(tblPrBuilder.getObject())
                 .withColumnInputs(buildColumns(colSpec))
                 .startTable();
         columnInfoList = tableAdapter.getColumns();
+        table = tableAdapter.getTable();
     }
 
     private String getTableStyle(TableGroup tableGroup, String styleName) {
@@ -166,58 +195,6 @@ public abstract class AbstractTableBuilder<S> extends AbstractBuilder<S> {
         }
         return getTblBordersBuilder().withTop(top).withLeft(left).withBottom(bottom)
                 .withRight(right).withInsideH(insideH).withInsideV(insideV).getObject();
-    }
-
-    private void buildHeader(TableHeader tableHeader) {
-        if (tableHeader != null) {
-            final var vAlign = tableHeader.getVAlign();
-            tableHeader.getRow().forEach(row -> buildRow(row, vAlign));
-        }
-    }
-
-    private void buildBody(TableBody tableBody) {
-        if (tableBody != null) {
-            final var vAlign = tableBody.getVAlign();
-            tableBody.getRow().forEach(row -> buildRow(row, vAlign));
-        }
-    }
-
-    private void buildFooter(TableFooter tableFooter) {
-        if (tableFooter != null) {
-            final var vAlign = tableFooter.getVAlign();
-            tableFooter.getRow().forEach(row -> buildRow(row, vAlign));
-        }
-    }
-
-    private void buildRow(Row row, VerticalAlign verticalAlign) {
-        tableAdapter.startRow();
-
-        var columnIndex = 0;
-        for (Object content : row.getContent()) {
-            if (AppUtil.isInstanceOf(Entry.class, content)) {
-                final var existingValue = nextColumnInfoMap.get(columnIndex);
-                if (existingValue != null && existingValue.getMoreRows() > 0) {
-                    columnIndex = existingValue.getNextColumnIndex();
-                    final var updatedValue = existingValue.decrementMoreRows();
-                    if (updatedValue.getMoreRows() > 0) {
-                        nextColumnInfoMap.put(updatedValue.getCurrentColumnIndex(), updatedValue);
-                    } else {
-                        nextColumnInfoMap.remove(updatedValue.getCurrentColumnIndex());
-                    }
-                }
-                var nextColumnInfo = ColumnBuilder.build(this, builderFactory, (Entry) content, columnIndex, verticalAlign);
-                tableAdapter.addColumn(nextColumnInfo.getColumnData());
-                if (nextColumnInfo.getMoreRows() > 0) {
-                    nextColumnInfoMap.put(nextColumnInfo.getCurrentColumnIndex(), nextColumnInfo);
-                }
-                columnIndex = nextColumnInfo.getNextColumnIndex();
-            } else {
-                throw new NotImplementedException(row, content);
-            }
-        }
-
-        nextColumnInfoMap.clear();
-        tableAdapter.endRow();
     }
 
     private static ColumnInput[] buildColumns(List<ColumnSpec> columnSpecs) {

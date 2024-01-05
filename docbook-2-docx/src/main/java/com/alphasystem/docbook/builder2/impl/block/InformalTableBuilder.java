@@ -12,7 +12,8 @@ public class InformalTableBuilder extends AbstractTableBuilder<InformalTable> {
 
     @Override
     protected void doInit(InformalTable source, Builder<?> parent) {
-        super.doInit(source, parent);
         this.docBookTableAdapter = DocBookTableAdapter.fromInformalTable(source);
+        super.doInit(source, parent);
+
     }
 }

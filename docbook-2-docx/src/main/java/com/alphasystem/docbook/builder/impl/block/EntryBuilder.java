@@ -48,7 +48,7 @@ public class EntryBuilder extends BlockBuilder<Entry> {
         final String moreRows = source.getMoreRows();
         VerticalMergeType vMergeType = null;
         if (moreRows != null) {
-            vMergeType = moreRows.endsWith("*") ? VerticalMergeType.CONTINUE : VerticalMergeType.RESTART;
+            vMergeType = moreRows.endsWith("*") ? VerticalMergeType.NONE : VerticalMergeType.RESTART;
         }
         tcPr = TableAdapter.getColumnProperties(tableBuilder.getTableType(), columnIndex, gridSpan, vMergeType, tcPr,
                 tableBuilder.getColumnInfos());
