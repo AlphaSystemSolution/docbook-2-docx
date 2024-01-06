@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<article xmlns="http://docbook.org/ns/docbook">
+    <informaltable colsep="1" rowsep="1" frame="all">
+        <tgroup cols="4">
+            <colspec colwidth="25*" colname="col_1"/>
+            <colspec colwidth="25*" colname="col_2"/>
+            <colspec colwidth="25*" colname="col_3"/>
+            <colspec colwidth="25*" colname="col_4"/>
+            <tbody>
+                <row>
+                    <entry valign="middle" align="center">
+                        <simpara>Row 4, Column 1</simpara>
+                    </entry>
+                    <entry valign="middle" align="center">
+                        <simpara>Row 4, Column 2</simpara>
+                    </entry>
+                    <entry valign="middle" align="center">
+                        <simpara>Row 4, Column 3</simpara>
+                    </entry>
+                    <entry valign="middle" align="center">
+                        <simpara>Row 4, Column 4</simpara>
+                    </entry>
+                </row>
+                <row>
+                    <entry valign="middle" morerows="2" namest="col_1" nameend="col_2" align="center">
+                        <simpara>Row span 3, Column 1 &amp; 2</simpara>
+                    </entry>
+                    <entry valign="middle" morerows="2" namest="col_2" nameend="col_3" align="center">
+                        <simpara>Row span 3, Column 3 &amp; 4</simpara>
+                    </entry>
+                </row>
+            </tbody>
+        </tgroup>
+    </informaltable>
+</article>

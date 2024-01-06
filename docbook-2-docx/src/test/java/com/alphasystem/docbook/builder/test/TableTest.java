@@ -77,25 +77,43 @@ public class TableTest extends AbstractTest2 {
 
     @Test(dependsOnMethods = "testTableColumnSpan")
     public void testTableRowSpan() {
-        final Row row1 = _createRow(4, 1);
-
-        Entry entry1 = _createEntry(LEFT, TOP, null, null, "1", "Row 2, Column 1, Row Span 1");
-        Entry entry2 = _createEntry(LEFT, TOP, "Row 2, Column 2");
-        Entry entry3 = _createEntry(LEFT, TOP, "Row 2, Column 3");
-        Entry entry4 = _createEntry(LEFT, TOP, "Row 2, Column 4");
-        final Row row2 = createRow(entry1, entry2, entry3, entry4);
-
-        entry2 = _createEntry(LEFT, TOP, "Row 3, Column 2");
-        entry3 = _createEntry(LEFT, TOP, "Row 3, Column 3");
-        entry4 = _createEntry(LEFT, TOP, "Row 3, Column 4");
-        final Row row3 = createRow(entry2, entry3, entry4);
-
-        final TableBody tableBody = createTableBody(null, null, row1, row2, row3);
-        final TableGroup tableGroup = createTableGroup(null, tableBody, null, 25, 25, 25, 25);
-        final Table table = createTable(null, Frame.ALL, Choice.ONE, Choice.ONE, null, tableGroup);
-
         addTestTitle("Table with row span");
         processContent(readXml("table-row-span"));
+        assertSize(2);
+        final var content = mainDocumentPart.getContent();
+        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 8);
+        addHorizontalLine();
+    }
+
+    @Test(dependsOnMethods = "testTableRowSpan")
+    public void testTableRowAndColumnSpan() {
+        addTestTitle("Table with row and column span");
+        processContent(readXml("table-row-column-span"));
+        assertSize(2);
+        final var content = mainDocumentPart.getContent();
+        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 6);
+        addHorizontalLine();
+    }
+
+    @Test(dependsOnMethods = "testTableRowAndColumnSpan")
+    public void testComplexMultiRowColumnSpan() {
+        addTestTitle("Test complex multi row and column span");
+        processContent(readXml("table-complex-row-column-span"));
+        assertSize(2);
+        final var content = mainDocumentPart.getContent();
+        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 31);
+        addHorizontalLine();
+    }
+
+    @Test(dependsOnMethods = {"testComplexMultiRowColumnSpan"})
+    public void testTableWithNoBorder() {
+        final Table table = tableBorderTest(Frame.NONE, Choice.ZERO, Choice.ZERO);
+
+        addTestTitle("Table without border");
+        processContent(readXml("table-without-border"));
+        assertSize(2);
+        final var content = mainDocumentPart.getContent();
+        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 12);
         addHorizontalLine();
     }
 
@@ -130,55 +148,9 @@ public class TableTest extends AbstractTest2 {
 
 
 
-    @Test(dependsOnMethods = "testTableRowSpan")
-    public void testTableRowAndColumnSpan() {
-        Entry entry1 = _createEntry(CENTER, MIDDLE, "col_1", "col_2", "2", "Row 1, Column 1 & 2");
-        Entry entry2 = _createEntry(CENTER, MIDDLE, "col_2", "col_3", "2", "Row 1, Column 3 & 4");
-        final Row row2 = createRow(entry1, entry2);
 
-        final TableBody tableBody = createTableBody(null, null, row2);
-        final TableGroup tableGroup = createTableGroup(null, tableBody, null, 25, 25, 25, 25);
-        final Table table = createTable(null, Frame.ALL, Choice.ONE, Choice.ONE, null, tableGroup);
-        addResult(null, 0, 1, "Table With Row & Column Span Test", table);
-    }
 
-    @Test(dependsOnMethods = "testTableRowAndColumnSpan")
-    public void testComplexMultiRowColumnSpan() {
-        Entry entry1 = _createEntry(CENTER, MIDDLE, "col_1", "col_3", null, "");
-        Entry middleEntry = _createEntry(CENTER, MIDDLE, null, null, "4", "");
-        Entry entry2 = _createEntry(CENTER, MIDDLE, "col_3", "col_5", null, "");
-        Entry entry3 = _createEntry(CENTER, MIDDLE, null, null, "1", "");
-        final Row row1 = createRow(entry1, middleEntry, entry2, entry3);
 
-        Object[] entries = new Entry[6];
-        for (int i = 0; i < entries.length; i++) {
-            entries[i] = _createEntry(CENTER, MIDDLE, null, null, null, "");
-        }
-        final Row row2 = createRow(entries);
-
-        entries = new Entry[7];
-        for (int i = 0; i < entries.length; i++) {
-            entries[i] = _createEntry(CENTER, MIDDLE, null, null, null, "");
-        }
-        final Row row3 = createRow(entries);
-
-        entries = new Entry[7];
-        for (int i = 0; i < entries.length; i++) {
-            entries[i] = _createEntry(CENTER, MIDDLE, null, null, null, "");
-        }
-        final Row row4 = createRow(entries);
-
-        entries = new Entry[7];
-        for (int i = 0; i < entries.length; i++) {
-            entries[i] = _createEntry(CENTER, MIDDLE, null, null, null, "");
-        }
-        final Row row5 = createRow(entries);
-
-        TableBody tableBody = createTableBody(null, null, row1, row2, row3, row4, row5);
-        final TableGroup tableGroup = createTableGroup(null, tableBody, null, 14, 14, 14, 1, 14, 14, 14, 15);
-        final Table table = createTable(null, Frame.ALL, Choice.ONE, Choice.ONE, null, tableGroup);
-        addResult(null, 0, 1, "Table With Row & Column Span Test", table);
-    }
 
     @Test(dependsOnMethods = "testComplexMultiRowColumnSpan")
     public void testTableWithFrameAll() {
@@ -186,11 +158,7 @@ public class TableTest extends AbstractTest2 {
         addResult(null, 0, 1, "Table With Frame ALL Test", table);
     }
 
-    @Test(dependsOnMethods = {"testTableWithFrameAll"})
-    public void testTableWithNoBorder() {
-        final Table table = tableBorderTest(Frame.NONE, Choice.ZERO, Choice.ZERO);
-        addResult(null, 0, 1, "Table With No Border Test", table);
-    }
+
 
     @Test(dependsOnMethods = {"testTableWithNoBorder"})
     public void testTableWithNoFrame() {

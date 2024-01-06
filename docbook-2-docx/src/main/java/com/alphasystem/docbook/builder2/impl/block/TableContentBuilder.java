@@ -5,6 +5,7 @@ import com.alphasystem.docbook.builder2.impl.AbstractBuilder;
 import com.alphasystem.openxml.builder.wml.table.VerticalMergeType;
 import com.alphasystem.util.AppUtil;
 import com.alphasystem.xml.UnmarshallerUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.docbook.model.Entry;
 import org.docbook.model.ObjectFactory;
 import org.docbook.model.Row;
@@ -12,6 +13,7 @@ import org.docbook.model.Row;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public abstract class TableContentBuilder<S> extends AbstractBuilder<S> {
@@ -48,6 +50,7 @@ public abstract class TableContentBuilder<S> extends AbstractBuilder<S> {
 
         final var parent = (AbstractTableBuilder<?>) getParent();
         final var numOfColumns = parent.getColumnInfoList().size();
+        logger.info("AR: {}, ER: {}, C: {}", rows.size(), totalRows, numOfColumns);
 
         // final data
         final var entries = new Object[totalRows][numOfColumns];
@@ -73,39 +76,40 @@ public abstract class TableContentBuilder<S> extends AbstractBuilder<S> {
                     final var entry = (Entry) content;
                     final var moreRows = UnmarshallerUtils.toInt(entry.getMoreRows(), 0);
 
+                    final var startColumnName = entry.getNameStart();
+                    final var endColumnName = entry.getNameEnd();
+                    final var gridSpan = parent.getGridSpan(startColumnName, endColumnName);
+
                     // we are populating with our value for "morerows" field
                     final var vMerge = moreRows <= 0 ? VerticalMergeType.NONE : VerticalMergeType.RESTART;
                     entry.setMoreRows(vMerge.name());
+                    logger.info("Adding entry: rowIndex={}, columnIndex={}, startColumnName={}, endColumnName={}, gridSpan={} vMerge={}",
+                            rowIndex, columnIndex, startColumnName, endColumnName, gridSpan, vMerge);
                     entries[rowIndex][columnIndex] = entry;
 
                     // moreRows is gt 0 then fill corresponding column for subsequent rows
                     if (moreRows > 0) {
-                        final String startColumnName = entry.getNameStart();
-                        final String endColumnName = entry.getNameEnd();
                         for (int i = 1; i <= moreRows; i++) {
                             final var nextEntry = OBJECT_FACTORY.createEntry().withMoreRows(VerticalMergeType.CONTINUE.name())
                                     .withNameStart(startColumnName).withNameEnd(endColumnName);
+                            logger.info(">>>>>> moreRows={}, startColumnName={}, endColumnName={}, rowIndex={} - [{}][{}]",
+                                    moreRows, startColumnName, endColumnName, rowIndex, rowIndex + i, columnIndex);
                             entries[rowIndex + i][columnIndex] = nextEntry;
+                            // if there is column span then no need to continue
+                            if (StringUtils.isNotBlank(startColumnName) && StringUtils.isNotBlank(endColumnName)) {
+                                break;
+                            }
                         }
-
                     }
+                    columnIndex += gridSpan;
                 } else {
                     logger.warn("Content of type \"{}\" is not implemented", content.getClass().getName());
                 }
             } // end of for loop for row.getContent
         } // end of for loop for row
 
-        for (int i = 0; i < entries.length; i++) {
-            final var entry = entries[i];
-            for (int j = 0; j < entry.length; j++) {
-                final var obj = entries[i][j];
-                if (obj == null) {
-                    logger.warn("Index {}:{} is not filled", i, j);
-                }
-            }
-        }
-
-        return Arrays.stream(entries).map (entry -> new Row().withContent(entry)).collect(Collectors.toList());
+        return Arrays.stream(entries).map (entry -> new Row().withContent(Arrays.stream(entry)
+                .filter(Objects::nonNull).toArray())).collect(Collectors.toList());
     }
 
     private int getTotalNumberOfRows(List<Row> rows) {
