@@ -2,7 +2,6 @@ package com.alphasystem.docbook.builder2.impl.block;
 
 import com.alphasystem.docbook.builder2.Builder;
 import com.alphasystem.docbook.builder2.impl.AbstractBuilder;
-import com.alphasystem.docbook.model.NextColumnInfo;
 import com.alphasystem.docbook.util.Utils;
 import com.alphasystem.openxml.builder.wml.PPrBuilder;
 import com.alphasystem.openxml.builder.wml.WmlAdapter;
@@ -12,7 +11,7 @@ import com.alphasystem.openxml.builder.wml.table.TableAdapter;
 import com.alphasystem.openxml.builder.wml.table.VerticalMergeType;
 import com.alphasystem.util.AppUtil;
 import com.alphasystem.xml.UnmarshallerConstants;
-import com.alphasystem.xml.UnmarshallerUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.docbook.model.Align;
 import org.docbook.model.BasicVerticalAlign;
 import org.docbook.model.Entry;
@@ -22,7 +21,10 @@ import org.docx4j.wml.P;
 import org.docx4j.wml.STVerticalJc;
 import org.docx4j.wml.TcPr;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class EntryBuilder extends AbstractBuilder<Entry> {
@@ -78,11 +80,11 @@ public class EntryBuilder extends AbstractBuilder<Entry> {
     protected List<Object> doProcess(List<Object> processedChildContent) {
         final var tableBuilder = getParent(AbstractTableBuilder.class);
         final var gridSpan = tableBuilder.getGridSpan(source.getNameStart(), source.getNameEnd());
-        final var moreRows = UnmarshallerUtils.toInt(source.getMoreRows(), 0);
-        final var vMergeType = moreRows <= 0 ? VerticalMergeType.NONE : VerticalMergeType.RESTART;
+        final var moreRows = source.getMoreRows();
+        final var vMergeType = StringUtils.isBlank(moreRows) ? VerticalMergeType.NONE : VerticalMergeType.valueOf(moreRows);
         final var parent = (RowBuilder) getParent();
         final var columnIndex = parent.getColumnIndex();
-        parent.updateNextColumnInfo(new NextColumnInfo(moreRows, columnIndex, columnIndex + gridSpan));
+        parent.updateColumnIndex(columnIndex + gridSpan);
         var columnData = new ColumnData(columnIndex).withColumnProperties(tcPr).withGridSpanValue(gridSpan)
                 .withVerticalMergeType(vMergeType).withContent(processedChildContent.toArray());
         final var tc = TableAdapter.createColumn(tableBuilder.getTableType(), columnData, tableBuilder.getColumnInfoList());

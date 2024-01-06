@@ -1,40 +1,40 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <article xmlns="http://docbook.org/ns/docbook">
-    <informaltable colsep="1" rowsep="1" frame="all">
+    <informaltable frame="all" rowsep="1" colsep="1">
         <tgroup cols="4">
-            <colspec colwidth="25*" colname="col_1"/>
-            <colspec colwidth="25*" colname="col_2"/>
-            <colspec colwidth="25*" colname="col_3"/>
-            <colspec colwidth="25*" colname="col_4"/>
+            <colspec colname="col_1" colwidth="25*"/>
+            <colspec colname="col_2" colwidth="25*"/>
+            <colspec colname="col_3" colwidth="25*"/>
+            <colspec colname="col_4" colwidth="25*"/>
             <tbody>
                 <row>
-                    <entry valign="top" align="left" morerows="2">
-                        <simpara>Row 1 &amp; 2 Column1</simpara>
+                    <entry align="left" valign="top" morerows="1">
+                        <simpara>Row 1 and 2 Column1</simpara>
                     </entry>
-                    <entry valign="top" align="left" morerows="3">
-                        <simpara>Row 1, 2, &amp; 3 Column 2</simpara>
+                    <entry align="left" valign="top" morerows="3">
+                        <simpara>Row 1, 2, 3, and 4 Column 2</simpara>
                     </entry>
-                    <entry valign="top" align="left">
+                    <entry align="left" valign="top">
                         <simpara>Row 1 Column 3</simpara>
                     </entry>
-                    <entry valign="top" align="left">
+                    <entry align="left" valign="top">
                         <simpara>Row1 Column 4</simpara>
                     </entry>
                 </row>
                 <row>
-                    <entry valign="top" align="left" morerows="2">
-                        <simpara>Row 2 &amp; 3 Column 3</simpara>
+                    <entry align="left" valign="top" morerows="2">
+                        <simpara>Row 2 and 3 Column 3</simpara>
                     </entry>
-                    <entry valign="top" align="left" morerows="1">
+                    <entry align="left" valign="top">
                         <simpara>Row 2 Column 4</simpara>
                     </entry>
                 </row>
                 <row>
-                    <entry valign="top" align="left">
-                        <simpara>Row 3 Column 1</simpara>
+                    <entry align="left" valign="top" morerows="1">
+                        <simpara>Row 3 and 4 Column 1</simpara>
                     </entry>
-                    <entry valign="top" align="left">
-                        <simpara>Row 3 Column 4</simpara>
+                    <entry align="left" valign="top" morerows="1">
+                        <simpara>Row 3 and 4 Column 4?</simpara>
                     </entry>
                 </row>
             </tbody>
