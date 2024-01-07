@@ -34,7 +34,7 @@ public class OrderedListTest extends AbstractTest2 {
     @Test(dependsOnMethods = "testOrderedListLowerAlpha")
     public void testNestedOrderedList() {
         addTestTitle("Nested ordered list.");
-        processContent(readXml("nested-ordered-list"));
+        processContent(readXml("ordered-list-nested"));
         assertSize(6);
         addHorizontalLine();
     }
@@ -42,7 +42,7 @@ public class OrderedListTest extends AbstractTest2 {
     @Test(dependsOnMethods = "testNestedOrderedList")
     public void testOrderedListMoreThenOnePara() {
         addTestTitle("Nested ordered list.");
-        processContent(readXml("multi-para-ordered-list"));
+        processContent(readXml("ordered-list-multi-para"));
         assertSize(4);
         addHorizontalLine();
     }

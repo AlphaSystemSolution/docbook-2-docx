@@ -18,7 +18,7 @@ public class ItemizedListTest extends AbstractTest2 {
     @Test(dependsOnMethods = "testItemizedList")
     public void testNestedItemizedList() {
         addTestTitle("Nested un-Ordered list with default marks.");
-        processContent(readXml("nested-itemized-list"));
+        processContent(readXml("itemized-list-nested"));
         assertSize(6);
         addHorizontalLine();
     }
@@ -28,6 +28,14 @@ public class ItemizedListTest extends AbstractTest2 {
         addTestTitle("Nested mixed list");
         processContent(readXml("nested-mixed-list"));
         assertSize(10);
+        addHorizontalLine();
+    }
+
+    @Test(dependsOnMethods = "testNestedItemizedList")
+    public void testTableWithinList() {
+        addTestTitle("Table within list");
+        processContent(readXml("itemized-list-with-table"));
+        assertSize(6);
         addHorizontalLine();
     }
 }
