@@ -50,7 +50,6 @@ public abstract class TableContentBuilder<S> extends AbstractBuilder<S> {
 
         final var parent = (AbstractTableBuilder<?>) getParent();
         final var numOfColumns = parent.getColumnInfoList().size();
-        logger.info("AR: {}, ER: {}, C: {}", rows.size(), totalRows, numOfColumns);
 
         // final data
         final var entries = new Object[totalRows][numOfColumns];
@@ -83,8 +82,6 @@ public abstract class TableContentBuilder<S> extends AbstractBuilder<S> {
                     // we are populating with our value for "morerows" field
                     final var vMerge = moreRows <= 0 ? VerticalMergeType.NONE : VerticalMergeType.RESTART;
                     entry.setMoreRows(vMerge.name());
-                    logger.info("Adding entry: rowIndex={}, columnIndex={}, startColumnName={}, endColumnName={}, gridSpan={} vMerge={}",
-                            rowIndex, columnIndex, startColumnName, endColumnName, gridSpan, vMerge);
                     entries[rowIndex][columnIndex] = entry;
 
                     // moreRows is gt 0 then fill corresponding column for subsequent rows
@@ -92,8 +89,6 @@ public abstract class TableContentBuilder<S> extends AbstractBuilder<S> {
                         for (int i = 1; i <= moreRows; i++) {
                             final var nextEntry = OBJECT_FACTORY.createEntry().withMoreRows(VerticalMergeType.CONTINUE.name())
                                     .withNameStart(startColumnName).withNameEnd(endColumnName);
-                            logger.info(">>>>>> moreRows={}, startColumnName={}, endColumnName={}, rowIndex={} - [{}][{}]",
-                                    moreRows, startColumnName, endColumnName, rowIndex, rowIndex + i, columnIndex);
                             entries[rowIndex + i][columnIndex] = nextEntry;
                             // if there is column span then no need to continue
                             if (StringUtils.isNotBlank(startColumnName) && StringUtils.isNotBlank(endColumnName)) {

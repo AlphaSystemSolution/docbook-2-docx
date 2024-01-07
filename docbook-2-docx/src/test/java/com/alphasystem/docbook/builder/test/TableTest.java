@@ -1,13 +1,8 @@
 package com.alphasystem.docbook.builder.test;
 
-import org.docbook.model.*;
 import org.docx4j.wml.Tbl;
 import org.testng.annotations.Test;
 
-import static com.alphasystem.docbook.builder.test.DataFactory.*;
-import static java.lang.String.format;
-import static org.docbook.model.Align.LEFT;
-import static org.docbook.model.BasicVerticalAlign.TOP;
 import static org.testng.Assert.assertEquals;
 
 /**
@@ -106,9 +101,7 @@ public class TableTest extends AbstractTest2 {
     }
 
     @Test(dependsOnMethods = {"testComplexMultiRowColumnSpan"})
-    public void testTableWithNoBorder() {
-        final Table table = tableBorderTest(Frame.NONE, Choice.ZERO, Choice.ZERO);
-
+    public void testTableWithoutBorder() {
         addTestTitle("Table without border");
         processContent(readXml("table-without-border"));
         assertSize(2);
@@ -117,105 +110,57 @@ public class TableTest extends AbstractTest2 {
         addHorizontalLine();
     }
 
-    /*@Test(dependsOnMethods = "testTableVAlignBottom")
+    @Test(dependsOnMethods = {"testTableWithoutBorder"})
+    public void testTableWithoutFrame() {
+        addTestTitle("Table without frame");
+        processContent(readXml("table-without-frame"));
+        assertSize(2);
+        addHorizontalLine();
+    }
+
+    @Test(dependsOnMethods = {"testTableWithoutFrame"})
+    public void testTableWithoutRowSep() {
+        addTestTitle("Table without row separator");
+        processContent(readXml("table-without-row-sep"));
+        assertSize(2);
+        addHorizontalLine();
+    }
+
+    @Test(dependsOnMethods = {"testTableWithoutRowSep"})
+    public void testTableWithoutColSep() {
+        addTestTitle("Table without col separator");
+        processContent(readXml("table-without-col-sep"));
+        assertSize(2);
+        addHorizontalLine();
+    }
+
+    @Test(dependsOnMethods = "testTableWithoutColSep")
     public void testTableWithHeader() {
-        final int numOfColumns = 4;
-        final TableBody tableBody = createTableBody(null, null, _createRow(numOfColumns, 1));
-        final TableGroup tableGroup = createTableGroup(_createHeader(numOfColumns), tableBody, null, 15, 15, 15, 55);
-        final Table table = createTable(null, Frame.ALL, Choice.ONE, Choice.ONE, null, tableGroup);
-        addResult(null, 0, 1, "Table With Header Test", table);
+        addTestTitle("Table with header");
+        processContent(readXml("table-with-header"));
+        assertSize(3);
+        final var content = mainDocumentPart.getContent();
+        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 8);
+        addHorizontalLine();
     }
 
     @Test(dependsOnMethods = "testTableWithHeader")
     public void testTableWithFooter() {
-        final int numOfColumns = 4;
-        final TableBody tableBody = createTableBody(null, null, _createRow(numOfColumns, 1));
-        final TableGroup tableGroup = createTableGroup(null, tableBody, _createFooter(numOfColumns), 15, 15, 15, 55);
-        final Table table = createTable(null, Frame.ALL, Choice.ONE, Choice.ONE, null, tableGroup);
-        addResult(null, 0, 1, "Table With Footer Test", table);
+       addTestTitle("Table with footer");
+        processContent(readXml("table-with-footer"));
+        assertSize(3);
+        final var content = mainDocumentPart.getContent();
+        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 8);
+        addHorizontalLine();
     }
 
     @Test(dependsOnMethods = "testTableWithFooter")
     public void testTableWithHeaderAndFooter() {
-        final int numOfColumns = 4;
-        final TableBody tableBody = createTableBody(null, null, _createRow(numOfColumns, 1));
-        final TableGroup tableGroup = createTableGroup(_createHeader(numOfColumns), tableBody,
-                _createFooter(numOfColumns), 15, 15, 15, 55);
-        final Table table = createTable(null, Frame.ALL, Choice.ONE, Choice.ONE, null, tableGroup);
-        addResult(null, 0, 1, "Table With Header And Footer Test", table);
-    }
-
-
-
-
-
-
-
-
-    @Test(dependsOnMethods = "testComplexMultiRowColumnSpan")
-    public void testTableWithFrameAll() {
-        final Table table = tableBorderTest(Frame.ALL, Choice.ZERO, Choice.ZERO);
-        addResult(null, 0, 1, "Table With Frame ALL Test", table);
-    }
-
-
-
-    @Test(dependsOnMethods = {"testTableWithNoBorder"})
-    public void testTableWithNoFrame() {
-        final Table table = tableBorderTest(Frame.NONE, Choice.ONE, Choice.ONE);
-        addResult(null, 0, 1, "Table With No Frame Test", table);
-    }*/
-
-    private Table tableBorderTest(Frame frame, Choice colSep, Choice rowSep) {
-        final int numOfColumns = 4;
-        final TableBody tableBody = createTableBody(null, null, _createRows(numOfColumns, 3));
-        final TableGroup tableGroup = createTableGroup(null, tableBody, null, 25, 25, 25, 25);
-        return createTable(null, frame, colSep, rowSep, null, tableGroup);
-    }
-
-    private Entry _createEntry(Align align, BasicVerticalAlign vAlign, String text) {
-        return _createEntry(align, vAlign, null, null, null, text);
-    }
-
-    private Entry _createEntry(Align align, BasicVerticalAlign vAlign, String nameStart, String nameEnd, String moreRows,
-                               String text) {
-        return createEntry(align, vAlign, nameStart, nameEnd, moreRows, createSimplePara(null, text));
-    }
-
-    private TableHeader _createHeader(int numOfColumns) {
-        Object[] entries = new Entry[numOfColumns];
-        for (int i = 0; i < numOfColumns; i++) {
-            entries[i] = _createEntry(LEFT, TOP, format("Header %s", (i + 1)));
-        }
-        return createTableHeader(null, null, createRow(entries));
-    }
-
-    private TableFooter _createFooter(int numOfColumns) {
-        Object[] entries = new Entry[numOfColumns];
-        for (int i = 0; i < numOfColumns; i++) {
-            entries[i] = _createEntry(LEFT, TOP, format("Footer %s", (i + 1)));
-        }
-        return createTableFooter(null, null, createRow(entries));
-    }
-
-    private Row[] _createRows(int numOfColumns, int numOfRows) {
-        Row[] rows = new Row[numOfRows];
-        for (int i = 0; i < numOfRows; i++) {
-            rows[i] = _createRow(numOfColumns, (i + 1));
-        }
-        return rows;
-    }
-
-    private Row _createRow(int numOfColumns, int row) {
-        return _createRow(numOfColumns, row, null);
-    }
-
-    private Row _createRow(int numOfColumns, int row, BasicVerticalAlign verticalAlign) {
-        verticalAlign = (verticalAlign == null) ? TOP : verticalAlign;
-        Object[] entries = new Entry[numOfColumns];
-        for (int i = 0; i < numOfColumns; i++) {
-            entries[i] = _createEntry(LEFT, verticalAlign, format("Row %s, Column %s", row, (i + 1)));
-        }
-        return createRow(entries);
+        addTestTitle("Table with header & footer");
+        processContent(readXml("table-with-header-footer"));
+        assertSize(3);
+        final var content = mainDocumentPart.getContent();
+        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 12);
+        addHorizontalLine();
     }
 }
