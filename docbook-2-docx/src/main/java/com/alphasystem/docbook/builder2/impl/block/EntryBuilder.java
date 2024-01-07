@@ -79,12 +79,11 @@ public class EntryBuilder extends AbstractBuilder<Entry> {
     @SuppressWarnings("unchecked")
     protected List<Object> doProcess(List<Object> processedChildContent) {
         final var tableBuilder = getParent(AbstractTableBuilder.class);
-        final var gridSpan = tableBuilder.getGridSpan(source.getNameStart(), source.getNameEnd());
-        final var moreRows = source.getMoreRows();
-        final var vMergeType = StringUtils.isBlank(moreRows) ? VerticalMergeType.NONE : VerticalMergeType.valueOf(moreRows);
-        final var parent = (RowBuilder) getParent();
-        final var columnIndex = parent.getColumnIndex();
-        parent.updateColumnIndex(columnIndex + gridSpan);
+
+        final var columnIndex = Integer.parseInt(source.getNameStart());
+        final var gridSpan = Integer.parseInt(source.getNameEnd());
+        final var vMergeType = VerticalMergeType.valueOf(source.getMoreRows());
+
         var columnData = new ColumnData(columnIndex).withColumnProperties(tcPr).withGridSpanValue(gridSpan)
                 .withVerticalMergeType(vMergeType).withContent(processedChildContent.toArray());
         final var tc = TableAdapter.createColumn(tableBuilder.getTableType(), columnData, tableBuilder.getColumnInfoList());

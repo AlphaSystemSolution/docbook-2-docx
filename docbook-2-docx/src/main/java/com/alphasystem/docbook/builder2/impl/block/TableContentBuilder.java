@@ -10,7 +10,6 @@ import org.docbook.model.Entry;
 import org.docbook.model.ObjectFactory;
 import org.docbook.model.Row;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -19,9 +18,6 @@ import java.util.stream.Collectors;
 public abstract class TableContentBuilder<S> extends AbstractBuilder<S> {
 
     private static final ObjectFactory OBJECT_FACTORY = new ObjectFactory();
-
-    // flag to indicate that one or table entries has row span, so we need to sanitize rows
-    private boolean hasRowSpan = false;
 
     protected TableContentBuilder(S source, Builder<?> parent) {
         super(null, source, parent);
@@ -42,11 +38,6 @@ public abstract class TableContentBuilder<S> extends AbstractBuilder<S> {
      */
     protected List<Object> sanitizeRows(List<Row> rows) {
         final var totalRows = getTotalNumberOfRows(rows);
-
-        if (!hasRowSpan) {
-            // no need to do any sanitization
-            return new ArrayList<>(rows);
-        }
 
         final var parent = (AbstractTableBuilder<?>) getParent();
         final var numOfColumns = parent.getColumnInfoList().size();
@@ -73,22 +64,29 @@ public abstract class TableContentBuilder<S> extends AbstractBuilder<S> {
                 // fill corresponding value in the result
                 if (AppUtil.isInstanceOf(Entry.class, content)) {
                     final var entry = (Entry) content;
-                    final var moreRows = UnmarshallerUtils.toInt(entry.getMoreRows(), 0);
 
+                    final var moreRows = UnmarshallerUtils.toInt(entry.getMoreRows(), 0);
+                    final var vMerge = moreRows <= 0 ? VerticalMergeType.NONE : VerticalMergeType.RESTART;
                     final var startColumnName = entry.getNameStart();
                     final var endColumnName = entry.getNameEnd();
                     final var gridSpan = parent.getGridSpan(startColumnName, endColumnName);
 
-                    // we are populating with our value for "morerows" field
-                    final var vMerge = moreRows <= 0 ? VerticalMergeType.NONE : VerticalMergeType.RESTART;
+                    // following columns will be overridden
+                    // NameStart will be populated with - columnIndex
+                    // NameEnd will be populated with - gridSpan
+                    // morerows will be populated with - VerticalMergeType
+                    // this is done so that we don't have to re-do calculation again
+
                     entry.setMoreRows(vMerge.name());
+                    entry.setNameStart(String.valueOf(columnIndex));
+                    entry.setNameEnd(String.valueOf(gridSpan));
                     entries[rowIndex][columnIndex] = entry;
 
                     // moreRows is gt 0 then fill corresponding column for subsequent rows
                     if (moreRows > 0) {
                         for (int i = 1; i <= moreRows; i++) {
                             final var nextEntry = OBJECT_FACTORY.createEntry().withMoreRows(VerticalMergeType.CONTINUE.name())
-                                    .withNameStart(startColumnName).withNameEnd(endColumnName);
+                                    .withNameStart(String.valueOf(columnIndex)).withNameEnd(String.valueOf(gridSpan));
                             entries[rowIndex + i][columnIndex] = nextEntry;
                             // if there is column span then no need to continue
                             if (StringUtils.isNotBlank(startColumnName) && StringUtils.isNotBlank(endColumnName)) {
@@ -116,9 +114,6 @@ public abstract class TableContentBuilder<S> extends AbstractBuilder<S> {
                     final var entry = (Entry) obj;
                     // +1 since we need to add current column as well
                     final var moreRows = UnmarshallerUtils.toInt(entry.getMoreRows(), -1) + 1;
-                    if (!hasRowSpan) {
-                        hasRowSpan = moreRows >= 1;
-                    }
                     totalRows = Math.max(totalRows, moreRows);
                 }
             }
