@@ -3,7 +3,9 @@ package com.alphasystem.docx.cli;
 import com.alphasystem.asciidoc.util.DocumentConverter;
 import com.alphasystem.docbook.DocumentBuilder;
 import com.alphasystem.docbook.util.FileUtil;
+import com.alphasystem.util.ZipUtil;
 import org.apache.commons.cli.*;
+import org.apache.commons.io.FileUtils;
 
 import java.awt.*;
 import java.nio.file.Files;
@@ -32,6 +34,15 @@ public class Main {
                 .desc("Specify destination Docx file path")
                 .build();
         options.addOption(destOption);
+
+        var extractPackage = Option
+                .builder("e")
+                .argName("extractedDocumentPath")
+                .hasArg()
+                .required(false)
+                .desc("Extracted document path")
+                .build();
+        options.addOption(extractPackage);
 
         // define parser
         CommandLine cmd;
@@ -63,6 +74,9 @@ public class Main {
             } else {
                 destPath = DocumentBuilder.buildDocument(documentInfo, docxPath);
             }
+            if (cmd.hasOption(extractPackage)) {
+                extractPackage(docxPath, toPath(cmd.getOptionValue(extractPackage)));
+            }
             Desktop.getDesktop().open(destPath.toFile());
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -81,5 +95,16 @@ public class Main {
         System.err.println(s);
         helper.printHelp("Usage:", options);
         System.exit(0);
+    }
+
+    private static void extractPackage(Path docxPath, Path dir) throws Exception {
+        if (Files.exists(dir)) {
+            System.out.printf("Path \"%s\" exists, deleting it before processing it%n", dir);
+            FileUtils.cleanDirectory(dir.toFile());
+        }
+        if (!Files.exists(dir)) {
+            Files.createDirectory(dir);
+        }
+        ZipUtil.extractZipFile(dir.toFile(), docxPath.toString());
     }
 }
