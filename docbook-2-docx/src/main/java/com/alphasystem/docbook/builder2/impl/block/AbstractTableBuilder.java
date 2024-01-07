@@ -7,7 +7,6 @@ import com.alphasystem.openxml.builder.wml.table.ColumnInfo;
 import com.alphasystem.openxml.builder.wml.table.ColumnInput;
 import com.alphasystem.openxml.builder.wml.table.TableAdapter;
 import com.alphasystem.openxml.builder.wml.table.TableType;
-import com.alphasystem.util.AppUtil;
 import org.docbook.model.Choice;
 import org.docbook.model.ColumnSpec;
 import org.docbook.model.Frame;
@@ -75,11 +74,13 @@ public abstract class AbstractTableBuilder<S> extends AbstractBuilder<S> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected void doInit(S source, Builder<?> parent) {
         super.doInit(source, parent);
         this.level = -1;
-        if (AppUtil.isInstanceOf(ListBuilder.class, parent)) {
-            this.level = (int) ((ListBuilder<?>) parent).listInfo.getLevel();
+        final var listParent = getParent(ListBuilder.class);
+        if (listParent != null) {
+            this.level = (int) listParent.listInfo.getLevel();
         }
         final var tableGroups = docBookTableAdapter.getTableGroup();
         tableGroup = ((tableGroups != null) && !tableGroups.isEmpty()) ? tableGroups.get(0) : null;
