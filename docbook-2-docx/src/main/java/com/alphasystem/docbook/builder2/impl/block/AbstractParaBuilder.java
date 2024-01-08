@@ -24,8 +24,8 @@ public abstract class AbstractParaBuilder<S> extends AbstractBuilder<S> {
     }
 
     @Override
-    protected void doInit(S source, Builder<?> parent) {
-        super.doInit(source, parent);
+    protected void preProcess() {
+        super.preProcess();
         if (AppUtil.isInstanceOf(ListItemBuilder.class, parent)) {
             // this para is within a list item
             final var listItemBuilder = (ListItemBuilder) parent;

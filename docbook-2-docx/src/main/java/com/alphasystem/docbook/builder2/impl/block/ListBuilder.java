@@ -18,8 +18,8 @@ public abstract class ListBuilder<S> extends AbstractBuilder<S> {
 
     @Override
     @SuppressWarnings({"unchecked"})
-    protected void doInit(S source, Builder<?> parent) {
-        super.doInit(source, parent);
+    protected void preProcess() {
+        super.preProcess();
         setListStyleName();
         final var parentListBuilder = getParent(ListBuilder.class);
         if (Objects.isNull(parentListBuilder)) {

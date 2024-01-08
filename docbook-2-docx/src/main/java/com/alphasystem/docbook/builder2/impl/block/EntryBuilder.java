@@ -11,7 +11,6 @@ import com.alphasystem.openxml.builder.wml.table.TableAdapter;
 import com.alphasystem.openxml.builder.wml.table.VerticalMergeType;
 import com.alphasystem.util.AppUtil;
 import com.alphasystem.xml.UnmarshallerConstants;
-import org.apache.commons.lang3.StringUtils;
 import org.docbook.model.Align;
 import org.docbook.model.BasicVerticalAlign;
 import org.docbook.model.Entry;
@@ -37,8 +36,8 @@ public class EntryBuilder extends AbstractBuilder<Entry> {
     }
 
     @Override
-    protected void doInit(Entry source, Builder<?> parent) {
-        super.doInit(source, parent);
+    protected void preProcess() {
+        super.preProcess();
 
         final var contentBuilder = getParent().getParent();
         if (!AppUtil.isInstanceOf(TableContentBuilder.class, contentBuilder)) {

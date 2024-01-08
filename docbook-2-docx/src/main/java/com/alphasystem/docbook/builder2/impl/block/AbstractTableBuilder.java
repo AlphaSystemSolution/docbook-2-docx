@@ -75,8 +75,8 @@ public abstract class AbstractTableBuilder<S> extends AbstractBuilder<S> {
 
     @Override
     @SuppressWarnings("unchecked")
-    protected void doInit(S source, Builder<?> parent) {
-        super.doInit(source, parent);
+    protected void preProcess() {
+        super.preProcess();
         this.level = -1;
         final var listParent = getParent(ListBuilder.class);
         if (listParent != null) {

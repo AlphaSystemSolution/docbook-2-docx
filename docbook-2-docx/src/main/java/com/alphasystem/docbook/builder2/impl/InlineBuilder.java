@@ -11,7 +11,6 @@ import org.docx4j.wml.R;
 import org.docx4j.wml.RPr;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,12 +31,6 @@ public abstract class InlineBuilder<S> extends AbstractBuilder<S> {
     protected InlineBuilder(String childContentMethodName, String defaultStyle, S source, Builder<?> parent) {
         super(childContentMethodName, source, parent);
         this.defaultStyle = defaultStyle;
-    }
-
-    @Override
-    protected void doInit(S source, Builder<?> parent) {
-        super.doInit(source, parent);
-        final var role = getRole();
         styles = isBlank(role) ? new String[]{defaultStyle} : role.split(" ");
     }
 
@@ -80,9 +73,6 @@ public abstract class InlineBuilder<S> extends AbstractBuilder<S> {
 
     @Override
     protected List<Object> doProcess(List<Object> processedChildContent) {
-        if (styles == null) {
-            styles = isBlank(role) ? new String[]{defaultStyle} : role.split(" ");
-        }
         createRunBuilder();
         final var r = runBuilder.getObject();
         final var result = new ArrayList<>();

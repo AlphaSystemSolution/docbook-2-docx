@@ -24,6 +24,12 @@ public abstract class LinkSupportBuilder<S> extends InlineBuilder<S> {
         super(childContentMethodName, HYPER_LINK, source, parent);
     }
 
+    @Override
+    protected void initFields(S source, Builder<?> parent) {
+        super.initFields(source, parent);
+        initHref();
+    }
+
     protected void initHref() {
         var href = (String) Utils.invokeMethod(source, "getLinkend");
         if (StringUtils.isBlank(href)) {
@@ -54,12 +60,6 @@ public abstract class LinkSupportBuilder<S> extends InlineBuilder<S> {
             processedChildContent = Collections.singletonList(getLinkLabel());
         }
         return processedChildContent;
-    }
-
-    @Override
-    protected void doInit(S source, Builder<?> parent) {
-        super.doInit(source, parent);
-        initHref();
     }
 
     @Override

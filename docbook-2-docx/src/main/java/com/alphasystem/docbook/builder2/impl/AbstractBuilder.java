@@ -28,13 +28,12 @@ public abstract class AbstractBuilder<S> implements Builder<S> {
     private final String childContentMethodName;
 
     protected AbstractBuilder(S source, Builder<?> parent) {
-        this.childContentMethodName = "getContent";
-        doInit(source, parent);
+        this("getContent", source, parent);
     }
 
     protected AbstractBuilder(String childContentMethodName, S source, Builder<?> parent) {
+        initFields(source, parent);
         this.childContentMethodName = childContentMethodName;
-        doInit(source, parent);
     }
 
     public String getId() {
@@ -53,17 +52,21 @@ public abstract class AbstractBuilder<S> implements Builder<S> {
 
     @Override
     public List<Object> process() {
-        if (source == null) {
-            throw new NullPointerException(String.format("Source object is null in \"%s\"", getClass().getName()));
-        }
+        preProcess();
         return doProcess(processChildContent(getChildContent()));
     }
 
-    protected void doInit(S source, Builder<?> parent) {
+    protected void initFields(S source, Builder<?> parent) {
+        if (source == null) {
+            throw new NullPointerException(String.format("Source object is null in \"%s\"", getClass().getName()));
+        }
         this.source = source;
         this.parent = parent;
         this.id = Utils.getId(source);
         this.role = (String) Utils.invokeMethod(source, "getRole");
+    }
+
+    protected void preProcess() {
     }
 
     @SuppressWarnings("unchecked")
