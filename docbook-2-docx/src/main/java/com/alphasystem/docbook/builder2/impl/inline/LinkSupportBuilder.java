@@ -22,11 +22,6 @@ public abstract class LinkSupportBuilder<S> extends InlineBuilder<S> {
 
     protected LinkSupportBuilder(String childContentMethodName, S source, Builder<?> parent) {
         super(childContentMethodName, HYPER_LINK, source, parent);
-    }
-
-    @Override
-    protected void initFields(S source, Builder<?> parent) {
-        super.initFields(source, parent);
         initHref();
     }
 

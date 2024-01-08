@@ -32,7 +32,13 @@ public abstract class AbstractBuilder<S> implements Builder<S> {
     }
 
     protected AbstractBuilder(String childContentMethodName, S source, Builder<?> parent) {
-        initFields(source, parent);
+        if (source == null) {
+            throw new NullPointerException(String.format("Source object is null in \"%s\"", getClass().getName()));
+        }
+        this.source = source;
+        this.parent = parent;
+        this.id = Utils.getId(source);
+        this.role = (String) Utils.invokeMethod(source, "getRole");
         this.childContentMethodName = childContentMethodName;
     }
 
@@ -54,16 +60,6 @@ public abstract class AbstractBuilder<S> implements Builder<S> {
     public List<Object> process() {
         preProcess();
         return doProcess(processChildContent(getChildContent()));
-    }
-
-    protected void initFields(S source, Builder<?> parent) {
-        if (source == null) {
-            throw new NullPointerException(String.format("Source object is null in \"%s\"", getClass().getName()));
-        }
-        this.source = source;
-        this.parent = parent;
-        this.id = Utils.getId(source);
-        this.role = (String) Utils.invokeMethod(source, "getRole");
     }
 
     protected void preProcess() {

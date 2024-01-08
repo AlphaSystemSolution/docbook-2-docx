@@ -8,11 +8,6 @@ public class TableBuilder extends AbstractTableBuilder<Table> {
 
     public TableBuilder(Table source, Builder<?> parent) {
         super(source, parent);
-    }
-
-    @Override
-    protected void initFields(Table source, Builder<?> parent) {
-        super.initFields(source, parent);
         this.docBookTableAdapter = DocBookTableAdapter.fromTable(source);
     }
 }
