@@ -3,6 +3,7 @@ package com.alphasystem.docbook.util;
 import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.builder.impl.block.SectionBuilder;
 import com.alphasystem.docbook.model.Admonition;
+import com.alphasystem.util.AppUtil;
 import org.apache.commons.configuration2.CompositeConfiguration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.SystemConfiguration;
@@ -12,12 +13,11 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.lang3.StringUtils;
 import org.docbook.model.Section;
 
-import java.io.File;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.alphasystem.docbook.ApplicationController.CONF_PATH_VALUE;
 import static com.alphasystem.util.AppUtil.isInstanceOf;
 import static java.lang.String.format;
 import static java.nio.file.Paths.get;
@@ -50,13 +50,18 @@ public class ConfigurationUtils {
      */
     private ConfigurationUtils() throws ConfigurationException {
         Parameters parameters = new Parameters();
-        final File file = get(CONF_PATH_VALUE, "system-defaults.properties").toFile();
-        FileBasedConfigurationBuilder<PropertiesConfiguration> builder = new FileBasedConfigurationBuilder<>(
-                PropertiesConfiguration.class).configure(parameters.fileBased().setFile(file));
 
-        configuration = new CompositeConfiguration();
-        configuration.addConfiguration(new SystemConfiguration());
-        configuration.addConfiguration(builder.getConfiguration());
+        try  {
+            final var file = get(AppUtil.getResource("system-defaults.properties").toURI()).toFile();
+            FileBasedConfigurationBuilder<PropertiesConfiguration> builder = new FileBasedConfigurationBuilder<>(
+                    PropertiesConfiguration.class).configure(parameters.fileBased().setFile(file));
+
+            configuration = new CompositeConfiguration();
+            configuration.addConfiguration(new SystemConfiguration());
+            configuration.addConfiguration(builder.getConfiguration());
+        }  catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public Class<?> getBuilderClass(Object o) throws ClassNotFoundException {
