@@ -9,12 +9,9 @@ import com.alphasystem.docbook.model.Admonition;
 import com.alphasystem.docbook.util.ConfigurationUtils;
 import org.docx4j.wml.Tbl;
 
-import java.nio.file.Path;
 import java.util.ServiceLoader;
 
 import static com.alphasystem.docbook.handler.BlockHandlerFactory.*;
-import static com.alphasystem.util.nio.NIOFileUtils.USER_DIR;
-import static java.nio.file.Paths.get;
 import static java.util.ServiceLoader.load;
 
 /**
@@ -22,10 +19,6 @@ import static java.util.ServiceLoader.load;
  */
 public final class ApplicationController {
 
-    private static final String CONF = "conf";
-    private static final String CONF_DIR = System.getProperty("conf.path", USER_DIR);
-    private static final Path CONF_PATH = get(CONF_DIR, CONF);
-    public static final String CONF_PATH_VALUE = CONF_PATH.toString();
     private static final ThreadLocal<DocumentContext> CONTEXT = new ThreadLocal<>();
 
     private static final ConfigurationUtils configurationUtils = ConfigurationUtils.getInstance();

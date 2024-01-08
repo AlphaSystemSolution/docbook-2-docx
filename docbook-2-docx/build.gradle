@@ -12,8 +12,7 @@ dependencies {
 
 tasks.withType(Test) {
     systemProperty 'template', '../conf/default.dotx'
-    systemProperty 'styles', '../conf/styles.xml,META-INF/custom-styles.xml'
-    systemProperty 'conf.path', '.'
+    systemProperty 'styles', 'META-INF/custom-styles.xml'
     systemProperty 'target.path', 'build/docs'
     systemProperty 'data.path', "${projectDir}/src/test/resources/data"
     systemProperty 'org.apache.commons.logging.Log', 'org.apache.commons.logging.impl.SimpleLog'

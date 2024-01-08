@@ -3,7 +3,6 @@ package com.alphasystem.docbook.util;
 import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.builder.impl.block.SectionBuilder;
 import com.alphasystem.docbook.model.Admonition;
-import com.alphasystem.util.AppUtil;
 import org.apache.commons.configuration2.CompositeConfiguration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.SystemConfiguration;
@@ -13,14 +12,13 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.lang3.StringUtils;
 import org.docbook.model.Section;
 
-import java.net.URISyntaxException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
 import static com.alphasystem.util.AppUtil.isInstanceOf;
 import static java.lang.String.format;
-import static java.nio.file.Paths.get;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
@@ -50,16 +48,22 @@ public class ConfigurationUtils {
      */
     private ConfigurationUtils() throws ConfigurationException {
         Parameters parameters = new Parameters();
+        configuration = new CompositeConfiguration();
 
         try  {
-            final var file = get(AppUtil.getResource("system-defaults.properties").toURI()).toFile();
-            FileBasedConfigurationBuilder<PropertiesConfiguration> builder = new FileBasedConfigurationBuilder<>(
-                    PropertiesConfiguration.class).configure(parameters.fileBased().setFile(file));
+            final var files = Utils.readResource("system-defaults.properties");
+            files.forEach(file -> {
+                FileBasedConfigurationBuilder<PropertiesConfiguration> builder = new FileBasedConfigurationBuilder<>(
+                        PropertiesConfiguration.class).configure(parameters.fileBased().setFile(file));
+                try {
+                    configuration.addConfiguration(builder.getConfiguration());
+                } catch (ConfigurationException e) {
+                    throw new RuntimeException(e);
+                }
+            });
 
-            configuration = new CompositeConfiguration();
             configuration.addConfiguration(new SystemConfiguration());
-            configuration.addConfiguration(builder.getConfiguration());
-        }  catch (URISyntaxException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -141,8 +145,10 @@ public class ConfigurationUtils {
     }
 
     public String[] getStyles() {
-        final String _styles = configuration.getString("styles");
-        return StringUtils.isBlank(_styles) ? null : _styles.split(",");
+        var defaultStyles = "default-styles.xml";
+        var _styles = configuration.getString("styles");
+        _styles = StringUtils.isBlank(_styles) ? defaultStyles : defaultStyles + "," + _styles;
+        return _styles.split(",");
     }
 
     public String getString(String key) {
