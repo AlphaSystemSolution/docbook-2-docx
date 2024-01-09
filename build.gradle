@@ -10,6 +10,7 @@ allprojects {
 subprojects {
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
+    apply plugin: 'jacoco'
 
     repositories {
         mavenLocal()
