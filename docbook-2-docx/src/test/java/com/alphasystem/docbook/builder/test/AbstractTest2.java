@@ -97,6 +97,7 @@ public abstract class AbstractTest2 {
     void addTestTitle(String title) {
         final var titlePara = new SimplePara().withId(IdGenerator.nextId()).withRole(DEFAULT_TITLE).withContent(title);
         processContent(createArticle(titlePara));
+        updateCount();
     }
 
     void addHorizontalLine() {

@@ -16,7 +16,7 @@ public class OrderedListTest extends AbstractTest2 {
     public void testOrderedList() {
         addTestTitle("Ordered list with \"arabic\" numeration.");
         processContent(readXml("ordered-list"));
-        assertSize(5);
+        assertSize(4);
 
         mainDocumentPart.addObject(WmlAdapter.getParagraph("Numbering in the following list will be restarted."));
         processContent(readXml("ordered-list"));
@@ -27,7 +27,7 @@ public class OrderedListTest extends AbstractTest2 {
     public void testOrderedListLowerAlpha() {
         addTestTitle("Ordered list with \"loweralpha\" numeration.");
         processContent(readXml("ordered-list-lower-alpha"));
-        assertSize(4);
+        assertSize(3);
         addHorizontalLine();
     }
 
@@ -35,7 +35,7 @@ public class OrderedListTest extends AbstractTest2 {
     public void testNestedOrderedList() {
         addTestTitle("Nested ordered list.");
         processContent(readXml("ordered-list-nested"));
-        assertSize(6);
+        assertSize(5);
         addHorizontalLine();
     }
 
@@ -43,7 +43,7 @@ public class OrderedListTest extends AbstractTest2 {
     public void testOrderedListMoreThenOnePara() {
         addTestTitle("Nested ordered list.");
         processContent(readXml("ordered-list-multi-para"));
-        assertSize(4);
+        assertSize(3);
         addHorizontalLine();
     }
 }

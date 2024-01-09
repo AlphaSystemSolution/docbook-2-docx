@@ -18,7 +18,7 @@ public class AdmonitionTest extends AbstractTest2 {
     public void testCaution() {
         addTestTitle("Caution Admonition");
         processContent(readXml("caution"));
-        assertSize(2);
+        assertSize(1);
         final var content = mainDocumentPart.getContent();
         // number of content are 5, admonition caption + empty para in second column + content
         assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 5);
@@ -29,7 +29,7 @@ public class AdmonitionTest extends AbstractTest2 {
     public void testImportant() {
         addTestTitle("Important Admonition");
         processContent(readXml("important"));
-        assertSize(2);
+        assertSize(1);
         final var content = mainDocumentPart.getContent();
         assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 6);
         addHorizontalLine();
@@ -39,7 +39,7 @@ public class AdmonitionTest extends AbstractTest2 {
     public void testNote() {
         addTestTitle("Note Admonition");
         processContent(readXml("note"));
-        assertSize(2);
+        assertSize(1);
         final var content = mainDocumentPart.getContent();
         assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 7);
         addHorizontalLine();
@@ -49,7 +49,7 @@ public class AdmonitionTest extends AbstractTest2 {
     public void testTip() {
         addTestTitle("Tip Admonition");
         processContent(readXml("tip"));
-        assertSize(2);
+        assertSize(1);
         final var content = mainDocumentPart.getContent();
         assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 8);
         addHorizontalLine();
@@ -59,7 +59,7 @@ public class AdmonitionTest extends AbstractTest2 {
     public void testWarning() {
         addTestTitle("Warning Admonition");
         processContent(readXml("warning"));
-        assertSize(2);
+        assertSize(1);
         final var content = mainDocumentPart.getContent();
         assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 5);
         addHorizontalLine();
