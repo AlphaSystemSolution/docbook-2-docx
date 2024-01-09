@@ -1,3 +1,8 @@
-<caution xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en">
-    <simpara>If the title line is not offset by a blank line, it gets interpreted as a section title, which we&#8217;ll discuss later.</simpara>
-</caution>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<article xmlns="http://docbook.org/ns/docbook">
+    <caution>
+        <simpara>Use <emphasis role="bold">CAUTION</emphasis> to advise the reader to act carefully (i.e.,
+            exercise care).
+        </simpara>
+    </caution>
+</article>

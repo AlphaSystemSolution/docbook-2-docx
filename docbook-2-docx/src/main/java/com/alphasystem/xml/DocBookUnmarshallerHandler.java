@@ -102,6 +102,9 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
                 sectionLevel = 0;
                 docbookObjects.push(new Article().withId(id));
                 break;
+            case CAUTION:
+                startCaution(id, attributes);
+                break;
             case COLUMN_SPEC:
                 startColumnSpec(attributes);
                 break;
@@ -113,6 +116,9 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
                 break;
             case ENTRY:
                 startEntry(attributes);
+                break;
+            case IMPORTANT:
+                startImportant(id, attributes);
                 break;
             case INFORMAL_TABLE:
                 startInformalTable(id, attributes);
@@ -129,6 +135,9 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
             case LITERAL:
                 startLiteral(id, attributes);
                 break;
+            case NOTE:
+                startNote(id, attributes);
+                break;
             case ORDERED_LIST:
                 startOrderedList(id, attributes);
                 break;
@@ -136,7 +145,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
                 startPhrase(id, attributes);
                 break;
             case ROW:
-                docbookObjects.push(new Row());
+                startRow();
                 break;
             case SECTION:
                 sectionLevel += 1;
@@ -169,8 +178,14 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
             case TERM:
                 startTerm(id, attributes);
                 break;
+            case TIP:
+                startTip(id, attributes);
+                break;
             case TITLE:
                 startTitle();
+                break;
+            case WARNING:
+                startWarning(id, attributes);
                 break;
             case INFO:
             case DATE:
@@ -193,6 +208,9 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
                 sectionLevel -= 1;
                 docbookObjects.pop();
                 break;
+            case CAUTION:
+                endCaution();
+                break;
             case CROSS_REFERENCE:
                 endCrossReference();
                 break;
@@ -201,6 +219,9 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
                 break;
             case ENTRY:
                 endEntry();
+                break;
+            case IMPORTANT:
+                endImportant();
                 break;
             case INFORMAL_TABLE:
                 endInformalTable();
@@ -217,6 +238,9 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
                 break;
             case LITERAL:
                 endLiteral();
+                break;
+            case NOTE:
+                endNote();
                 break;
             case PHRASE:
                 endPhrase();
@@ -251,8 +275,14 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
             case TERM:
                 endTerm();
                 break;
+            case TIP:
+                endTip();
+                break;
             case TITLE:
                 endTitle();
+                break;
+            case WARNING:
+                endWarning();
                 break;
             case INFO:
             case DATE:
@@ -326,57 +356,77 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
 
     // blocks
 
-    private void startTitle() {
-        final var parent = docbookObjects.peek();
-        final var titleStyle = configurationUtils.getTitleStyle(sectionLevel, parent.getClass());
-        docbookObjects.push(new Title().withId(Utils.getId(parent)).withRole(titleStyle));
+    private void startCaution(String id, Attributes attributes) {
+        final var caution = new Caution().withId(id).withRole(getRole(attributes));
+        docbookObjects.push(caution);
     }
 
-    private void endTitle() {
+    private void endCaution() {
         pushText();
-        // title is handled differently
-        final var title = (Title) docbookObjects.pop();
-        final var linkText = getLinkText("", title.getContent());
-        if (StringUtils.isNotBlank(linkText)) {
-            ApplicationController.getContext().putLabel(title.getId(), linkText);
-        }
-        processContent(title);
+        processEndElement();
     }
 
-    private String getLinkText(String result, List<Object> contents) {
-        if (Objects.isNull(contents) || contents.isEmpty()) {
-            return result;
-        }
-        final var collectedText = contents.stream().map(content -> {
-            if (isStringType(content)) {
-                return (String) content;
-            } else if (isEmphasisType(content)) {
-                return getLinkText(result, ((Emphasis) content).getContent());
-            } else if (isPhraseType(content)) {
-                return getLinkText(result, ((Phrase) content).getContent());
-            } else if (isSuperscriptType(content)) {
-                return getLinkText(result, ((Superscript) content).getContent());
-            } else {
-                logger.warn("Not sure how to get text from: ");
-                return "";
-            }
-        }).collect(Collectors.joining(""));
-
-        return result + collectedText;
+    private void startColumnSpec(Attributes attributes) {
+        final var columnName = getAttributeValue("colname", attributes);
+        final var columnWidth = getAttributeValue("colwidth", attributes);
+        final var columnSpec = new ColumnSpec().withColumnName(columnName).withColumnWidth(columnWidth);
+        final var tableGroup = (TableGroup) docbookObjects.pop();
+        tableGroup.getColSpec().add(columnSpec);
+        docbookObjects.push(tableGroup);
     }
 
-    private void startSimplePara(String id, Attributes attributes) {
-        final var simplePara = new SimplePara().withId(id).withRole(getAttributeValue("role", attributes));
-        docbookObjects.push(simplePara);
+    private void startCrossReference(String id, Attributes attributes) {
+        pushText();
+        final var xref = new CrossReference().withId(id).withRole(getRole(attributes))
+                .withLinkend(getAttributeValue("linkend", attributes))
+                .withHref(getAttributeValue("href", attributes))
+                .withEndterm(getAttributeValue("endterm", attributes));
+        docbookObjects.push(xref);
     }
 
-    private void endSimplePara() {
+    private void endCrossReference() {
+        endInline();
+        processEndElement();
+    }
+
+    private void starEmphasis(String id, Attributes attributes) {
+        pushText();
+        final var emphasis = new Emphasis().withId(id).withRole(getRole(attributes));
+        docbookObjects.push(emphasis);
+    }
+
+    private void endEmphasis() {
+        endInline();
+        processEndElement();
+    }
+
+    private void startEntry(Attributes attributes) {
+        final var align = UnmarshallerUtils.toAlign(getAttributeValue("align", attributes));
+        final var valign = UnmarshallerUtils.toBasicVerticalAlign(getAttributeValue("valign", attributes));
+        final var nameStart = getAttributeValue("namest", attributes);
+        final var nameEnd = getAttributeValue("nameend", attributes);
+        final var moreRows = getAttributeValue("morerows", attributes);
+        final var entry = new Entry().withAlign(align).withValign(valign).withNameStart(nameStart).withNameEnd(nameEnd)
+                .withMoreRows(moreRows);
+        docbookObjects.push(entry);
+    }
+
+    private void endEntry() {
+        processEndElement();
+    }
+
+    private void startImportant(String id, Attributes attributes) {
+        final var important = new Important().withId(id).withRole(getRole(attributes));
+        docbookObjects.push(important);
+    }
+
+    private void endImportant() {
         pushText();
         processEndElement();
     }
 
     private void startInformalTable(String id, Attributes attributes) {
-        final var role = getAttributeValue("role", attributes);
+        final var role = getRole(attributes);
         final var frame = UnmarshallerUtils.toFrame(getAttributeValue("frame", attributes));
         final var rowSep = UnmarshallerUtils.toChoice(getAttributeValue("rowsep", attributes));
         final var colSep = UnmarshallerUtils.toChoice(getAttributeValue("colsep", attributes));
@@ -391,8 +441,121 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         processEndElement();
     }
 
+    private void startItemizedList(String id, Attributes attributes) {
+        var mark = getAttributeValue("mark", attributes);
+        if (Objects.isNull(mark)) {
+            mark = UnorderedList.values()[0].getStyleName();
+        }
+        docbookObjects.push(new ItemizedList().withId(id).withMark(mark));
+    }
+
+    private void startLink(String id, Attributes attributes) {
+        pushText();
+        final var link = new Link().withId(id).withRole(getRole(attributes))
+                .withLinkend(getAttributeValue("linkend", attributes))
+                .withHref(getAttributeValue("href", attributes))
+                .withEndterm(getAttributeValue("endterm", attributes));
+        docbookObjects.push(link);
+    }
+
+    private void endLink() {
+        endInline();
+        processEndElement();
+    }
+
+    private void endList() {
+        processEndElement();
+    }
+
+    private void startListItem() {
+        docbookObjects.push(new ListItem());
+    }
+
+    private void endListItem() {
+        processEndElement();
+    }
+
+    private void startLiteral(String id, Attributes attributes) {
+        pushText();
+        final var literal = new Literal().withId(id).withRole(getRole(attributes));
+        docbookObjects.push(literal);
+    }
+
+    private void endLiteral() {
+        endInline();
+        processEndElement();
+    }
+
+    private void startNote(String id, Attributes attributes) {
+        final var note = new Note().withId(id).withRole(getRole(attributes));
+        docbookObjects.push(note);
+    }
+
+    private void endNote() {
+        pushText();
+        processEndElement();
+    }
+
+    private void startOrderedList(String id, Attributes attributes) {
+        final var numeration = UnmarshallerUtils.toNumeration(getAttributeValue("numeration", attributes), Numeration.ARABIC);
+        final var startingNumber = getAttributeValue("startingnumber", attributes);
+        final var orderedList = new OrderedList().withId(id).withNumeration(numeration).withStartigNumber(startingNumber);
+        docbookObjects.push(orderedList);
+    }
+
+    private void startPhrase(String id, Attributes attributes) {
+        pushText();
+        final var phrase = new Phrase().withId(id).withRole(getRole(attributes));
+        docbookObjects.push(phrase);
+    }
+
+    private void endPhrase() {
+        endInline();
+        processEndElement();
+    }
+
+    private void startRow() {
+        docbookObjects.push(new Row());
+    }
+
+    private void endRow() {
+        processEndElement();
+    }
+
+    private void startSimplePara(String id, Attributes attributes) {
+        final var simplePara = new SimplePara().withId(id).withRole(getRole(attributes));
+        docbookObjects.push(simplePara);
+    }
+
+    private void endSimplePara() {
+        pushText();
+        processEndElement();
+    }
+
+    private void startSubscript(String id, Attributes attributes) {
+        pushText();
+        final var subscript = new Subscript().withId(id).withRole(getRole(attributes));
+        docbookObjects.push(subscript);
+    }
+
+    private void endSubscript() {
+        endInline();
+        processEndElement();
+    }
+
+    private void startSuperscript(String id, Attributes attributes) {
+        pushText();
+        final var superscript = new Superscript().withId(id).withRole(getRole(attributes));
+        docbookObjects.push(superscript);
+    }
+
+    private void endSuperscript() {
+        endInline();
+        processEndElement();
+    }
+
     private void startTable(String id, Attributes attributes) {
-        final var role = getAttributeValue("role", attributes);
+        final var role = getRole(attributes);
         final var frame = UnmarshallerUtils.toFrame(getAttributeValue("frame", attributes));
         final var rowSep = UnmarshallerUtils.toChoice(getAttributeValue("rowsep", attributes));
         final var colSep = UnmarshallerUtils.toChoice(getAttributeValue("colsep", attributes));
@@ -404,36 +567,6 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     }
 
     private void endTable() {
-        processEndElement();
-    }
-
-    private void startTableGroup(Attributes attributes) {
-        final var cols = getAttributeValue("cols", attributes);
-        final var tableGroup = new TableGroup().withCols(cols);
-        docbookObjects.push(tableGroup);
-    }
-
-    private void endTableGroup() {
-        processEndElement();
-    }
-
-    private void startColumnSpec(Attributes attributes) {
-        final var columnName = getAttributeValue("colname", attributes);
-        final var columnWidth = getAttributeValue("colwidth", attributes);
-        final var columnSpec = new ColumnSpec().withColumnName(columnName).withColumnWidth(columnWidth);
-        final var tableGroup = (TableGroup) docbookObjects.pop();
-        tableGroup.getColSpec().add(columnSpec);
-        docbookObjects.push(tableGroup);
-    }
-
-    private void startTableHeader(Attributes attributes) {
-        final var align = UnmarshallerUtils.toAlign(getAttributeValue("align", attributes));
-        final var valign = UnmarshallerUtils.toVerticalAlign(getAttributeValue("valign", attributes));
-        final var tableHeader = new TableHeader().withId(getId(attributes)).withAlign(align).withVAlign(valign);
-        docbookObjects.push(tableHeader);
-    }
-
-    private void endTableHeader() {
         processEndElement();
     }
 
@@ -459,139 +592,30 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         processEndElement();
     }
 
-    private void endRow() {
+    private void startTableGroup(Attributes attributes) {
+        final var cols = getAttributeValue("cols", attributes);
+        final var tableGroup = new TableGroup().withCols(cols);
+        docbookObjects.push(tableGroup);
+    }
+
+    private void endTableGroup() {
         processEndElement();
     }
 
-    private void startEntry(Attributes attributes) {
+    private void startTableHeader(Attributes attributes) {
         final var align = UnmarshallerUtils.toAlign(getAttributeValue("align", attributes));
-        final var valign = UnmarshallerUtils.toBasicVerticalAlign(getAttributeValue("valign", attributes));
-        final var nameStart = getAttributeValue("namest", attributes);
-        final var nameEnd = getAttributeValue("nameend", attributes);
-        final var moreRows = getAttributeValue("morerows", attributes);
-        final var entry = new Entry().withAlign(align).withValign(valign).withNameStart(nameStart).withNameEnd(nameEnd)
-                .withMoreRows(moreRows);
-        docbookObjects.push(entry);
+        final var valign = UnmarshallerUtils.toVerticalAlign(getAttributeValue("valign", attributes));
+        final var tableHeader = new TableHeader().withId(getId(attributes)).withAlign(align).withVAlign(valign);
+        docbookObjects.push(tableHeader);
     }
 
-    private void endEntry() {
-        processEndElement();
-    }
-
-    private void startOrderedList(String id, Attributes attributes) {
-        final var numeration = UnmarshallerUtils.toNumeration(getAttributeValue("numeration", attributes), Numeration.ARABIC);
-        final var startingNumber = getAttributeValue("startingnumber", attributes);
-        final var orderedList = new OrderedList().withId(id).withNumeration(numeration).withStartigNumber(startingNumber);
-        docbookObjects.push(orderedList);
-    }
-
-    private void startItemizedList(String id, Attributes attributes) {
-        var mark = getAttributeValue("mark", attributes);
-        if (Objects.isNull(mark)) {
-            mark = UnorderedList.values()[0].getStyleName();
-        }
-        docbookObjects.push(new ItemizedList().withId(id).withMark(mark));
-    }
-
-    private void endList() {
-        processEndElement();
-    }
-
-    private void startListItem() {
-        docbookObjects.push(new ListItem());
-    }
-
-    private void endListItem() {
-        processEndElement();
-    }
-
-    // inlines
-    private void startPhrase(String id, Attributes attributes) {
-        pushText();
-        final var phrase = new Phrase().withId(id).withRole(getAttributeValue("role", attributes));
-        docbookObjects.push(phrase);
-    }
-
-    private void endPhrase() {
-        endInline();
-        processEndElement();
-    }
-
-    private void starEmphasis(String id, Attributes attributes) {
-        pushText();
-        final var emphasis = new Emphasis().withId(id).withRole(getAttributeValue("role", attributes));
-        docbookObjects.push(emphasis);
-    }
-
-    private void endEmphasis() {
-        endInline();
-        processEndElement();
-    }
-
-    private void startLiteral(String id, Attributes attributes) {
-        pushText();
-        final var literal = new Literal().withId(id).withRole(getAttributeValue("role", attributes));
-        docbookObjects.push(literal);
-    }
-
-    private void endLiteral() {
-        endInline();
-        processEndElement();
-    }
-
-    private void startSubscript(String id, Attributes attributes) {
-        pushText();
-        final var subscript = new Subscript().withId(id).withRole(getAttributeValue("role", attributes));
-        docbookObjects.push(subscript);
-    }
-
-    private void endSubscript() {
-        endInline();
-        processEndElement();
-    }
-
-    private void startSuperscript(String id, Attributes attributes) {
-        pushText();
-        final var superscript = new Superscript().withId(id).withRole(getAttributeValue("role", attributes));
-        docbookObjects.push(superscript);
-    }
-
-    private void endSuperscript() {
-        endInline();
-        processEndElement();
-    }
-
-    private void startCrossReference(String id, Attributes attributes) {
-        pushText();
-        final var xref = new CrossReference().withId(id).withRole(getAttributeValue("role", attributes))
-                .withLinkend(getAttributeValue("linkend", attributes))
-                .withHref(getAttributeValue("href", attributes))
-                .withEndterm(getAttributeValue("endterm", attributes));
-        docbookObjects.push(xref);
-    }
-
-    private void endCrossReference() {
-        endInline();
-        processEndElement();
-    }
-
-    private void startLink(String id, Attributes attributes) {
-        pushText();
-        final var link = new Link().withId(id).withRole(getAttributeValue("role", attributes))
-                .withLinkend(getAttributeValue("linkend", attributes))
-                .withHref(getAttributeValue("href", attributes))
-                .withEndterm(getAttributeValue("endterm", attributes));
-        docbookObjects.push(link);
-    }
-
-    private void endLink() {
-        endInline();
+    private void endTableHeader() {
         processEndElement();
     }
 
     private void startTerm(String id, Attributes attributes) {
         pushText();
-        final var term = new Term().withId(id).withRole(getAttributeValue("role", attributes));
+        final var term = new Term().withId(id).withRole(getRole(attributes));
         docbookObjects.push(term);
     }
 
@@ -599,6 +623,222 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         endInline();
         processEndElement();
     }
+
+    private void startTip(String id, Attributes attributes) {
+        final var tip = new Tip().withId(id).withRole(getRole(attributes));
+        docbookObjects.push(tip);
+    }
+
+    private void endTip() {
+        pushText();
+        processEndElement();
+    }
+
+    private void startTitle() {
+        final var parent = docbookObjects.peek();
+        final var titleStyle = configurationUtils.getTitleStyle(sectionLevel, parent.getClass());
+        docbookObjects.push(new Title().withId(Utils.getId(parent)).withRole(titleStyle));
+    }
+
+    private void endTitle() {
+        pushText();
+        // title is handled differently
+        final var title = (Title) docbookObjects.pop();
+        final var linkText = getLinkText("", title.getContent());
+        if (StringUtils.isNotBlank(linkText)) {
+            ApplicationController.getContext().putLabel(title.getId(), linkText);
+        }
+        processContent(title);
+    }
+
+    private void startWarning(String id, Attributes attributes) {
+        final var warning = new Warning().withId(id).withRole(getRole(attributes));
+        docbookObjects.push(warning);
+    }
+
+    private void endWarning() {
+        pushText();
+        processEndElement();
+    }
+
+    // START OF HANDLER FUNCTIONS TO PROCESS END ELEMENTS
+
+    /*
+     * For Article or Section types we process the content.
+     */
+    private void handleArticleOrSection(Object parent, Object child) {
+        processContent(child);
+        docbookObjects.push(parent);
+    }
+
+    private void handleCaution(Caution obj, Object child) {
+        obj.getContent().add(child);
+        docbookObjects.push(obj);
+    }
+
+    private void handleEmphasis(Emphasis obj, Object child) {
+        obj.getContent().add(child);
+        docbookObjects.push(obj);
+    }
+
+    private void handleEntry(Entry obj, Object child) {
+        obj.getContent().add(child);
+        docbookObjects.push(obj);
+    }
+
+    private void handleImportant(Important obj, Object child) {
+        obj.getContent().add(child);
+        docbookObjects.push(obj);
+    }
+
+    private void handleInformalTable(InformalTable obj, Object child) {
+        if (isTableGroupType(child)) {
+            obj.getTableGroup().add((TableGroup) child);
+        } else {
+            throw new NotImplementedException(obj, child);
+        }
+        docbookObjects.push(obj);
+    }
+
+    private void handleItemizedList(ItemizedList obj, Object child) {
+        if (isListItemType(child)) {
+            obj.getListItem().add((ListItem) child);
+        } else {
+            throw new NotImplementedException(obj, child);
+        }
+        docbookObjects.push(obj);
+    }
+
+    private void handleLink(Link obj, Object child) {
+        obj.getContent().add(child);
+        docbookObjects.push(obj);
+    }
+
+    private void handleListItem(ListItem obj, Object child) {
+        obj.getContent().add(child);
+        docbookObjects.push(obj);
+    }
+
+    private void handleLiteral(Literal obj, Object child) {
+        obj.getContent().add(child);
+        docbookObjects.push(obj);
+    }
+
+    private void handleNote(Note obj, Object child) {
+        obj.getContent().add(child);
+        docbookObjects.push(obj);
+    }
+
+    private void handleOrderedList(OrderedList obj, Object child) {
+        if (isListItemType(child)) {
+            obj.getListItem().add((ListItem) child);
+        } else {
+            throw new NotImplementedException(obj, child);
+        }
+        docbookObjects.push(obj);
+    }
+
+    private void handlePhrase(Phrase obj, Object child) {
+        obj.getContent().add(child);
+        docbookObjects.push(obj);
+    }
+
+    private void handleRow(Row obj, Object child) {
+        obj.getContent().add(child);
+        docbookObjects.push(obj);
+    }
+
+    private void handleSimplePara(SimplePara obj, Object child) {
+        obj.getContent().add(child);
+        docbookObjects.push(obj);
+    }
+
+    private void handleSubscript(Subscript obj, Object child) {
+        obj.getContent().add(child);
+        docbookObjects.push(obj);
+    }
+
+    private void handleSuperscript(Superscript obj, Object child) {
+        obj.getContent().add(child);
+        docbookObjects.push(obj);
+    }
+
+    private void handleTable(Table obj, Object child) {
+        if (isTableGroupType(child)) {
+            obj.getTableGroup().add((TableGroup) child);
+        } else {
+            throw new NotImplementedException(obj, child);
+        }
+        docbookObjects.push(obj);
+    }
+
+    private void handleTableBody(TableBody obj, Object child) {
+        if (isRowType(child)) {
+            obj.getRow().add((Row) child);
+        } else if (isTrType(child)) {
+            throw new NotImplementedException(obj, child);
+        }
+        docbookObjects.push(obj);
+    }
+
+    private void handleTableFooter(TableFooter obj, Object child) {
+        if (isRowType(child)) {
+            obj.getRow().add((Row) child);
+        } else if (isColumnSpecType(child)) {
+            obj.getColSpec().add((ColumnSpec) child);
+        } else if (isTrType(child)) {
+            throw new NotImplementedException(obj, child);
+        }
+        docbookObjects.push(obj);
+    }
+
+    private void handleTableGroup(TableGroup obj, Object child) {
+        if (isTableHeaderType(child)) {
+            obj.setTableHeader((TableHeader) child);
+        } else if (isTableBodyType(child)) {
+            obj.setTableBody((TableBody) child);
+        } else if (isTableFooterType(child)) {
+            obj.setTableFooter((TableFooter) child);
+        } else {
+            throw new NotImplementedException(obj, child);
+        }
+        docbookObjects.push(obj);
+    }
+
+    private void handleTableHeader(TableHeader obj, Object child) {
+        if (isRowType(child)) {
+            obj.getRow().add((Row) child);
+        } else if (isColumnSpecType(child)) {
+            obj.getColSpec().add((ColumnSpec) child);
+        } else if (isTrType(child)) {
+            throw new NotImplementedException(obj, child);
+        }
+        docbookObjects.push(obj);
+    }
+
+    private void handleTerm(Term obj, Object child) {
+        obj.getContent().add(child);
+        docbookObjects.push(obj);
+    }
+
+    private void handleTip(Tip obj, Object child) {
+        obj.getContent().add(child);
+        docbookObjects.push(obj);
+    }
+
+    private void handleTitle(Title obj, Object child) {
+        obj.getContent().add(child);
+        docbookObjects.push(obj);
+    }
+
+    private void handleWarning(Warning obj, Object child) {
+        obj.getContent().add(child);
+        docbookObjects.push(obj);
+    }
+
+    // END OF HANDLER FUNCTIONS TO PROCESS END ELEMENTS
+
+    // HELPER FUNCTIONS
 
     private void endInline() {
         if (StringUtils.isNotBlank(currentText)) {
@@ -652,10 +892,14 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
                 logger.warn("Not sure how to handle section");
             }
             handleArticleOrSection(parent, child);
+        } else if (isCautionType(parent)) {
+            handleCaution((Caution) parent, child);
         } else if (isEmphasisType(parent)) {
             handleEmphasis((Emphasis) parent, child);
         } else if (isEntryType(parent)) {
             handleEntry((Entry) parent, child);
+        } else if (isImportantType(parent)) {
+            handleImportant((Important) parent, child);
         } else if (isInformalTableType(parent)) {
             handleInformalTable((InformalTable) parent, child);
         } else if (isItemizedListType(parent)) {
@@ -666,6 +910,8 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
             handleListItem((ListItem) parent, child);
         } else if (isLiteralType(parent)) {
             handleLiteral((Literal) parent, child);
+        } else if (isNoteType(parent)) {
+            handleNote((Note) parent, child);
         } else if (isOrderedListType(parent)) {
             handleOrderedList((OrderedList) parent, child);
         } else if (isParaType(parent)) {
@@ -694,159 +940,37 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
             handleTableHeader((TableHeader) parent, child);
         } else if (isTermType(parent)) {
             handleTerm((Term) parent, child);
+        } else if (isTipType(parent)) {
+            handleTip((Tip) parent, child);
         } else if (isTitleType(parent)) {
             handleTitle((Title) parent, child);
+        } else if (isWarningType(parent)) {
+            handleWarning((Warning) parent, child);
         } else {
             throw new NotImplementedException(parent, child);
         }
     }
 
-    /*
-     * For Article or Section types we process the content.
-     */
-    private void handleArticleOrSection(Object parent, Object child) {
-        processContent(child);
-        docbookObjects.push(parent);
-    }
-
-    private void handleListItem(ListItem obj, Object child) {
-        obj.getContent().add(child);
-        docbookObjects.push(obj);
-    }
-
-    private void handleItemizedList(ItemizedList obj, Object child) {
-        if (isListItemType(child)) {
-            obj.getListItem().add((ListItem) child);
-        } else {
-            throw new NotImplementedException(obj, child);
+    private String getLinkText(String result, List<Object> contents) {
+        if (Objects.isNull(contents) || contents.isEmpty()) {
+            return result;
         }
-        docbookObjects.push(obj);
-    }
+        final var collectedText = contents.stream().map(content -> {
+            if (isStringType(content)) {
+                return (String) content;
+            } else if (isEmphasisType(content)) {
+                return getLinkText(result, ((Emphasis) content).getContent());
+            } else if (isPhraseType(content)) {
+                return getLinkText(result, ((Phrase) content).getContent());
+            } else if (isSuperscriptType(content)) {
+                return getLinkText(result, ((Superscript) content).getContent());
+            } else {
+                logger.warn("Not sure how to get text from: ");
+                return "";
+            }
+        }).collect(Collectors.joining(""));
 
-    private void handleOrderedList(OrderedList obj, Object child) {
-        if (isListItemType(child)) {
-            obj.getListItem().add((ListItem) child);
-        } else {
-            throw new NotImplementedException(obj, child);
-        }
-        docbookObjects.push(obj);
-    }
-
-    private void handleLiteral(Literal obj, Object child) {
-        obj.getContent().add(child);
-        docbookObjects.push(obj);
-    }
-
-    private void handleLink(Link obj, Object child) {
-        obj.getContent().add(child);
-        docbookObjects.push(obj);
-    }
-
-    private void handleSubscript(Subscript obj, Object child) {
-        obj.getContent().add(child);
-        docbookObjects.push(obj);
-    }
-
-    private void handleSuperscript(Superscript obj, Object child) {
-        obj.getContent().add(child);
-        docbookObjects.push(obj);
-    }
-
-    private void handleEntry(Entry obj, Object child) {
-        obj.getContent().add(child);
-        docbookObjects.push(obj);
-    }
-
-    private void handleRow(Row obj, Object child) {
-        obj.getContent().add(child);
-        docbookObjects.push(obj);
-    }
-
-    private void handleTableFooter(TableFooter obj, Object child) {
-        if (isRowType(child)) {
-            obj.getRow().add((Row) child);
-        } else if (isColumnSpecType(child)) {
-            obj.getColSpec().add((ColumnSpec) child);
-        } else if (isTrType(child)) {
-            throw new NotImplementedException(obj, child);
-        }
-        docbookObjects.push(obj);
-    }
-
-    private void handleTable(Table obj, Object child) {
-        if (isTableGroupType(child)) {
-            obj.getTableGroup().add((TableGroup) child);
-        } else {
-            throw new NotImplementedException(obj, child);
-        }
-        docbookObjects.push(obj);
-    }
-
-    private void handleTableBody(TableBody obj, Object child) {
-        if (isRowType(child)) {
-            obj.getRow().add((Row) child);
-        } else if (isTrType(child)) {
-            throw new NotImplementedException(obj, child);
-        }
-        docbookObjects.push(obj);
-    }
-
-    private void handleTableHeader(TableHeader obj, Object child) {
-        if (isRowType(child)) {
-            obj.getRow().add((Row) child);
-        } else if (isColumnSpecType(child)) {
-            obj.getColSpec().add((ColumnSpec) child);
-        } else if (isTrType(child)) {
-            throw new NotImplementedException(obj, child);
-        }
-        docbookObjects.push(obj);
-    }
-
-    private void handleTableGroup(TableGroup obj, Object child) {
-        if (isTableHeaderType(child)) {
-            obj.setTableHeader((TableHeader) child);
-        } else if (isTableBodyType(child)) {
-            obj.setTableBody((TableBody) child);
-        } else if (isTableFooterType(child)) {
-            obj.setTableFooter((TableFooter) child);
-        } else {
-            throw new NotImplementedException(obj, child);
-        }
-        docbookObjects.push(obj);
-    }
-
-    private void handleInformalTable(InformalTable obj, Object child) {
-        if (isTableGroupType(child)) {
-            obj.getTableGroup().add((TableGroup) child);
-        } else {
-            throw new NotImplementedException(obj, child);
-        }
-        docbookObjects.push(obj);
-    }
-
-    private void handleTitle(Title obj, Object child) {
-        obj.getContent().add(child);
-        docbookObjects.push(obj);
-    }
-
-    private void handleTerm(Term obj, Object child) {
-        obj.getContent().add(child);
-        docbookObjects.push(obj);
-    }
-
-    private void handleSimplePara(SimplePara obj, Object child) {
-        obj.getContent().add(child);
-        docbookObjects.push(obj);
-    }
-
-    private void handleEmphasis(Emphasis obj, Object child) {
-        obj.getContent().add(child);
-        docbookObjects.push(obj);
-    }
-
-    private void handlePhrase(Phrase obj, Object child) {
-        obj.getContent().add(child);
-        docbookObjects.push(obj);
+        return result + collectedText;
     }
 
     private void processContent(Object content) {
@@ -860,6 +984,10 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     private static String getId(Attributes attributes) {
         var id = getAttributeValue("xml:id", attributes);
         return StringUtils.isBlank(id) ? IdGenerator.nextId() : id;
+    }
+
+    private static String getRole(Attributes attributes) {
+        return getAttributeValue("role", attributes);
     }
 
     private static String getXrefLabel(Attributes attributes) {

@@ -42,13 +42,12 @@ public class ConfigurationUtils {
 
     /**
      * Do not let any one instantiate this class.
-     *
      */
     private ConfigurationUtils() throws ConfigurationException {
         Parameters parameters = new Parameters();
         configuration = new CompositeConfiguration();
 
-        try  {
+        try {
             final var builder = new FileBasedConfigurationBuilder<>(
                     PropertiesConfiguration.class).configure(parameters.fileBased()
                     .setFile(Utils.readResource("system-defaults.properties")));
@@ -123,7 +122,7 @@ public class ConfigurationUtils {
         return isBlank(ts) ? null : configuration.getString(ts);
     }
 
-    public String getTemplate(){
+    public String getTemplate() {
         return configuration.getString("template");
     }
 
@@ -139,7 +138,9 @@ public class ConfigurationUtils {
         final var results = new ArrayList<>(defaultJsFiles);
         try {
             final var customJsFiles = configuration.getList(String.class, "customs.js.files");
-            results.addAll(customJsFiles);
+            if (Objects.nonNull(customJsFiles)) {
+                results.addAll(customJsFiles);
+            }
         } catch (Exception ex) {
             ex.printStackTrace(System.out);
         }

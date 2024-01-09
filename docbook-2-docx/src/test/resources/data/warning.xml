@@ -1,4 +1,6 @@
-<warning xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en">
-    <simpara>Wolpertingers are known to nest in server racks.
-        Enter at your own risk.</simpara>
-</warning>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<article xmlns="http://docbook.org/ns/docbook">
+    <warning>
+        <simpara>Use <emphasis role="bold">WARNING</emphasis> to inform the reader of danger, harm, or consequences that exist.</simpara>
+    </warning>
+</article>

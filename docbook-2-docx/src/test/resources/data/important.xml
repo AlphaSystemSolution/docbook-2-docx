@@ -1,3 +1,18 @@
-<important xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en">
-    <simpara>There should be no blank lines between the first attribute entry and the rest of the header.</simpara>
-</important>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<article xmlns="http://docbook.org/ns/docbook">
+    <important>
+        <simpara>Admonition can contain other block elements, for example, ordered list:</simpara>
+        <orderedlist numeration="arabic">
+            <listitem>
+                <simpara>First</simpara>
+                <simpara>Another para</simpara>
+            </listitem>
+            <listitem>
+                <simpara>Second</simpara>
+            </listitem>
+            <listitem>
+                <simpara>Third</simpara>
+            </listitem>
+        </orderedlist>
+    </important>
+</article>

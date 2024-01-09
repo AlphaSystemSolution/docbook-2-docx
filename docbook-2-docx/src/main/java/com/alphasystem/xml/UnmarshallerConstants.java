@@ -7,17 +7,20 @@ import static com.alphasystem.util.AppUtil.isInstanceOf;
 public interface UnmarshallerConstants {
 
     String ARTICLE = "article";
+    String CAUTION = "caution";
     String COLUMN_SPEC = "colspec";
     String CROSS_REFERENCE = "xref";
     String DATE = "date";
     String EMPHASIS = "emphasis";
     String ENTRY = "entry";
+    String IMPORTANT = "important";
     String INFO = "info";
     String INFORMAL_TABLE = "informaltable";
     String ITEMIZED_LIST = "itemizedlist";
     String LINK = "link";
     String LIST_ITEM = "listitem";
     String LITERAL = "literal";
+    String NOTE = "note";
     String ORDERED_LIST = "orderedlist";
     String PHRASE = "phrase";
     String ROW = "row";
@@ -27,14 +30,20 @@ public interface UnmarshallerConstants {
     String SUPERSCRIPT = "superscript";
     String TABLE = "table";
     String TABLE_BODY = "tbody";
-    String TERM = "term";
     String TABLE_FOOTER = "tfoot";
     String TABLE_GROUP = "tgroup";
     String TABLE_HEAD = "thead";
+    String TERM = "term";
+    String TIP = "tip";
     String TITLE = "title";
+    String WARNING = "warning";
 
     static boolean isArticleType(Object o) {
         return isInstanceOf(Article.class, o);
+    }
+
+    static boolean isCautionType(Object o) {
+        return isInstanceOf(Caution.class, o);
     }
 
     static boolean isColumnSpecType(Object o) {
@@ -57,6 +66,10 @@ public interface UnmarshallerConstants {
         return isInstanceOf(FormalPara.class, o);
     }
 
+    static boolean isImportantType(Object o) {
+        return isInstanceOf(Important.class, o);
+    }
+
     static boolean isInformalTableType(Object o) {
         return isInstanceOf(InformalTable.class, o);
     }
@@ -75,6 +88,10 @@ public interface UnmarshallerConstants {
 
     static boolean isLiteralType(Object o) {
         return isInstanceOf(Literal.class, o);
+    }
+
+    static boolean isNoteType(Object o) {
+        return isInstanceOf(Note.class, o);
     }
 
     static boolean isOrderedListType(Object o) {
@@ -125,16 +142,20 @@ public interface UnmarshallerConstants {
         return isInstanceOf(TableFooter.class, o);
     }
 
-    static boolean isTableHeaderType(Object o) {
-        return isInstanceOf(TableHeader.class, o);
-    }
-
     static boolean isTableGroupType(Object o) {
         return isInstanceOf(TableGroup.class, o);
     }
 
+    static boolean isTableHeaderType(Object o) {
+        return isInstanceOf(TableHeader.class, o);
+    }
+
     static boolean isTermType(Object o) {
         return isInstanceOf(Term.class, o);
+    }
+
+    static boolean isTipType(Object o) {
+        return isInstanceOf(Tip.class, o);
     }
 
     static boolean isTitleType(Object o) {
@@ -143,6 +164,10 @@ public interface UnmarshallerConstants {
 
     static boolean isTrType(Object o) {
         return isInstanceOf(Tr.class, o);
+    }
+
+    static boolean isWarningType(Object o) {
+        return isInstanceOf(Warning.class, o);
     }
 
     static boolean isParaTypes(Object o) {

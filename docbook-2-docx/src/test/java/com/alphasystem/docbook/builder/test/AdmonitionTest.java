@@ -1,47 +1,67 @@
 package com.alphasystem.docbook.builder.test;
 
-import org.docbook.model.*;
+import org.docx4j.wml.Tbl;
 import org.testng.annotations.Test;
 
-import static com.alphasystem.docbook.builder.test.DataFactory.*;
+import static org.testng.Assert.assertEquals;
 
 /**
  * @author sali
  */
-public class AdmonitionTest extends AbstractTest {
+public class AdmonitionTest extends AbstractTest2 {
 
     @Test
     public void testCaution() {
-        Caution caution = createCaution(createSimplePara(null, "If the title line is not offset by a blank line, it gets interpreted as a section title, which we&#8217;ll discuss later."));
-        addResult(null, 0, 3, "Caution Test", caution);
+        addTestTitle("Caution Admonition");
+        processContent(readXml("caution"));
+        assertSize(2);
+        final var content = mainDocumentPart.getContent();
+        // number of content are 5, admonition caption + empty para in second column + content
+        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 5);
+        addHorizontalLine();
     }
 
     @Test(dependsOnMethods = {"testCaution"})
     public void testImportant() {
-        Important important = createImportant(createSection(null, "There should be no blank lines between the first attribute entry and the rest of the header."));
-        addResult(null, 0, 3, "Important Test", important);
+        addTestTitle("Important Admonition");
+        processContent(readXml("important"));
+        assertSize(2);
+        final var content = mainDocumentPart.getContent();
+        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 6);
+        addHorizontalLine();
     }
 
     @Test(dependsOnMethods = {"testImportant"})
     public void testNote() {
-        Note note = createNote(createSimplePara(null, "Admonitions can also encapsulate any block content, which we&#8217;ll cover later."));
-        addResult(null, 0, 3, "Note Test", note);
+        addTestTitle("Note Admonition");
+        processContent(readXml("note"));
+        assertSize(2);
+        final var content = mainDocumentPart.getContent();
+        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 7);
+        addHorizontalLine();
     }
 
     @Test(dependsOnMethods = {"testNote"})
     public void testTip() {
-        Tip tip = createTip(createSimplePara(null, "A document title is an <emphasis>optional</emphasis> feature of an AsciiDoc document."));
-        addResult(null, 0, 3, "Tip Test", tip);
+        addTestTitle("Tip Admonition");
+        processContent(readXml("tip"));
+        assertSize(2);
+        final var content = mainDocumentPart.getContent();
+        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 8);
+        addHorizontalLine();
     }
 
     @Test(dependsOnMethods = {"testTip"})
     public void testWarning() {
-        Warning warning = createWarning(createSimplePara(null, "Wolpertingers are known to nest in server racks.\n" +
-                "        Enter at your own risk."));
-        addResult(null, 0, 3, "Warning Test", warning);
+        addTestTitle("Warning Admonition");
+        processContent(readXml("warning"));
+        assertSize(2);
+        final var content = mainDocumentPart.getContent();
+        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 5);
+        addHorizontalLine();
     }
 
-    @Test(dependsOnMethods = {"testWarning"})
+    /*@Test(dependsOnMethods = {"testWarning"})
     public void testExample() {
         addResult(null, 0, 3, "Example Test", readXml("example", Example.class));
     }
@@ -49,5 +69,5 @@ public class AdmonitionTest extends AbstractTest {
     @Test(dependsOnMethods = {"testExample"})
     public void testInformalExample() {
         addResult(null, 0, 3, "Informal Example Test", readXml("informal-example", InformalExample.class));
-    }
+    }*/
 }

@@ -1,3 +1,23 @@
-<note xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en">
-    <simpara>Admonitions can also encapsulate any block content, which we&#8217;ll cover later.</simpara>
-</note>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<article xmlns="http://docbook.org/ns/docbook">
+    <note>
+        <simpara>An admonition, also known as a notice, helps draw attention to content with a special label or icon.</simpara>
+        <itemizedlist mark="diamond">
+            <listitem>
+                <simpara>NOTE</simpara>
+            </listitem>
+            <listitem>
+                <simpara>TIP</simpara>
+            </listitem>
+            <listitem>
+                <simpara>IMPORTANT</simpara>
+            </listitem>
+            <listitem>
+                <simpara>CAUTION</simpara>
+            </listitem>
+            <listitem>
+                <simpara>WARNING</simpara>
+            </listitem>
+        </itemizedlist>
+    </note>
+</article>
