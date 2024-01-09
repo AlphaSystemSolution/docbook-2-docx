@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class JavaScriptBasedBuilder<S, T> extends AbstractBuilder<S> {
+public abstract class JavaScriptBasedBuilder<S, T> extends BlockBuilder<S> {
 
 
     protected JavaScriptBasedBuilder(S source, Builder<?> parent) {

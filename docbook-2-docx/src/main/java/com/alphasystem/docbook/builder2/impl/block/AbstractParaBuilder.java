@@ -1,7 +1,7 @@
 package com.alphasystem.docbook.builder2.impl.block;
 
 import com.alphasystem.docbook.builder2.Builder;
-import com.alphasystem.docbook.builder2.impl.AbstractBuilder;
+import com.alphasystem.docbook.builder2.impl.BlockBuilder;
 import com.alphasystem.openxml.builder.wml.WmlAdapter;
 import com.alphasystem.openxml.builder.wml.WmlBuilderFactory;
 import com.alphasystem.util.AppUtil;
@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class AbstractParaBuilder<S> extends AbstractBuilder<S> {
+public abstract class AbstractParaBuilder<S> extends BlockBuilder<S> {
 
     protected PPr paraProperties;
 

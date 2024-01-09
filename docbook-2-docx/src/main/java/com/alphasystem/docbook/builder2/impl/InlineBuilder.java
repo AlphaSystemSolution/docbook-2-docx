@@ -19,8 +19,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public abstract class InlineBuilder<S> extends AbstractBuilder<S> {
 
-    protected String[] styles = null;
-    private final String defaultStyle;
+    protected String[] styles;
     protected RBuilder runBuilder;
     protected InlineHandlerFactory handlerFactory = InlineHandlerFactory.getInstance();
 
@@ -30,7 +29,6 @@ public abstract class InlineBuilder<S> extends AbstractBuilder<S> {
 
     protected InlineBuilder(String childContentMethodName, String defaultStyle, S source, Builder<?> parent) {
         super(childContentMethodName, source, parent);
-        this.defaultStyle = defaultStyle;
         styles = isBlank(role) ? new String[]{defaultStyle} : role.split(" ");
     }
 

@@ -60,9 +60,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     public void endDocument() {
         final var documentInfo = documentContext.getDocumentInfo();
         if (documentInfo.isToc() && documentInfo.isSectionNumbers()) {
-            new TocGenerator().level(5).tocHeading(documentInfo.getTocTitle()).level(5)
-                    .mainDocumentPart(ApplicationController.getContext().getMainDocumentPart())
-                    .generateToc();
+            new TocGenerator().level(5).tocHeading(documentInfo.getTocTitle()).level(5).mainDocumentPart(ApplicationController.getContext().getMainDocumentPart()).generateToc();
         }
         if (!docbookObjects.isEmpty()) {
             logger.warn("===================================");
@@ -377,10 +375,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
 
     private void startCrossReference(String id, Attributes attributes) {
         pushText();
-        final var xref = new CrossReference().withId(id).withRole(getRole(attributes))
-                .withLinkend(getAttributeValue("linkend", attributes))
-                .withHref(getAttributeValue("href", attributes))
-                .withEndterm(getAttributeValue("endterm", attributes));
+        final var xref = new CrossReference().withId(id).withRole(getRole(attributes)).withLinkend(getAttributeValue("linkend", attributes)).withHref(getAttributeValue("href", attributes)).withEndterm(getAttributeValue("endterm", attributes));
         docbookObjects.push(xref);
     }
 
@@ -406,8 +401,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         final var nameStart = getAttributeValue("namest", attributes);
         final var nameEnd = getAttributeValue("nameend", attributes);
         final var moreRows = getAttributeValue("morerows", attributes);
-        final var entry = new Entry().withAlign(align).withValign(valign).withNameStart(nameStart).withNameEnd(nameEnd)
-                .withMoreRows(moreRows);
+        final var entry = new Entry().withAlign(align).withValign(valign).withNameStart(nameStart).withNameEnd(nameEnd).withMoreRows(moreRows);
         docbookObjects.push(entry);
     }
 
@@ -432,8 +426,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         final var colSep = UnmarshallerUtils.toChoice(getAttributeValue("colsep", attributes));
         final var tableStyle = getAttributeValue("tabstyle", attributes);
         final var style = getAttributeValue("style", attributes);
-        final var informalTable = new InformalTable().withId(id).withRole(role).withFrame(frame).withRowSep(rowSep)
-                .withColSep(colSep).withTableStyle(tableStyle).withStyle(style);
+        final var informalTable = new InformalTable().withId(id).withRole(role).withFrame(frame).withRowSep(rowSep).withColSep(colSep).withTableStyle(tableStyle).withStyle(style);
         docbookObjects.push(informalTable);
     }
 
@@ -451,10 +444,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
 
     private void startLink(String id, Attributes attributes) {
         pushText();
-        final var link = new Link().withId(id).withRole(getRole(attributes))
-                .withLinkend(getAttributeValue("linkend", attributes))
-                .withHref(getAttributeValue("href", attributes))
-                .withEndterm(getAttributeValue("endterm", attributes));
+        final var link = new Link().withId(id).withRole(getRole(attributes)).withLinkend(getAttributeValue("linkend", attributes)).withHref(getAttributeValue("href", attributes)).withEndterm(getAttributeValue("endterm", attributes));
         docbookObjects.push(link);
     }
 
@@ -561,8 +551,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         final var colSep = UnmarshallerUtils.toChoice(getAttributeValue("colsep", attributes));
         final var tableStyle = getAttributeValue("tabstyle", attributes);
         final var style = getAttributeValue("style", attributes);
-        final var table = new Table().withId(id).withRole(role).withFrame(frame).withRowSep(rowSep)
-                .withColSep(colSep).withTableStyle(tableStyle).withStyle(style);
+        final var table = new Table().withId(id).withRole(role).withFrame(frame).withRowSep(rowSep).withColSep(colSep).withTableStyle(tableStyle).withStyle(style);
         docbookObjects.push(table);
     }
 
@@ -643,12 +632,12 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     private void endTitle() {
         pushText();
         // title is handled differently
-        final var title = (Title) docbookObjects.pop();
+        final var title = (Title) docbookObjects.peek();
         final var linkText = getLinkText("", title.getContent());
         if (StringUtils.isNotBlank(linkText)) {
             ApplicationController.getContext().putLabel(title.getId(), linkText);
         }
-        processContent(title);
+        processEndElement();
     }
 
     private void startWarning(String id, Attributes attributes) {
@@ -672,7 +661,8 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     }
 
     private void handleCaution(Caution obj, Object child) {
-        obj.getContent().add(child);
+        if (isTitleType(child)) obj.getTitleContent().add(child);
+        else obj.getContent().add(child);
         docbookObjects.push(obj);
     }
 
@@ -687,7 +677,8 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     }
 
     private void handleImportant(Important obj, Object child) {
-        obj.getContent().add(child);
+        if (isTitleType(child)) obj.getTitleContent().add(child);
+        else obj.getContent().add(child);
         docbookObjects.push(obj);
     }
 
@@ -703,6 +694,8 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     private void handleItemizedList(ItemizedList obj, Object child) {
         if (isListItemType(child)) {
             obj.getListItem().add((ListItem) child);
+        } else if (isTitleType(child)) {
+            obj.getTitleContent().add(child);
         } else {
             throw new NotImplementedException(obj, child);
         }
@@ -725,13 +718,16 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     }
 
     private void handleNote(Note obj, Object child) {
-        obj.getContent().add(child);
+        if (isTitleType(child)) obj.getTitleContent().add(child);
+        else obj.getContent().add(child);
         docbookObjects.push(obj);
     }
 
     private void handleOrderedList(OrderedList obj, Object child) {
         if (isListItemType(child)) {
             obj.getListItem().add((ListItem) child);
+        } else if (isTitleType(child)) {
+            obj.getTitleContent().add(child);
         } else {
             throw new NotImplementedException(obj, child);
         }
@@ -766,6 +762,8 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     private void handleTable(Table obj, Object child) {
         if (isTableGroupType(child)) {
             obj.getTableGroup().add((TableGroup) child);
+        } else if (isTitleType(child)) {
+            obj.setTitle((Title) child);
         } else {
             throw new NotImplementedException(obj, child);
         }
@@ -822,7 +820,8 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     }
 
     private void handleTip(Tip obj, Object child) {
-        obj.getContent().add(child);
+        if (isTitleType(child)) obj.getTitleContent().add(child);
+        else obj.getContent().add(child);
         docbookObjects.push(obj);
     }
 
@@ -832,7 +831,8 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     }
 
     private void handleWarning(Warning obj, Object child) {
-        obj.getContent().add(child);
+        if (isTitleType(child)) obj.getTitleContent().add(child);
+        else obj.getContent().add(child);
         docbookObjects.push(obj);
     }
 

@@ -1,7 +1,7 @@
 package com.alphasystem.docbook.builder2.impl.block;
 
 import com.alphasystem.docbook.builder2.Builder;
-import com.alphasystem.docbook.builder2.impl.AbstractBuilder;
+import com.alphasystem.docbook.builder2.impl.BlockBuilder;
 import com.alphasystem.docbook.model.DocBookTableAdapter;
 import com.alphasystem.openxml.builder.wml.table.ColumnInfo;
 import com.alphasystem.openxml.builder.wml.table.ColumnInput;
@@ -28,7 +28,7 @@ import static com.alphasystem.openxml.builder.wml.WmlBuilderFactory.getTblPrBuil
 import static java.lang.String.format;
 import static org.docbook.model.Choice.ONE;
 
-public abstract class AbstractTableBuilder<S> extends AbstractBuilder<S> {
+public abstract class AbstractTableBuilder<S> extends BlockBuilder<S> {
 
     private static final int HEADER = 1;
     private static final int FOOTER = 2;
