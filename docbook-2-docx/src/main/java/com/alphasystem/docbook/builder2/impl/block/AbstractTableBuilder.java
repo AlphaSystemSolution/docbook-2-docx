@@ -80,7 +80,7 @@ public abstract class AbstractTableBuilder<S> extends AbstractBuilder<S> {
         this.level = -1;
         final var listParent = getParent(ListBuilder.class);
         if (listParent != null) {
-            this.level = (int) listParent.listInfo.getLevel();
+            this.level = (int) listParent.getListInfo().getLevel();
         }
         final var tableGroups = docBookTableAdapter.getTableGroup();
         tableGroup = ((tableGroups != null) && !tableGroups.isEmpty()) ? tableGroups.get(0) : null;

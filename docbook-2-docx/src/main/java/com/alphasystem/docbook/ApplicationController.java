@@ -7,8 +7,13 @@ import com.alphasystem.docbook.handler.BuilderHandlerService;
 import com.alphasystem.docbook.handler.InlineHandlerService;
 import com.alphasystem.docbook.model.Admonition;
 import com.alphasystem.docbook.util.ConfigurationUtils;
+import com.alphasystem.docbook.util.Utils;
 import org.docx4j.wml.Tbl;
+import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.Source;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ServiceLoader;
 
 import static com.alphasystem.docbook.handler.BlockHandlerFactory.*;
@@ -62,6 +67,7 @@ public final class ApplicationController {
     }
 
     private final BlockHandlerFactory blockHandlerFactory;
+    private final Context context;
 
     /**
      * Do not let anyone instantiate this class
@@ -77,6 +83,35 @@ public final class ApplicationController {
         builderHandlerServices.forEach(BuilderHandlerService::initializeHandlers);
 
         blockHandlerFactory = BlockHandlerFactory.getInstance();
+        context = Context.newBuilder("js").allowAllAccess(true).build();
+
+        // initialization of scripts
+        configurationUtils.getScriptFiles().stream()
+                .map(ApplicationController::readResource)
+                .map(ApplicationController::loadSource)
+                .forEach(context::eval);
+
+        Runtime.getRuntime().addShutdownHook(new Thread(context::close));
+    }
+
+    private static File readResource(String resourceName) {
+        try {
+            return Utils.readResource(resourceName);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static Source loadSource(File file) {
+        try {
+            return Source.newBuilder("js", file).build();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Context getScriptEngine() {
+        return context;
     }
 
     public Tbl getExampleTable() {

@@ -5,6 +5,7 @@ dependencies {
     api("jakarta.xml.bind:jakarta.xml.bind-api:${bindApiVersion}")
     api("com.alphasystem.openxml:openxml-builder:${openxmlBuilderVersion}")
     api('io.vavr:vavr:0.10.4')
+    api('org.graalvm.js:js:22.3.4')
     testImplementation group: 'org.testng', name: 'testng', version: '7.7.0'
     testImplementation group: 'com.google.inject', name: 'guice', version: '7.0.0'
     testImplementation group: 'org.uncommons', name: 'reportng', version: '1.1.4'

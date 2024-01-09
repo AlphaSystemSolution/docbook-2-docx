@@ -34,4 +34,8 @@ public abstract class ListBuilder<S> extends AbstractBuilder<S> {
     }
 
     protected abstract void setListStyleName();
+
+    public ListInfo getListInfo() {
+        return listInfo;
+    }
 }

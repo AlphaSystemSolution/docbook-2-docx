@@ -13,9 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.docbook.model.Section;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static com.alphasystem.util.AppUtil.isInstanceOf;
 import static java.lang.String.format;
@@ -51,17 +49,10 @@ public class ConfigurationUtils {
         configuration = new CompositeConfiguration();
 
         try  {
-            final var files = Utils.readResource("system-defaults.properties");
-            files.forEach(file -> {
-                FileBasedConfigurationBuilder<PropertiesConfiguration> builder = new FileBasedConfigurationBuilder<>(
-                        PropertiesConfiguration.class).configure(parameters.fileBased().setFile(file));
-                try {
-                    configuration.addConfiguration(builder.getConfiguration());
-                } catch (ConfigurationException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-
+            final var builder = new FileBasedConfigurationBuilder<>(
+                    PropertiesConfiguration.class).configure(parameters.fileBased()
+                    .setFile(Utils.readResource("system-defaults.properties")));
+            configuration.addConfiguration(builder.getConfiguration());
             configuration.addConfiguration(new SystemConfiguration());
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -108,16 +99,8 @@ public class ConfigurationUtils {
         return getString("default.list.style");
     }
 
-    public String getAdmonitionStyle(Admonition admonition) {
-        return getString(format("%s.style", admonition.name()));
-    }
-
-    public String getAdmonitionCaptionStyle(Admonition admonition) {
-        return getString(format("%s.caption.style", admonition.name()));
-    }
-
-    public String getAdmonitionListStyle(Admonition admonition) {
-        return getString(format("%s.list.style", admonition.name()));
+    public String getAdmonitionCaptionColor(Admonition admonition) {
+        return getString(format("%s.color", admonition.name()));
     }
 
     public String getAdmonitionCaption(Admonition admonition) {
@@ -145,10 +128,22 @@ public class ConfigurationUtils {
     }
 
     public String[] getStyles() {
-        var defaultStyles = "default-styles.xml";
+        final var defaultStyles = "default-styles.xml";
         var _styles = configuration.getString("styles");
         _styles = StringUtils.isBlank(_styles) ? defaultStyles : defaultStyles + "," + _styles;
         return _styles.split(",");
+    }
+
+    public List<String> getScriptFiles() {
+        final var defaultJsFiles = configuration.getList(String.class, "default.js.files");
+        final var results = new ArrayList<>(defaultJsFiles);
+        try {
+            final var customJsFiles = configuration.getList(String.class, "customs.js.files");
+            results.addAll(customJsFiles);
+        } catch (Exception ex) {
+            ex.printStackTrace(System.out);
+        }
+        return results;
     }
 
     public String getString(String key) {

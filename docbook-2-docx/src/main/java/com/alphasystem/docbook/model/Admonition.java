@@ -5,5 +5,15 @@ package com.alphasystem.docbook.model;
  */
 public enum Admonition {
 
-    CAUTION, IMPORTANT, NOTE, TIP, WARNING
+    CAUTION("Caution"), IMPORTANT("Important"), NOTE("Note"), TIP("Tip"), WARNING("Warning");
+
+    private final String value;
+
+    Admonition(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
 }
