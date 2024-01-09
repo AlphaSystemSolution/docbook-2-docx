@@ -5,7 +5,6 @@ import org.docbook.model.SimplePara;
 import org.testng.annotations.Test;
 
 import static com.alphasystem.docbook.builder.test.DataFactory.*;
-import static org.testng.Assert.assertEquals;
 
 public class InlineTest extends AbstractTest2 {
 
@@ -16,6 +15,10 @@ public class InlineTest extends AbstractTest2 {
             createEmphasis(null, "Text to display"),
             ").")
             .withXreflabel("Text to display");
+
+    public InlineTest() {
+        super("Inline Elements");
+    }
 
     @Test
     public void testBasicInline() {

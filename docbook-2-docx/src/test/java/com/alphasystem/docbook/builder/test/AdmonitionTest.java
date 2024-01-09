@@ -10,6 +10,10 @@ import static org.testng.Assert.assertEquals;
  */
 public class AdmonitionTest extends AbstractTest2 {
 
+    public AdmonitionTest() {
+        super("Admonitions");
+    }
+
     @Test
     public void testCaution() {
         addTestTitle("Caution Admonition");

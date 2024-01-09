@@ -8,24 +8,26 @@ import com.alphasystem.util.AppUtil;
 import com.alphasystem.util.IdGenerator;
 import com.alphasystem.xml.UnmarshallerTool;
 import jakarta.xml.bind.JAXBElement;
+import org.apache.commons.lang3.StringUtils;
 import org.docbook.model.SimplePara;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
 import org.docx4j.wml.*;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
 
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static com.alphasystem.docbook.builder.test.DataFactory.createArticle;
-import static com.alphasystem.docbook.builder.test.DataFactory.toXml;
+import static com.alphasystem.docbook.builder.test.DataFactory.*;
 import static java.lang.String.format;
 import static java.nio.file.Paths.get;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
-public class AbstractTest2 {
+public abstract class AbstractTest2 {
 
     protected static final String DEFAULT_TITLE = "DefaultTitle";
     private static final String DATA_PATH = System.getProperty("data.path");
@@ -42,8 +44,34 @@ public class AbstractTest2 {
         mainDocumentPart = ApplicationController.getContext().getMainDocumentPart();
     }
 
+    private final String testTitle;
+
+    public AbstractTest2(String testTitle) {
+        this.testTitle = testTitle;
+    }
+
+    @BeforeClass
+    public void beforeClass() {
+        if (StringUtils.isNotBlank(testTitle)) {
+            processContent(createArticle(createTitle(testTitle)));
+            updateCount();
+        }
+    }
+
+    @AfterClass
+    public void afterClass() {
+        if (StringUtils.isNotBlank(testTitle)) {
+            mainDocumentPart.addObject(WmlAdapter.getPageBreak());
+            updateCount();
+        }
+    }
+
     @AfterMethod
     public void reset() {
+        updateCount();
+    }
+
+    void updateCount() {
         previousSize = mainDocumentPart.getContent().size();
     }
 

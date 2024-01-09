@@ -3,12 +3,15 @@ package com.alphasystem.docbook.builder.test;
 import org.testng.annotations.Test;
 
 import static com.alphasystem.docbook.builder.test.DataFactory.*;
-import static org.testng.Assert.assertEquals;
 
 /**
  * @author sali
  */
 public class TitleTest extends AbstractTest2 {
+
+    public TitleTest() {
+        super("Titles");
+    }
 
     @Test
     public void testTitle() {

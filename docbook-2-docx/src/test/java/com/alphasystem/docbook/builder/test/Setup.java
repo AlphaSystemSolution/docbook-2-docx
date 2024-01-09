@@ -14,6 +14,10 @@ import static org.testng.Assert.fail;
  */
 public class Setup extends AbstractTest2 {
 
+    public Setup() {
+        super("");
+    }
+
     @BeforeSuite
     public void setup() {
        final Path path = get(targetPath);

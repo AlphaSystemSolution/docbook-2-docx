@@ -7,6 +7,10 @@ import org.testng.annotations.Test;
  */
 public class ItemizedListTest extends AbstractTest2 {
 
+    public ItemizedListTest() {
+        super("Itemized list");
+    }
+
     @Test
     public void testItemizedList() {
         addTestTitle("Un-Ordered list with \"diamond\" mark.");

@@ -3,14 +3,14 @@ package com.alphasystem.docbook.builder.test;
 import com.alphasystem.openxml.builder.wml.WmlAdapter;
 import org.testng.annotations.Test;
 
-import java.util.Collections;
-
-import static org.testng.Assert.assertEquals;
-
 /**
  * @author sali
  */
 public class OrderedListTest extends AbstractTest2 {
+
+    public OrderedListTest() {
+        super("Ordered List");
+    }
 
     @Test
     public void testOrderedList() {

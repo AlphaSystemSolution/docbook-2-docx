@@ -15,6 +15,9 @@ import static org.testng.Assert.fail;
  */
 public class TearDown extends AbstractTest2 {
 
+    public TearDown() {
+        super("");
+    }
 
     @AfterSuite
     public void tearDown() {

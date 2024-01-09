@@ -10,6 +10,10 @@ import static org.testng.Assert.assertEquals;
  */
 public class TableTest extends AbstractTest2 {
 
+    public TableTest() {
+        super("Tables");
+    }
+
     @Test
     public void testInformalTable() {
         addTestTitle("Basic informal table test");
