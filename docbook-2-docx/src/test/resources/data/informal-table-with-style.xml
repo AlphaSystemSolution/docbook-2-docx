@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<article xmlns="http://docbook.org/ns/docbook">
+    <informaltable tabstyle="horizontal" frame="none" colsep="0" rowsep="0">
+        <tgroup cols="2">
+            <colspec colwidth="15*"/>
+            <colspec colwidth="85*"/>
+            <tbody valign="top">
+                <row>
+                    <entry>
+                        <simpara>TTF</simpara>
+                    </entry>
+                    <entry>
+                        <simpara>TrueType fonts.</simpara>
+                    </entry>
+                </row>
+                <row>
+                    <entry>
+                        <simpara>PFA, PFB</simpara>
+                    </entry>
+                    <entry>
+                        <simpara>PostScript fonts. <literal>PFA</literal> files are common on <literal>UNIX</literal> systems, <literal>PFB</literal> files are more common on Windows systems.
+                        </simpara>
+                    </entry>
+                </row>
+            </tbody>
+        </tgroup>
+    </informaltable>
+</article>

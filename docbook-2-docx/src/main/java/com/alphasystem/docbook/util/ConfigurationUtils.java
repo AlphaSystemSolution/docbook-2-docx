@@ -160,9 +160,8 @@ public class ConfigurationUtils {
         return tocCaption;
     }
 
-    @Deprecated
     public String getTableStyle(String ts) {
-        return null;
+        return getString(String.format("table.%s", ts));
     }
 
     public String getTemplate() {

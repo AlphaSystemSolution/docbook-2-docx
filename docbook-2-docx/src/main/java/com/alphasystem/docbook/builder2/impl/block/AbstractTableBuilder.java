@@ -123,7 +123,10 @@ public abstract class AbstractTableBuilder<S> extends BlockBuilder<S> {
     }
 
     private String getTableStyle(TableGroup tableGroup, String styleName) {
-        var tableStyle = Objects.nonNull(styleName) ? styleName : null;
+        var tableStyle = configurationUtils.getTableStyle(styleName);
+        if ((styleName != null) && (tableStyle == null)) {
+            tableStyle = styleName;
+        }
         if (Objects.isNull(tableStyle)) {
             int header = (tableGroup.getTableHeader() == null) ? 0 : HEADER;
             int footer = (tableGroup.getTableFooter() == null) ? 0 : FOOTER;

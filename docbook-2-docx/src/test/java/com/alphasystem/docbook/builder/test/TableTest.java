@@ -167,4 +167,14 @@ public class TableTest extends AbstractTest2 {
         assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 12);
         addHorizontalLine();
     }
+
+    @Test(dependsOnMethods = "testTableWithHeaderAndFooter")
+    public void testTableWithStyle() {
+        addTestTitle("Table with style (horizontal)");
+        processContent(readXml("informal-table-with-style"));
+        assertSize(1);
+        final var content = mainDocumentPart.getContent();
+        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 13);
+        addHorizontalLine();
+    }
 }
