@@ -34,7 +34,7 @@ public abstract class DocumentCaption extends HeadingList<DocumentCaption> {
     protected final String caption;
 
     DocumentCaption(Class<?> titleType, String caption) {
-        super(getInstance().getString(format("%s.title", titleType.getName())));
+        super(getInstance().getTitleStyle(titleType.getName()));
         setName(titleType.getSimpleName());
         this.caption = caption;
     }

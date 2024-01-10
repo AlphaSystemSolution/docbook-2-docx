@@ -49,11 +49,12 @@ public final class ApplicationController {
     private static DocumentInfo createDocumentInfo(final DocumentInfo src) {
         var documentInfo = new DocumentInfo(src);
         documentInfo.setTocTitle(configurationUtils.getTableOfContentCaption());
-        documentInfo.setCautionCaption(configurationUtils.getAdmonitionCaption(Admonition.CAUTION));
+        // TODO: revisit whether we need these to be set here
+        /*documentInfo.setCautionCaption(configurationUtils.getAdmonitionCaption(Admonition.CAUTION));
         documentInfo.setImportantCaption(configurationUtils.getAdmonitionCaption(Admonition.IMPORTANT));
         documentInfo.setNoteCaption(configurationUtils.getAdmonitionCaption(Admonition.NOTE));
         documentInfo.setTipCaption(configurationUtils.getAdmonitionCaption(Admonition.TIP));
-        documentInfo.setWarningCaption(configurationUtils.getAdmonitionCaption(Admonition.WARNING));
+        documentInfo.setWarningCaption(configurationUtils.getAdmonitionCaption(Admonition.WARNING));*/
         documentInfo.setExampleCaption(configurationUtils.getExampleCaption());
         documentInfo.setTableCaption(configurationUtils.getTableCaption());
         return documentInfo;

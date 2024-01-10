@@ -30,6 +30,6 @@ public class SideBarBuilder extends JavaScriptBasedBuilder<SideBar, Tbl> {
            args[0] = builderFactory.process(title, this).get(0);
         }
         args[1] = processedChildContent;
-        return new FunctionInput<>(configurationUtils.getString("sidebar.functionName"), Tbl.class, args);
+        return new FunctionInput<>(configurationUtils.getSideBarFunctionName(), Tbl.class, args);
     }
 }

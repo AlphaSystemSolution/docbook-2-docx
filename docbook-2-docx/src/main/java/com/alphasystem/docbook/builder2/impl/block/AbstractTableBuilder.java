@@ -123,12 +123,8 @@ public abstract class AbstractTableBuilder<S> extends BlockBuilder<S> {
     }
 
     private String getTableStyle(TableGroup tableGroup, String styleName) {
-        String tableStyle = configurationUtils.getTableStyle(styleName);
-        if ((styleName != null) && (tableStyle == null)) {
-            // styleName is not null but there is no corresponding style in Word document
-            logger.warn("No style defined for table with name \"{}\"", styleName);
-        }
-        if (tableStyle == null) {
+        var tableStyle = Objects.nonNull(styleName) ? styleName : null;
+        if (Objects.isNull(tableStyle)) {
             int header = (tableGroup.getTableHeader() == null) ? 0 : HEADER;
             int footer = (tableGroup.getTableFooter() == null) ? 0 : FOOTER;
             int value = header | footer;
@@ -136,6 +132,7 @@ public abstract class AbstractTableBuilder<S> extends BlockBuilder<S> {
                 tableStyle = format("TableGrid%s", value);
             }
         }
+
         return tableStyle;
     }
 

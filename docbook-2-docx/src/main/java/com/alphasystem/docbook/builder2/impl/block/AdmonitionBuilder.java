@@ -24,11 +24,12 @@ public abstract class AdmonitionBuilder<S> extends JavaScriptBasedBuilder<S, Tbl
         if (parent != null) {
             level = (int) parent.getListInfo().getLevel();
         }
-        return new FunctionInput<>(configurationUtils.getString("admonition.functionName"),
+        final var admonitionConfig = configurationUtils.getAdmonitionConfig(admonition);
+        return new FunctionInput<>(configurationUtils.getAdmonitionFunctionName(),
                 Tbl.class,
                 new Object[]{admonition.getValue(),
-                        configurationUtils.getAdmonitionCaption(admonition),
-                        configurationUtils.getAdmonitionCaptionColor(admonition),
+                        admonitionConfig._1,
+                        admonitionConfig._2,
                         level,
                         processedChildContent.toArray()});
     }

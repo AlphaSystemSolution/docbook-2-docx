@@ -1,23 +1,20 @@
 package com.alphasystem.docbook.util;
 
 import com.alphasystem.docbook.builder.Builder;
-import com.alphasystem.docbook.builder.impl.block.SectionBuilder;
 import com.alphasystem.docbook.model.Admonition;
-import org.apache.commons.configuration2.CompositeConfiguration;
-import org.apache.commons.configuration2.PropertiesConfiguration;
-import org.apache.commons.configuration2.SystemConfiguration;
-import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
-import org.apache.commons.configuration2.builder.fluent.Parameters;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import io.vavr.Tuple;
+import io.vavr.Tuple2;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.lang3.StringUtils;
 import org.docbook.model.Section;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.*;
 
-import static com.alphasystem.util.AppUtil.isInstanceOf;
 import static java.lang.String.format;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * @author sali
@@ -37,109 +34,155 @@ public class ConfigurationUtils {
         return instance;
     }
 
-    private final CompositeConfiguration configuration;
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private final Map<String, Class<?>> buildersClassMap = new HashMap<>();
+    private final Map<String, String> titlesMap = new HashMap<>();
+    private final Map<Admonition, Tuple2<String, String>> admonitions = new HashMap<>();
+    private final Config appConfig;
+    private String defaultListStyle;
+    private String tocCaption;
+    private String tableCaption;
+    private String exampleCaption;
+    private String admonitionFunctionName;
+    private String sideBarFunctionName;
 
     /**
      * Do not let any one instantiate this class.
      */
     private ConfigurationUtils() throws ConfigurationException {
-        Parameters parameters = new Parameters();
-        configuration = new CompositeConfiguration();
+        final var config = ConfigFactory.load();
+        appConfig = config.getConfig("docbook-docx");
+        loadBuilders();
+        loadTitles();
+        loadAdmonitions();
+    }
 
-        try {
-            final var builder = new FileBasedConfigurationBuilder<>(
-                    PropertiesConfiguration.class).configure(parameters.fileBased()
-                    .setFile(Utils.readResource("system-defaults.properties")));
-            configuration.addConfiguration(builder.getConfiguration());
-            configuration.addConfiguration(new SystemConfiguration());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    private void loadBuilders() {
+        final var config = appConfig.getConfig("builders");
+        config.entrySet().forEach(entry -> {
+            final var key = entry.getKey();
+            final var builderClassName = entry.getValue().unwrapped().toString();
+            logger.info("Loading builder \"{}\" for \"{}\".", builderClassName, key);
+            try {
+                buildersClassMap.put(key, Class.forName(builderClassName));
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    private void loadTitles() {
+        final var config = appConfig.getConfig("titles");
+        config.entrySet().forEach(entry -> {
+            final var key = entry.getKey();
+            final var value = entry.getValue().unwrapped().toString();
+            titlesMap.put(key, value);
+        });
+    }
+
+    private void loadAdmonitions() {
+        final var config = appConfig.getConfig("admonitions");
+        Arrays.stream(Admonition.values()).forEach(admonition -> {
+            final var c = config.getConfig(admonition.name().toLowerCase());
+            admonitions.put(admonition, Tuple.of(c.getString("caption"), c.getString("color")));
+        });
     }
 
     public Class<?> getBuilderClass(Object o) throws ClassNotFoundException {
         final var className = o.getClass().getName();
         var clazz = buildersClassMap.get(className);
         if (Objects.isNull(clazz)) {
-            final var configValue = configuration.getString(format("%s.builder", className));
-            if (Objects.isNull(configValue)) {
-                throw new RuntimeException(format("No builder found for: %s", className));
-            }
-            clazz = Class.forName(configValue);
-            buildersClassMap.put(className, clazz);
+            throw new RuntimeException(format("No builder found for: %s", className));
         }
         return clazz;
     }
 
+    public String getTitleStyle(String titleKey) {
+        return titlesMap.getOrDefault(titleKey, titlesMap.get("default"));
+    }
+
     public String getTitleStyle(int level, Class<?> parentClass) {
-        String defaultTitle = configuration.getString("default.title");
         var titleKey = parentClass.getName();
         if (parentClass.equals(Section.class)) {
             titleKey = format("%s.%s", titleKey, level);
         }
-        titleKey = format("%s.title", titleKey);
-        return configuration.getString(titleKey, defaultTitle);
+        return getTitleStyle(titleKey);
     }
 
+    @Deprecated
     public String getTitleStyle(Builder builder) {
-        String defaultTitle = configuration.getString("default.title");
-        String titleKey = format("%s", builder.getSource().getClass().getName());
-        if (isInstanceOf(SectionBuilder.class, builder)) {
-            SectionBuilder sectionBuilder = (SectionBuilder) builder;
-            int level = sectionBuilder.getLevel();
-            titleKey = format("%s.%s", titleKey, level);
-        }
-        titleKey = format("%s.title", titleKey);
-        return configuration.getString(titleKey, defaultTitle);
+        return null;
     }
 
     public String getDefaultListStyle() {
-        return getString("default.list.style");
+        if (Objects.isNull(defaultListStyle)) {
+            defaultListStyle = getString("list-style.default");
+        }
+        return defaultListStyle;
     }
 
-    public String getAdmonitionCaptionColor(Admonition admonition) {
-        return getString(format("%s.color", admonition.name()));
+    public Tuple2<String, String> getAdmonitionConfig(Admonition admonition) {
+        return admonitions.get(admonition);
     }
 
-    public String getAdmonitionCaption(Admonition admonition) {
-        return getString(format("%s.caption", admonition.name()));
+    public String getAdmonitionFunctionName() {
+        if (Objects.isNull(admonitionFunctionName)) {
+            admonitionFunctionName = appConfig.getString("admonitions.functionName");
+        }
+        return admonitionFunctionName;
+    }
+
+    public String getSideBarFunctionName() {
+        if (Objects.isNull(sideBarFunctionName)) {
+            sideBarFunctionName = appConfig.getString("sidebar.functionName");
+        }
+        return sideBarFunctionName;
     }
 
     public String getExampleCaption() {
-        return configuration.getString("example.caption");
+        if (Objects.isNull(exampleCaption)) {
+            exampleCaption = appConfig.getString("captions.example");
+        }
+        return exampleCaption;
     }
 
     public String getTableCaption() {
-        return configuration.getString("table.caption");
+        if (Objects.isNull(tableCaption)) {
+            tableCaption = appConfig.getString("captions.table");
+        }
+        return tableCaption;
     }
 
     public String getTableOfContentCaption() {
-        return configuration.getString("toc.caption");
+        if (Objects.isNull(tocCaption)) {
+            tocCaption = appConfig.getString("captions.toc");
+        }
+        return tocCaption;
     }
 
+    @Deprecated
     public String getTableStyle(String ts) {
-        return isBlank(ts) ? null : configuration.getString(ts);
+        return null;
     }
 
     public String getTemplate() {
-        return configuration.getString("template");
+        return getString("template");
     }
 
     public String[] getStyles() {
         final var defaultStyles = "default-styles.xml";
-        var _styles = configuration.getString("styles");
+        var _styles = getString("styles");
         _styles = StringUtils.isBlank(_styles) ? defaultStyles : defaultStyles + "," + _styles;
         return _styles.split(",");
     }
 
     public List<String> getScriptFiles() {
-        final var defaultJsFiles = Arrays.asList(configuration.getString("default.js.files").split(","));
+        final var defaultJsFiles = appConfig.getStringList("scripts");
         final var results = new ArrayList<>(defaultJsFiles);
         try {
-            final var customJsFiles = configuration.getList(String.class, "customs.js.files");
-            if (Objects.nonNull(customJsFiles)) {
-                results.addAll(customJsFiles);
+            final var customScripts = getString("custom-scripts");
+            if (Objects.nonNull(customScripts)) {
+                results.addAll(Arrays.asList(customScripts.split(",")));
             }
         } catch (Exception ex) {
             ex.printStackTrace(System.out);
@@ -147,7 +190,7 @@ public class ConfigurationUtils {
         return results;
     }
 
-    public String getString(String key) {
-        return configuration.getString(key);
+    private String getString(String key) {
+        return appConfig.hasPath(key) ? appConfig.getString(key) : null;
     }
 }
