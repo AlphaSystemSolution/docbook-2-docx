@@ -115,6 +115,9 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
             case ENTRY:
                 startEntry(attributes);
                 break;
+            case FORMAL_PARA:
+                startFormalPara(id, attributes);
+                break;
             case IMPORTANT:
                 startImportant(id, attributes);
                 break;
@@ -138,6 +141,9 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
                 break;
             case ORDERED_LIST:
                 startOrderedList(id, attributes);
+                break;
+            case PARA:
+                startPara(id, attributes);
                 break;
             case PHRASE:
                 startPhrase(id, attributes);
@@ -221,6 +227,9 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
             case ENTRY:
                 endEntry();
                 break;
+            case FORMAL_PARA:
+                endFormalPara();
+                break;
             case IMPORTANT:
                 endImportant();
                 break;
@@ -242,6 +251,9 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
                 break;
             case NOTE:
                 endNote();
+                break;
+            case PARA:
+                endPara();
                 break;
             case PHRASE:
                 endPhrase();
@@ -415,6 +427,16 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         processEndElement();
     }
 
+    private void startFormalPara(String id, Attributes attributes) {
+        final var formalPara = new FormalPara().withId(id).withRole(getRole(attributes));
+        docbookObjects.push(formalPara);
+    }
+
+    private void endFormalPara() {
+        pushText();
+        processEndElement();
+    }
+
     private void startImportant(String id, Attributes attributes) {
         final var important = new Important().withId(id).withRole(getRole(attributes));
         docbookObjects.push(important);
@@ -503,6 +525,16 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         pushText();
         final var phrase = new Phrase().withId(id).withRole(getRole(attributes));
         docbookObjects.push(phrase);
+    }
+
+    private void startPara(String id, Attributes attributes) {
+        final var para = new Para().withId(id).withRole(getRole(attributes));
+        docbookObjects.push(para);
+    }
+
+    private void endPara() {
+        pushText();
+        processEndElement();
     }
 
     private void endPhrase() {
@@ -691,6 +723,13 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         docbookObjects.push(obj);
     }
 
+    private void handleFormalPara(FormalPara obj, Object child) {
+        if (isTitleType(child)) obj.getTitleContent().add(child);
+        else if (isParaType(child)) obj.setPara((Para) child);
+        else logger.warn("Unhandled child for FormalPara: {}", child.getClass().getName());
+        docbookObjects.push(obj);
+    }
+
     private void handleImportant(Important obj, Object child) {
         if (isTitleType(child)) obj.getTitleContent().add(child);
         else obj.getContent().add(child);
@@ -746,6 +785,11 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         } else {
             throw new NotImplementedException(obj, child);
         }
+        docbookObjects.push(obj);
+    }
+
+    private void handlePara(Para obj, Object child) {
+        obj.getContent().add(child);
         docbookObjects.push(obj);
     }
 
@@ -919,6 +963,8 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
             handleEmphasis((Emphasis) parent, child);
         } else if (isEntryType(parent)) {
             handleEntry((Entry) parent, child);
+        } else if (isFormalParaType(parent)) {
+            handleFormalPara((FormalPara) parent, child);
         } else if (isImportantType(parent)) {
             handleImportant((Important) parent, child);
         } else if (isInformalTableType(parent)) {
@@ -936,7 +982,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         } else if (isOrderedListType(parent)) {
             handleOrderedList((OrderedList) parent, child);
         } else if (isParaType(parent)) {
-            // TODO:
+            handlePara((Para) parent, child);
         } else if (isPhraseType(parent)) {
             handlePhrase((Phrase) parent, child);
         } else if (isRowType(parent)) {

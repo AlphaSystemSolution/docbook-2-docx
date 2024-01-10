@@ -13,6 +13,7 @@ public interface UnmarshallerConstants {
     String DATE = "date";
     String EMPHASIS = "emphasis";
     String ENTRY = "entry";
+    String FORMAL_PARA = "formalpara";
     String IMPORTANT = "important";
     String INFO = "info";
     String INFORMAL_TABLE = "informaltable";
@@ -22,6 +23,7 @@ public interface UnmarshallerConstants {
     String LITERAL = "literal";
     String NOTE = "note";
     String ORDERED_LIST = "orderedlist";
+    String PARA = "para";
     String PHRASE = "phrase";
     String ROW = "row";
     String SIDE_BAR = "sidebar";

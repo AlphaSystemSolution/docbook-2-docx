@@ -43,12 +43,16 @@ public abstract class AbstractParaBuilder<S> extends BlockBuilder<S> {
         }
     }
 
-    @Override
-    protected List<Object> doProcess(List<Object> processedChildContent) {
+    protected List<Object> createPara(List<Object> processedChildContent) {
         final var id = getId();
         final var p = WmlBuilderFactory.getPBuilder().withParaId(id).withPPr(paraProperties)
                 .addContent(processedChildContent.toArray()).getObject();
         WmlAdapter.addBookMark(p, id);
         return Collections.singletonList(p);
+    }
+
+    @Override
+    protected List<Object> doProcess(List<Object> processedChildContent) {
+        return createPara(processedChildContent);
     }
 }

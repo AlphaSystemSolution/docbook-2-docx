@@ -164,4 +164,37 @@ public class InlineTest extends AbstractTest2 {
         assertText(content.get(content.size() - 1), "Link to Text to display.");
         addHorizontalLine();
     }
+
+    @Test(dependsOnMethods = "xrefWithXrefLabel")
+    public void customParaStyleUsingParaTest() {
+        final var article = createArticle(
+                createPara(IdGenerator.nextId(), "Paragraph with custom style.").withRole("Style1")
+        );
+
+        addTestTitle("Custom para style using Para Test");
+        processContent(article);
+        final var content = mainDocumentPart.getContent();
+        assertSize( 1);
+        assertText(content.get(content.size() - 1), "Paragraph with custom style.");
+        addHorizontalLine();
+    }
+
+    @Test(dependsOnMethods = "customParaStyleUsingParaTest")
+    public void handleFormalWithDefaultTitleStylePara() {
+        final var title = createTitle("Title with nested ", createEmphasis(null, "style"), ".");
+        final var para = createPara(
+                IdGenerator.nextId(),
+                "This paragraph contains mixed of English and Arabic text (",
+                createPhrase("arabicNormal", "سلم"),
+                ")."
+        );
+        final var article = createArticle(
+                createFormalPara(IdGenerator.nextId(), null, title, para)
+        );
+
+        addTestTitle("FormalPara test");
+        processContent(article);
+        assertSize( 2);
+        addHorizontalLine();;
+    }
 }

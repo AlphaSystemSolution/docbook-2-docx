@@ -2,7 +2,7 @@ package com.alphasystem.docbook.builder2.impl.block;
 
 import com.alphasystem.docbook.builder2.Builder;
 import com.alphasystem.docbook.builder2.impl.JavaScriptBasedBuilder;
-import com.alphasystem.util.AppUtil;
+import com.alphasystem.xml.UnmarshallerConstants;
 import org.docbook.model.SideBar;
 import org.docbook.model.Title;
 import org.docx4j.wml.Tbl;
@@ -23,7 +23,7 @@ public class SideBarBuilder extends JavaScriptBasedBuilder<SideBar, Tbl> {
 
     @Override
     protected FunctionInput<Tbl> initFunctionInputs(List<Object> processedChildContent) {
-        final var title = (Title) source.getTitleContent().stream().filter(c -> AppUtil.isInstanceOf(Title.class, c))
+        final var title = (Title) source.getTitleContent().stream().filter(UnmarshallerConstants::isTitleType)
                 .findFirst().orElse(null);
         final var args = new Object[2];
         if (Objects.nonNull(title)) {

@@ -121,6 +121,14 @@ public final class DataFactory {
         return objectFactory.createSimplePara().withId(id).withContent(content);
     }
 
+    public static Para createPara(String id, Object... content) {
+        return objectFactory.createPara().withId(id).withContent(content);
+    }
+
+    public static FormalPara createFormalPara(String id,  String role,Title title, Para para) {
+        return objectFactory.createFormalPara().withId(id).withRole(role).withTitleContent(title).withPara(para);
+    }
+
     public static CrossReference createCrossReference(Object content) {
         return new CrossReference().withLinkend(content);
     }
