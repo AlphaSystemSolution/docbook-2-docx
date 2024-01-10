@@ -134,7 +134,7 @@ public class ConfigurationUtils {
     }
 
     public List<String> getScriptFiles() {
-        final var defaultJsFiles = configuration.getList(String.class, "default.js.files");
+        final var defaultJsFiles = Arrays.asList(configuration.getString("default.js.files").split(","));
         final var results = new ArrayList<>(defaultJsFiles);
         try {
             final var customJsFiles = configuration.getList(String.class, "customs.js.files");

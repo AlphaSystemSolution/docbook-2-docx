@@ -3,7 +3,6 @@ var WmlBuilderFactory = Java.type("com.alphasystem.openxml.builder.wml.WmlBuilde
 var TableAdapter = Java.type("com.alphasystem.openxml.builder.wml.table.TableAdapter");
 var ColumnData = Java.type("com.alphasystem.openxml.builder.wml.table.ColumnData");
 var TableType = Java.type("com.alphasystem.openxml.builder.wml.table.TableType");
-var IdGenerator = Java.type("com.alphasystem.util.IdGenerator");
 var STBorder = Java.type("org.docx4j.wml.STBorder");
 var STThemeColor = Java.type("org.docx4j.wml.STThemeColor");
 var STShd = Java.type("org.docx4j.wml.STShd");

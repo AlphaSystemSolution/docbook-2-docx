@@ -149,6 +149,9 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
                 sectionLevel += 1;
                 docbookObjects.push(new Section().withId(id));
                 break;
+            case SIDE_BAR:
+                startSideBar(id, attributes);
+                break;
             case SIMPLE_PARA:
                 startSimplePara(id, attributes);
                 break;
@@ -245,6 +248,9 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
                 break;
             case ROW:
                 endRow();
+                break;
+            case SIDE_BAR:
+                endSideBar();
                 break;
             case SIMPLE_PARA:
                 endSimplePara();
@@ -512,6 +518,15 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         processEndElement();
     }
 
+    private void startSideBar(String id, Attributes attributes) {
+        final var sideBar = new SideBar().withId(id).withRole(getRole(attributes));
+        docbookObjects.push(sideBar);
+    }
+
+    private void endSideBar() {
+        processEndElement();
+    }
+
     private void startSimplePara(String id, Attributes attributes) {
         final var simplePara = new SimplePara().withId(id).withRole(getRole(attributes));
         docbookObjects.push(simplePara);
@@ -744,6 +759,12 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         docbookObjects.push(obj);
     }
 
+    private void handleSideBar(SideBar obj, Object child) {
+        if (isTitleType(child)) obj.getTitleContent().add(child);
+        else obj.getContent().add(child);
+        docbookObjects.push(obj);
+    }
+
     private void handleSimplePara(SimplePara obj, Object child) {
         obj.getContent().add(child);
         docbookObjects.push(obj);
@@ -922,6 +943,8 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
             handleRow((Row) parent, child);
         } else if (isSectionType(parent)) {
             handleArticleOrSection(parent, child);
+        } else if (isSideBarType(parent)) {
+            handleSideBar((SideBar) parent, child);
         } else if (isSimpleParaType(parent)) {
             handleSimplePara((SimplePara) parent, child);
         } else if (isSubscriptType(parent)) {

@@ -65,6 +65,14 @@ public class AdmonitionTest extends AbstractTest2 {
         addHorizontalLine();
     }
 
+    @Test(dependsOnMethods = {"testWarning"})
+    public void testSideBar() {
+        addTestTitle("Side Bar");
+        processContent(readXml("side-bar"));
+        assertSize(1);
+        addHorizontalLine();
+    }
+
     /*@Test(dependsOnMethods = {"testWarning"})
     public void testExample() {
         addResult(null, 0, 3, "Example Test", readXml("example", Example.class));

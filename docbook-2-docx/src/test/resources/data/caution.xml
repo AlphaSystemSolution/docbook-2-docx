@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <article xmlns="http://docbook.org/ns/docbook">
     <caution>
-        <simpara>Use <emphasis role="bold">CAUTION</emphasis> to advise the reader to act carefully (i.e.,
-            exercise care).
+        <simpara>Use <emphasis role="bold">CAUTION</emphasis> to advise the reader to act carefully (i.e., exercise care).
         </simpara>
     </caution>
 </article>

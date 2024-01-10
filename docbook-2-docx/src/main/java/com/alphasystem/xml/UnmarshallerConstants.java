@@ -24,6 +24,7 @@ public interface UnmarshallerConstants {
     String ORDERED_LIST = "orderedlist";
     String PHRASE = "phrase";
     String ROW = "row";
+    String SIDE_BAR = "sidebar";
     String SIMPLE_PARA = "simpara";
     String SECTION = "section";
     String SUBSCRIPT = "subscript";
@@ -112,6 +113,10 @@ public interface UnmarshallerConstants {
 
     static boolean isSectionType(Object o) {
         return isInstanceOf(Section.class, o);
+    }
+
+    static boolean isSideBarType(Object o) {
+        return isInstanceOf(SideBar.class, o);
     }
 
     static boolean isSimpleParaType(Object o) {

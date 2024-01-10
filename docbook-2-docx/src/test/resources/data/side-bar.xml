@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<article xmlns="http://docbook.org/ns/docbook">
+    <sidebar>
+        <title>Caution vs. Warning</title>
+        <simpara>When choosing the admonition type, you may find yourself getting confused between "caution" and "warning" as these words are often used interchangeably. Here’s a simple rule to help you differentiate the two:</simpara>
+        <itemizedlist>
+            <listitem>
+                <simpara>Use <emphasis role="strong">CAUTION</emphasis> to advise the reader to act carefully (i.e., exercise care).</simpara>
+            </listitem>
+            <listitem>
+                <simpara>Use <emphasis role="strong">WARNING</emphasis> to inform the reader of danger, harm, or consequences that exist.</simpara>
+            </listitem>
+        </itemizedlist>
+    </sidebar>
+</article>

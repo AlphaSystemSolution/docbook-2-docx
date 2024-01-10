@@ -2,37 +2,37 @@
 <w:styles xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
           xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
           mc:Ignorable="w14 w15 w16se w16cid w16 w16cex">
-    <w:style w:type="paragraph" w:customStyle="true" w:styleId="SideBarTitle">
-        <w:name w:val="SideBar Title"/>
+    <w:style w:type="character" w:styleId="SideBarCaptionChar" w:customStyle="true">
+        <w:name w:val="SideBar Caption Char"/>
+        <w:basedOn w:val="DefaultParagraphFont"/>
+        <w:rsid w:val="1D2261C3"/>
+        <w:rPr>
+            <w:rFonts w:ascii="Century" w:hAnsi="Century"/>
+            <w:b w:val="true"/>
+            <w:bCs w:val="true"/>
+            <w:caps w:val="true"/>
+            <w:color w:val="7A2518"/>
+            <w:sz w:val="24"/>
+            <w:szCs w:val="24"/>
+        </w:rPr>
+    </w:style>
+    <w:style w:type="paragraph" w:styleId="SideBarCaption" w:customStyle="true">
+        <w:name w:val="SideBar Caption"/>
         <w:basedOn w:val="Normal"/>
-        <w:link w:val="SideBarTitleChar"/>
-        <w:qFormat/>
-        <w:rsid w:val="00F31842"/>
+        <w:link w:val="SideBarCaptionChar"/>
+        <w:rsid w:val="FD242DD0"/>
         <w:pPr>
-            <w:spacing w:before="120" w:after="280"/>
+            <w:spacing w:before="120" w:after="120"/>
             <w:jc w:val="center"/>
         </w:pPr>
         <w:rPr>
             <w:rFonts w:ascii="Century" w:hAnsi="Century"/>
-            <w:b/>
-            <w:bCs/>
+            <w:b w:val="true"/>
+            <w:bCs w:val="true"/>
+            <w:caps w:val="true"/>
             <w:color w:val="7A2518"/>
-            <w:sz w:val="32"/>
-            <w:szCs w:val="32"/>
-        </w:rPr>
-    </w:style>
-    <w:style w:type="character" w:customStyle="true" w:styleId="SideBarTitleChar">
-        <w:name w:val="SideBar Title Char"/>
-        <w:basedOn w:val="DefaultParagraphFont"/>
-        <w:link w:val="SideBarTitle0"/>
-        <w:rsid w:val="00F31842"/>
-        <w:rPr>
-            <w:rFonts w:ascii="Century" w:hAnsi="Century"/>
-            <w:b/>
-            <w:bCs/>
-            <w:color w:val="7A2518"/>
-            <w:sz w:val="32"/>
-            <w:szCs w:val="32"/>
+            <w:sz w:val="24"/>
+            <w:szCs w:val="24"/>
         </w:rPr>
     </w:style>
     <w:style w:type="paragraph" w:customStyle="true" w:styleId="ExampleTitle">
