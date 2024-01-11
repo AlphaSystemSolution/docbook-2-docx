@@ -39,6 +39,8 @@ public interface UnmarshallerConstants {
     String TERM = "term";
     String TIP = "tip";
     String TITLE = "title";
+    String VARIABLE_LIST = "variablelist";
+    String VARIABLE_LIST_ENTRY = "varlistentry";
     String WARNING = "warning";
 
     static boolean isArticleType(Object o) {
@@ -175,6 +177,14 @@ public interface UnmarshallerConstants {
 
     static boolean isWarningType(Object o) {
         return isInstanceOf(Warning.class, o);
+    }
+
+    static boolean isVariableListType(Object o) {
+        return isInstanceOf(VariableList.class, o);
+    }
+
+    static boolean isVariableListEntryType(Object o) {
+        return isInstanceOf(VariableListEntry.class, o);
     }
 
     static boolean isParaTypes(Object o) {

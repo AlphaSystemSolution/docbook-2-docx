@@ -191,6 +191,12 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
             case TITLE:
                 startTitle();
                 break;
+            case VARIABLE_LIST:
+                startVariableList();
+                break;
+            case VARIABLE_LIST_ENTRY:
+                startVariableListEntry();
+                break;
             case WARNING:
                 startWarning(id, attributes);
                 break;
@@ -296,6 +302,12 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
                 break;
             case TITLE:
                 endTitle();
+                break;
+            case VARIABLE_LIST:
+                endVariableList();
+                break;
+            case VARIABLE_LIST_ENTRY:
+                endVariableListEntry();
                 break;
             case WARNING:
                 endWarning();
@@ -687,6 +699,22 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         processEndElement();
     }
 
+    private void startVariableList() {
+        docbookObjects.push(new VariableList());
+    }
+
+    private void endVariableList() {
+        processEndElement();
+    }
+
+    private void startVariableListEntry() {
+        docbookObjects.push(new VariableListEntry());
+    }
+
+    private void endVariableListEntry() {
+        processEndElement();
+    }
+
     private void startWarning(String id, Attributes attributes) {
         final var warning = new Warning().withId(id).withRole(getRole(attributes));
         docbookObjects.push(warning);
@@ -895,6 +923,26 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         docbookObjects.push(obj);
     }
 
+    private void handleVariableListEntry(VariableListEntry obj, Object child) {
+        if (isTermType(child)) {
+            obj.getTerm().add((Term) child);
+        } else if (isListItemType(child)) {
+            obj.setListItem((ListItem) child);
+        } else {
+            logger.warn("Unhandled child \"{}\" of \"VariableListEntry\"", child.getClass().getName());
+        }
+        docbookObjects.push(obj);
+    }
+
+    private void handleVariableList(VariableList obj, Object child) {
+        if (isVariableListEntryType(child)) {
+            obj.getVariableListEntry().add((VariableListEntry) child);
+        } else {
+            logger.warn("Unhandled child \"{}\" of \"VariableList\"", child.getClass().getName());
+        }
+        docbookObjects.push(obj);
+    }
+
     private void handleWarning(Warning obj, Object child) {
         if (isTitleType(child)) obj.getTitleContent().add(child);
         else obj.getContent().add(child);
@@ -1013,6 +1061,10 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
             handleTip((Tip) parent, child);
         } else if (isTitleType(parent)) {
             handleTitle((Title) parent, child);
+        } else if (isVariableListType(parent)) {
+            handleVariableList((VariableList) parent, child);
+        } else if (isVariableListEntryType(parent)) {
+            handleVariableListEntry((VariableListEntry) parent, child);
         } else if (isWarningType(parent)) {
             handleWarning((Warning) parent, child);
         } else {
