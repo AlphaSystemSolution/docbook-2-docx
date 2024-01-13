@@ -38,6 +38,7 @@ public class ConfigurationUtils {
     private final Map<String, Class<?>> buildersClassMap = new HashMap<>();
     private final Map<String, String> titlesMap = new HashMap<>();
     private final Map<Admonition, Tuple2<String, String>> admonitions = new HashMap<>();
+    private final Config mainConfig;
     private final Config appConfig;
     private String defaultListStyle;
     private String tocCaption;
@@ -51,8 +52,8 @@ public class ConfigurationUtils {
      * Do not let any one instantiate this class.
      */
     private ConfigurationUtils() throws ConfigurationException {
-        final var config = ConfigFactory.load();
-        appConfig = config.getConfig("docbook-docx");
+        mainConfig = ConfigFactory.load();
+        appConfig = mainConfig.getConfig("docbook-docx");
         loadBuilders();
         loadTitles();
         loadAdmonitions();
@@ -195,6 +196,10 @@ public class ConfigurationUtils {
             ex.printStackTrace(System.out);
         }
         return results;
+    }
+
+    public Config getConfig(String path) {
+        return mainConfig.getConfig(path);
     }
 
     private String getString(String key) {
