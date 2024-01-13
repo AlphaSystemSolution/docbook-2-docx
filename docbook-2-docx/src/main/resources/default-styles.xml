@@ -243,8 +243,8 @@
             </w:tcPr>
         </w:tblStylePr>
     </w:style>
-    <w:style w:type="table" w:styleId="SourceCode" w:customStyle="true">
-        <w:name w:val="SourceCode"/>
+    <w:style w:type="table" w:styleId="ProgramListingCode" w:customStyle="true">
+        <w:name w:val="ProgramListingCode"/>
         <w:basedOn w:val="TableNormal"/>
         <w:uiPriority w:val="99"/>
         <w:rsid w:val="0072091B"/>
