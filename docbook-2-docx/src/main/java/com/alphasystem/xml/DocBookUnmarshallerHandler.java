@@ -154,6 +154,9 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
             case PHRASE:
                 startPhrase(id, attributes);
                 break;
+            case PROGRAM_LISTING:
+                startProgramListing(id, attributes);
+                break;
             case ROW:
                 startRow();
                 break;
@@ -275,6 +278,9 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
                 break;
             case PHRASE:
                 endPhrase();
+                break;
+            case PROGRAM_LISTING:
+                endProgramListing();
                 break;
             case ROW:
                 endRow();
@@ -565,12 +571,6 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         docbookObjects.push(orderedList);
     }
 
-    private void startPhrase(String id, Attributes attributes) {
-        pushText();
-        final var phrase = new Phrase().withId(id).withRole(getRole(attributes));
-        docbookObjects.push(phrase);
-    }
-
     private void startPara(String id, Attributes attributes) {
         final var para = new Para().withId(id).withRole(getRole(attributes));
         docbookObjects.push(para);
@@ -581,8 +581,24 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         processEndElement();
     }
 
+    private void startPhrase(String id, Attributes attributes) {
+        final var phrase = new Phrase().withId(id).withRole(getRole(attributes));
+        docbookObjects.push(phrase);
+    }
+
     private void endPhrase() {
         endInline();
+        processEndElement();
+    }
+
+    private void startProgramListing(String id, Attributes attributes) {
+        pushText();
+        final var programListing = new ProgramListing().withId(id).withRole(getRole(attributes));
+        docbookObjects.push(programListing);
+    }
+
+    private void endProgramListing() {
+        pushText();
         processEndElement();
     }
 
@@ -873,6 +889,11 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         docbookObjects.push(obj);
     }
 
+    private void handleProgramListing(ProgramListing obj, Object child) {
+        obj.getContent().add(child);
+        docbookObjects.push(obj);
+    }
+
     private void handleRow(Row obj, Object child) {
         obj.getContent().add(child);
         docbookObjects.push(obj);
@@ -1084,6 +1105,8 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
             handlePara((Para) parent, child);
         } else if (isPhraseType(parent)) {
             handlePhrase((Phrase) parent, child);
+        } else if (isProgramListingType(parent)) {
+            handleProgramListing((ProgramListing) parent, child);
         } else if (isRowType(parent)) {
             handleRow((Row) parent, child);
         } else if (isSectionType(parent)) {

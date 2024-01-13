@@ -27,6 +27,7 @@ public interface UnmarshallerConstants {
     String ORDERED_LIST = "orderedlist";
     String PARA = "para";
     String PHRASE = "phrase";
+    String PROGRAM_LISTING = "programlisting";
     String ROW = "row";
     String SIDE_BAR = "sidebar";
     String SIMPLE_PARA = "simpara";
@@ -127,6 +128,10 @@ public interface UnmarshallerConstants {
 
     static boolean isPhraseType(Object o) {
         return isInstanceOf(Phrase.class, o);
+    }
+
+    static boolean isProgramListingType(Object o) {
+        return isInstanceOf(ProgramListing.class, o);
     }
 
     static boolean isRowType(Object o) {

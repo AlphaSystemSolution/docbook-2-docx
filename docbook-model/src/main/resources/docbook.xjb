@@ -145,6 +145,9 @@
                 <jaxb:typesafeEnumMember name="COLUMN_GROUP" value="colgroup"/>
             </jaxb:typesafeEnumClass>
         </jaxb:bindings>
+        <jaxb:bindings node="xs:element[@name='programlisting']">
+            <jaxb:class name="ProgramListing"/>
+        </jaxb:bindings>
         <jaxb:bindings node="xs:element[@name='titleabbrev']">
             <jaxb:class name="TitleAbbreviation"/>
         </jaxb:bindings>
