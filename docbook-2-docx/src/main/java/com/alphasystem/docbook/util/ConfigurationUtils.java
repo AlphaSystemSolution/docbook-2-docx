@@ -43,6 +43,7 @@ public class ConfigurationUtils {
     private String tocCaption;
     private String tableCaption;
     private String exampleCaption;
+    private String varTermStyle;
     private String admonitionFunctionName;
     private String sideBarFunctionName;
 
@@ -119,6 +120,13 @@ public class ConfigurationUtils {
             defaultListStyle = getString("list-style.default");
         }
         return defaultListStyle;
+    }
+
+    public String getVarTermStyle() {
+        if (Objects.isNull(varTermStyle)) {
+            varTermStyle = getString("list-style.var-term");
+        }
+        return varTermStyle;
     }
 
     public Tuple2<String, String> getAdmonitionConfig(Admonition admonition) {

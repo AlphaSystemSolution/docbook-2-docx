@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<article xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en">
+    <variablelist>
+        <varlistentry>
+            <term>CPU</term>
+            <listitem>
+                <simpara>The brain of the computer.</simpara>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term>Hard drive</term>
+            <listitem>
+                <simpara>Permanent storage for operating system and/or user files.</simpara>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term>RAM</term>
+            <listitem>
+                <simpara>Temporarily stores information the CPU uses during operation.</simpara>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term>Keyboard</term>
+            <listitem>
+                <simpara>Used to enter text or control items on the screen.</simpara>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term>Mouse</term>
+            <listitem>
+                <simpara>Used to point to and select items on your computer screen.</simpara>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term>Monitor</term>
+            <listitem>
+                <simpara>Displays information in visual form using text and graphics.</simpara>
+            </listitem>
+        </varlistentry>
+    </variablelist>
+</article>

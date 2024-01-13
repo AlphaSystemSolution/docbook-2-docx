@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<article xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en">
+    <variablelist>
+        <varlistentry>
+            <term>TTF</term>
+            <listitem>
+                <simpara>TrueType fonts.</simpara>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term>PFA</term>
+            <term>PFB</term>
+            <listitem>
+                <simpara>PostScript fonts. <literal>PFA</literal> files are common on <literal>UNIX</literal> systems, <literal>PFB</literal> files are more common on Windows systems.
+                </simpara>
+            </listitem>
+        </varlistentry>
+    </variablelist>
+</article>

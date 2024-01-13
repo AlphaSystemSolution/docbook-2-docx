@@ -9,10 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -92,7 +89,7 @@ public abstract class AbstractBuilder<S> implements Builder<S> {
     }
 
     @SuppressWarnings({"unchecked"})
-    protected <B extends Builder<B>> B getParent(Class<B> parentBuilderClass) {
+    protected <B extends Builder<?>> B getParent(Class<B> parentBuilderClass) {
         B result = null;
         var currentParent = parent;
         while (currentParent != null) {
@@ -103,5 +100,19 @@ public abstract class AbstractBuilder<S> implements Builder<S> {
             currentParent = currentParent.getParent();
         }
         return result;
+    }
+
+    /**
+     * Returns list of parent builders of this builder, will return empty list if there is no parent.
+     * @return list of parents of this builder.
+     */
+    protected List<Builder<?>> getParents() {
+        final var parents = new ArrayList<Builder<?>>();
+        var currentParent = parent;
+        while (currentParent != null) {
+            parents.add(currentParent);
+            currentParent = currentParent.getParent();
+        }
+        return parents;
     }
 }

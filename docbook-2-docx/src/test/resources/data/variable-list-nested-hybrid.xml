@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<article xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en">
+    <variablelist>
+        <varlistentry>
+            <term>Operating Systems</term>
+            <listitem>
+                <variablelist>
+                    <varlistentry>
+                        <term>Linux</term>
+                        <listitem>
+                            <orderedlist numeration="arabic">
+                                <listitem>
+                                    <simpara>Fedora</simpara>
+                                    <itemizedlist>
+                                        <listitem>
+                                            <simpara>Desktop</simpara>
+                                        </listitem>
+                                    </itemizedlist>
+                                </listitem>
+                                <listitem>
+                                    <simpara>Ubuntu</simpara>
+                                    <itemizedlist>
+                                        <listitem>
+                                            <simpara>Desktop</simpara>
+                                        </listitem>
+                                        <listitem>
+                                            <simpara>Server</simpara>
+                                        </listitem>
+                                    </itemizedlist>
+                                </listitem>
+                            </orderedlist>
+                        </listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term>BSD</term>
+                        <listitem>
+                            <orderedlist numeration="arabic">
+                                <listitem>
+                                    <simpara>FreeBSD</simpara>
+                                </listitem>
+                                <listitem>
+                                    <simpara>NetBSD</simpara>
+                                </listitem>
+                            </orderedlist>
+                        </listitem>
+                    </varlistentry>
+                </variablelist>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term>Cloud Providers</term>
+            <listitem>
+                <variablelist>
+                    <varlistentry>
+                        <term>PaaS</term>
+                        <listitem>
+                            <orderedlist numeration="arabic">
+                                <listitem>
+                                    <simpara>OpenShift</simpara>
+                                </listitem>
+                                <listitem>
+                                    <simpara>CloudBees</simpara>
+                                </listitem>
+                            </orderedlist>
+                        </listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term>IaaS</term>
+                        <listitem>
+                            <orderedlist numeration="arabic">
+                                <listitem>
+                                    <simpara>Amazon EC2</simpara>
+                                </listitem>
+                                <listitem>
+                                    <simpara>Rackspace</simpara>
+                                </listitem>
+                            </orderedlist>
+                        </listitem>
+                    </varlistentry>
+                </variablelist>
+            </listitem>
+        </varlistentry>
+    </variablelist>
+</article>

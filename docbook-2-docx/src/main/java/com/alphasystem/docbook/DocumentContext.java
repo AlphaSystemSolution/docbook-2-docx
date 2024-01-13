@@ -111,6 +111,10 @@ public final class DocumentContext {
 
     public long getListNumber(String styleName, long level) {
         final var listItem = numberingHelper.getListItem(styleName);
+        if (listItem == null && level >= 0) {
+            // for var list
+            listNumbersMap.put(styleName, styleName);
+        }
         if (listItem == null || level < 0) {
             return -1;
         }

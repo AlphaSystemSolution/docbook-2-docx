@@ -74,7 +74,6 @@ public abstract class AbstractTableBuilder<S> extends BlockBuilder<S> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     protected void preProcess() {
         super.preProcess();
         this.level = -1;

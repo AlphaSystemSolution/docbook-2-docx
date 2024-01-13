@@ -2,6 +2,17 @@
 <w:styles xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
           xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
           mc:Ignorable="w14 w15 w16se w16cid w16 w16cex">
+    <w:style w:type="paragraph" w:styleId="VarTerm">
+        <w:name w:val="Var Term"/>
+        <w:basedOn w:val="Normal"/>
+        <w:rsid w:val="CDF0417A"/>
+        <w:pPr>
+            <w:rPr>
+                <w:b w:val="true"/>
+                <w:bCs w:val="true"/>
+            </w:rPr>
+        </w:pPr>
+    </w:style>
     <w:style w:type="character" w:styleId="SideBarCaptionChar" w:customStyle="true">
         <w:name w:val="SideBar Caption Char"/>
         <w:basedOn w:val="DefaultParagraphFont"/>
