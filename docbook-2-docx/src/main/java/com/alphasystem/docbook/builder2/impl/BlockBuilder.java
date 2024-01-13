@@ -2,8 +2,10 @@ package com.alphasystem.docbook.builder2.impl;
 
 import com.alphasystem.docbook.builder2.Builder;
 import com.alphasystem.docbook.util.Utils;
+import com.alphasystem.openxml.builder.wml.WmlBuilderFactory;
 import com.alphasystem.util.AppUtil;
 import org.docbook.model.Title;
+import org.docx4j.wml.R;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,10 +39,25 @@ public abstract class BlockBuilder<S> extends AbstractBuilder<S> {
     }
 
     @Override
+    protected List<Object> doProcess(List<Object> processedChildContent) {
+        // at this stage child content should have been wrapped in one of block element, if not wrap in "P" object
+        final var onlyRunType = io.vavr.collection.List.ofAll(processedChildContent).forAll(BlockBuilder::isRunType);
+        if (onlyRunType) {
+            processedChildContent = Collections.singletonList(WmlBuilderFactory.getPBuilder()
+                    .addContent(processedChildContent.toArray()).getObject());
+        }
+        return super.doProcess(processedChildContent);
+    }
+
+    @Override
     public List<Object> process() {
         final var processed = super.process();
         final var result = new ArrayList<>(processTitle());
         result.addAll(processed);
         return result;
+    }
+
+    private static boolean isRunType(Object o) {
+        return AppUtil.isInstanceOf(R.class, o);
     }
 }

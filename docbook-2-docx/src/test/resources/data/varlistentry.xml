@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<varlistentry xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en">
-    <term>Entry title</term>
-    <listitem>
-        <simpara>This text is under simple para and it has to be indented using "ListParagraph" style without any numbering.</simpara>
-    </listitem>
-</varlistentry>
