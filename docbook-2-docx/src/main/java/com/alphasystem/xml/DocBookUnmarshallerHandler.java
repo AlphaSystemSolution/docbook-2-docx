@@ -593,7 +593,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
 
     private void startProgramListing(String id, Attributes attributes) {
         pushText();
-        final var programListing = new ProgramListing().withId(id).withRole(getRole(attributes));
+        final var programListing = new ProgramListing().withId(id).withRole(getRole(attributes, "ProgramListingCode"));
         docbookObjects.push(programListing);
     }
 
@@ -1182,7 +1182,12 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     }
 
     private static String getRole(Attributes attributes) {
-        return getAttributeValue("role", attributes);
+        return getRole(attributes, null);
+    }
+
+    private static String getRole(Attributes attributes, String defaultRole) {
+        final var role = getAttributeValue("role", attributes);
+        return StringUtils.isBlank(role) ? defaultRole : role;
     }
 
     private static String getXrefLabel(Attributes attributes) {
