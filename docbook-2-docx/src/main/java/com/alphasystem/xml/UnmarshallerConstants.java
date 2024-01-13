@@ -13,9 +13,11 @@ public interface UnmarshallerConstants {
     String DATE = "date";
     String EMPHASIS = "emphasis";
     String ENTRY = "entry";
+    String EXAMPLE = "example";
     String FORMAL_PARA = "formalpara";
     String IMPORTANT = "important";
     String INFO = "info";
+    String INFORMAL_EXAMPLE = "informalexample";
     String INFORMAL_TABLE = "informaltable";
     String ITEMIZED_LIST = "itemizedlist";
     String LINK = "link";
@@ -47,6 +49,10 @@ public interface UnmarshallerConstants {
         return isInstanceOf(Article.class, o);
     }
 
+    static boolean isCaptionType(Object o) {
+        return isInstanceOf(Caption.class, o);
+    }
+
     static boolean isCautionType(Object o) {
         return isInstanceOf(Caution.class, o);
     }
@@ -67,6 +73,10 @@ public interface UnmarshallerConstants {
         return isInstanceOf(Entry.class, o);
     }
 
+    static boolean isExampleType(Object o) {
+        return isInstanceOf(Example.class, o);
+    }
+
     static boolean isFormalParaType(Object o) {
         return isInstanceOf(FormalPara.class, o);
     }
@@ -75,8 +85,16 @@ public interface UnmarshallerConstants {
         return isInstanceOf(Important.class, o);
     }
 
+    static boolean isInfoType(Object o) {
+        return isInstanceOf(Info.class, o);
+    }
+
     static boolean isInformalTableType(Object o) {
         return isInstanceOf(InformalTable.class, o);
+    }
+
+    static boolean isInformalExampleType(Object o) {
+        return isInstanceOf(InformalExample.class, o);
     }
 
     static boolean isItemizedListType(Object o) {

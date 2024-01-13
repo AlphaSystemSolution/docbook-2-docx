@@ -115,6 +115,9 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
             case ENTRY:
                 startEntry(attributes);
                 break;
+            case EXAMPLE:
+                startExample(id);
+                break;
             case FORMAL_PARA:
                 startFormalPara(id, attributes);
                 break;
@@ -123,6 +126,9 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
                 break;
             case INFORMAL_TABLE:
                 startInformalTable(id, attributes);
+                break;
+            case INFORMAL_EXAMPLE:
+                startInformalExample(id);
                 break;
             case ITEMIZED_LIST:
                 startItemizedList(id, attributes);
@@ -233,11 +239,17 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
             case ENTRY:
                 endEntry();
                 break;
+            case EXAMPLE:
+                endExample();
+                break;
             case FORMAL_PARA:
                 endFormalPara();
                 break;
             case IMPORTANT:
                 endImportant();
+                break;
+            case INFORMAL_EXAMPLE:
+                endInformalExample();
                 break;
             case INFORMAL_TABLE:
                 endInformalTable();
@@ -439,6 +451,14 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         processEndElement();
     }
 
+    private void startExample(String id) {
+        docbookObjects.push(new Example().withId(id));
+    }
+
+    private void endExample() {
+        processEndElement();
+    }
+
     private void startFormalPara(String id, Attributes attributes) {
         final var formalPara = new FormalPara().withId(id).withRole(getRole(attributes));
         docbookObjects.push(formalPara);
@@ -456,6 +476,14 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
 
     private void endImportant() {
         pushText();
+        processEndElement();
+    }
+
+    private void startInformalExample(String id) {
+        docbookObjects.push(new InformalExample().withId(id));
+    }
+
+    private void endInformalExample() {
         processEndElement();
     }
 
@@ -751,6 +779,14 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         docbookObjects.push(obj);
     }
 
+    private void handleExample(Example obj, Object child) {
+        if (isTitleType(child)) obj.getTitleContent().add(child);
+        else if (isInfoType(child) || isCaptionType(child)) {
+            logger.warn("Unhandled child for Example: {}", child.getClass().getName());
+        } else obj.getContent().add(child);
+        docbookObjects.push(obj);
+    }
+
     private void handleFormalPara(FormalPara obj, Object child) {
         if (isTitleType(child)) obj.getTitleContent().add(child);
         else if (isParaType(child)) obj.setPara((Para) child);
@@ -761,6 +797,13 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     private void handleImportant(Important obj, Object child) {
         if (isTitleType(child)) obj.getTitleContent().add(child);
         else obj.getContent().add(child);
+        docbookObjects.push(obj);
+    }
+
+    private void handleInformalExample(InformalExample obj, Object child) {
+        if (isInfoType(child) || isCaptionType(child)) {
+            logger.warn("Unhandled child for InformalExample: {}", child.getClass().getName());
+        } else obj.getContent().add(child);
         docbookObjects.push(obj);
     }
 
@@ -1011,10 +1054,14 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
             handleEmphasis((Emphasis) parent, child);
         } else if (isEntryType(parent)) {
             handleEntry((Entry) parent, child);
+        } else if (isExampleType(parent)) {
+            handleExample((Example) parent, child);
         } else if (isFormalParaType(parent)) {
             handleFormalPara((FormalPara) parent, child);
         } else if (isImportantType(parent)) {
             handleImportant((Important) parent, child);
+        } else if (isInformalExampleType(parent)) {
+            handleInformalExample((InformalExample) parent, child);
         } else if (isInformalTableType(parent)) {
             handleInformalTable((InformalTable) parent, child);
         } else if (isItemizedListType(parent)) {
