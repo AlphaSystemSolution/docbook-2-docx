@@ -1,6 +1,5 @@
-<itemizedlist xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en">
-    <listitem>
-        <simpara>A list item with two</simpara>
-        <simpara>paragraphs</simpara>
-    </listitem>
-</itemizedlist>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<article xmlns="http://docbook.org/ns/docbook">
+    <simpara>This line breaks into<?asciidoc-br?>two lines using <literal>asciidoc-br</literal>&#160;<emphasis>processing instruction</emphasis>.</simpara>
+    <simpara>This line breaks into<?linebreak?>two lines using <literal>linebreak</literal>&#160;<emphasis>processing instruction</emphasis>.</simpara>
+</article>

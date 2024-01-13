@@ -195,6 +195,14 @@ public class InlineTest extends AbstractTest2 {
         addTestTitle("FormalPara test");
         processContent(article);
         assertSize( 2);
-        addHorizontalLine();;
+        addHorizontalLine();
+    }
+
+    @Test(dependsOnMethods = "handleFormalWithDefaultTitleStylePara")
+    public void lineBreakWithAsciidocBr() {
+        addTestTitle("Line break test");
+        processContent(readXml("linebreak"));
+        assertSize( 2);
+        addHorizontalLine();
     }
 }

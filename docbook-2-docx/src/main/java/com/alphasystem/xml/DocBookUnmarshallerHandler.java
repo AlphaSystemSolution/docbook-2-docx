@@ -375,6 +375,10 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
             case "asciidoc-pagebreak":
                 ApplicationController.getContext().getMainDocumentPart().addObject(WmlAdapter.getPageBreak());
                 break;
+            case "asciidoc-br":
+            case "linebreak":
+                currentText += System.lineSeparator();
+                break;
             default:
                 logger.warn("Unhandled processing instruction: target = {}", target);
                 break;

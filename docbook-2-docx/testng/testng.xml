@@ -13,13 +13,8 @@
             <class name="com.alphasystem.docbook.builder.test.AdmonitionTest"/>
             <class name="com.alphasystem.docbook.builder.test.TearDown"/>
             <!--
-            <class name="com.alphasystem.docbook.builder.test.LineBreakTest"/>
-
-
-
-
-
-            <class name="com.alphasystem.docbook.builder.test.ScreenTest"/-->
+            <class name="com.alphasystem.docbook.builder.test.ScreenTest"/>
+            -->
         </classes>
     </test> <!-- Test -->
 </suite> <!-- Suite -->
