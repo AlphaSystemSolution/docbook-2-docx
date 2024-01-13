@@ -1,14 +1,17 @@
-<example xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en">
-    <title>Rendered unordered list</title>
-    <itemizedlist>
-        <listitem>
-            <simpara>Edgar Allen Poe</simpara>
-        </listitem>
-        <listitem>
-            <simpara>Sheri S. Tepper</simpara>
-        </listitem>
-        <listitem>
-            <simpara>Bill Bryson</simpara>
-        </listitem>
-    </itemizedlist>
-</example>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<article xmlns="http://docbook.org/ns/docbook">
+    <example>
+        <title>Rendered unordered list</title>
+        <itemizedlist>
+            <listitem>
+                <simpara>Edgar Allen Poe</simpara>
+            </listitem>
+            <listitem>
+                <simpara>Sheri S. Tepper</simpara>
+            </listitem>
+            <listitem>
+                <simpara>Bill Bryson</simpara>
+            </listitem>
+        </itemizedlist>
+    </example>
+</article>

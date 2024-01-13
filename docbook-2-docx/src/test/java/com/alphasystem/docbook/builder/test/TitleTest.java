@@ -41,10 +41,4 @@ public class TitleTest extends AbstractTest2 {
         assertSize( 10);
         addHorizontalLine();
     }
-
-    /*@Test(dependsOnMethods = "testDocumentTitleWithCustomStyle")
-    public void testExampleTitle() {
-        final Builder parent = builderFactory.getBuilder(null, new Example(), -1);
-        addResult(parent, 0, 3, "Example Title Test", createExample("Example Title"));
-    }*/
 }

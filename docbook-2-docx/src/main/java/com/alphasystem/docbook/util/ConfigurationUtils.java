@@ -37,6 +37,7 @@ public class ConfigurationUtils {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final Map<String, Class<?>> buildersClassMap = new HashMap<>();
     private final Map<String, String> titlesMap = new HashMap<>();
+    private final Map<String, String> functionNames = new HashMap<>();
     private final Map<Admonition, Tuple2<String, String>> admonitions = new HashMap<>();
     private final Config mainConfig;
     private final Config appConfig;
@@ -45,8 +46,6 @@ public class ConfigurationUtils {
     private String tableCaption;
     private String exampleCaption;
     private String varTermStyle;
-    private String admonitionFunctionName;
-    private String sideBarFunctionName;
 
     /**
      * Do not let any one instantiate this class.
@@ -57,6 +56,7 @@ public class ConfigurationUtils {
         loadBuilders();
         loadTitles();
         loadAdmonitions();
+        loadFunctionNames();
     }
 
     private void loadBuilders() {
@@ -87,6 +87,15 @@ public class ConfigurationUtils {
         Arrays.stream(Admonition.values()).forEach(admonition -> {
             final var c = config.getConfig(admonition.name().toLowerCase());
             admonitions.put(admonition, Tuple.of(c.getString("caption"), c.getString("color")));
+        });
+    }
+
+    private void loadFunctionNames() {
+        final var config = appConfig.getConfig("script-function-names");
+        config.entrySet().forEach(entry -> {
+            final var key = entry.getKey();
+            final var value = entry.getValue().unwrapped().toString();
+            functionNames.put(key, value);
         });
     }
 
@@ -135,17 +144,15 @@ public class ConfigurationUtils {
     }
 
     public String getAdmonitionFunctionName() {
-        if (Objects.isNull(admonitionFunctionName)) {
-            admonitionFunctionName = appConfig.getString("admonitions.functionName");
-        }
-        return admonitionFunctionName;
+        return functionNames.get("admonition");
     }
 
     public String getSideBarFunctionName() {
-        if (Objects.isNull(sideBarFunctionName)) {
-            sideBarFunctionName = appConfig.getString("sidebar.functionName");
-        }
-        return sideBarFunctionName;
+        return functionNames.get("sidebar");
+    }
+
+    public String getExampleFunctionName() {
+        return functionNames.get("example");
     }
 
     public String getExampleCaption() {

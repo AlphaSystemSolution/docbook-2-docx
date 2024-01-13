@@ -67,19 +67,25 @@ public class AdmonitionTest extends AbstractTest2 {
 
     @Test(dependsOnMethods = {"testWarning"})
     public void testSideBar() {
-        addTestTitle("Side Bar");
+        addTestTitle("SideBar test");
         processContent(readXml("side-bar"));
         assertSize(1);
         addHorizontalLine();
     }
 
-    /*@Test(dependsOnMethods = {"testWarning"})
+    @Test(dependsOnMethods = {"testSideBar"})
     public void testExample() {
-        addResult(null, 0, 3, "Example Test", readXml("example", Example.class));
+        addTestTitle("Example test");
+        processContent(readXml("example"));
+        assertSize(2);
+        addHorizontalLine();
     }
 
     @Test(dependsOnMethods = {"testExample"})
     public void testInformalExample() {
-        addResult(null, 0, 3, "Informal Example Test", readXml("informal-example", InformalExample.class));
-    }*/
+        addTestTitle("InformalExample text");
+        processContent(readXml("informal-example"));
+        assertSize(1);
+        addHorizontalLine();
+    }
 }
