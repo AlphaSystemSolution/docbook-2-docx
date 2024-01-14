@@ -7,7 +7,7 @@ import com.alphasystem.openxml.builder.wml.RPrBuilder;
  *
  * @author sali
  */
-public interface InlineStyleHandler extends Handler {
+public interface InlineStyleHandler {
 
     /**
      * Apply the style on the current run.
