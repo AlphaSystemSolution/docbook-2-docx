@@ -5,15 +5,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class BuilderFactory {
 
     private static final BuilderFactory instance;
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
-    private final ConfigurationUtils configurationUtils = ConfigurationUtils.getInstance();
 
     static {
         instance = new BuilderFactory();
@@ -23,10 +22,17 @@ public class BuilderFactory {
         return instance;
     }
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    private final ConfigurationUtils configurationUtils = ConfigurationUtils.getInstance();
+
+    private final Map<String, Class<?>> buildersClassMap = new HashMap<>();
+
     /*
      * Do not let any one instantiate this class
      */
     private BuilderFactory() {
+        loadBuilders();
     }
 
     private Builder<?> getBuilder(Object o, Builder<?> parent) {
@@ -34,14 +40,28 @@ public class BuilderFactory {
             throw new NullPointerException("Object cannot be null.");
         }
         try {
-            final var builderClass = configurationUtils.getBuilderClass(o);
+            final var builderClass = buildersClassMap.get(o.getClass().getName());
             final var constructor = builderClass.getConstructor(o.getClass(), Builder.class);
             return (Builder<?>) constructor.newInstance(o, parent);
-        } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | InstantiationException
-                 | IllegalAccessException e) {
+        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
+                 IllegalAccessException e) {
             logger.warn("No builder found for: {}", o.getClass().getName());
             throw new RuntimeException(e);
         }
+    }
+
+    private void loadBuilders() {
+        final var config = configurationUtils.getConfig("docbook-docx.builders");
+        config.entrySet().forEach(entry -> {
+            final var key = entry.getKey();
+            final var builderClassName = entry.getValue().unwrapped().toString();
+            logger.info("Loading builder \"{}\" for \"{}\".", builderClassName, key);
+            try {
+                buildersClassMap.put(key, Class.forName(builderClassName));
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     public List<Object> process(Object o, Builder<?> parent) {

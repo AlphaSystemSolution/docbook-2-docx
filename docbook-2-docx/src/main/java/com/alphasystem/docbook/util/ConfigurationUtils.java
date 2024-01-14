@@ -7,8 +7,6 @@ import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import org.apache.commons.lang3.StringUtils;
 import org.docbook.model.Section;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -29,8 +27,6 @@ public class ConfigurationUtils {
         return instance;
     }
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-    private final Map<String, Class<?>> buildersClassMap = new HashMap<>();
     private final Map<String, String> titlesMap = new HashMap<>();
     private final Map<String, String> functionNames = new HashMap<>();
     private final Map<Admonition, Tuple2<String, String>> admonitions = new HashMap<>();
@@ -48,24 +44,9 @@ public class ConfigurationUtils {
     private ConfigurationUtils() {
         mainConfig = ConfigFactory.load();
         appConfig = mainConfig.getConfig("docbook-docx");
-        loadBuilders();
         loadTitles();
         loadAdmonitions();
         loadFunctionNames();
-    }
-
-    private void loadBuilders() {
-        final var config = appConfig.getConfig("builders");
-        config.entrySet().forEach(entry -> {
-            final var key = entry.getKey();
-            final var builderClassName = entry.getValue().unwrapped().toString();
-            logger.info("Loading builder \"{}\" for \"{}\".", builderClassName, key);
-            try {
-                buildersClassMap.put(key, Class.forName(builderClassName));
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-        });
     }
 
     private void loadTitles() {
@@ -92,15 +73,6 @@ public class ConfigurationUtils {
             final var value = entry.getValue().unwrapped().toString();
             functionNames.put(key, value);
         });
-    }
-
-    public Class<?> getBuilderClass(Object o) throws ClassNotFoundException {
-        final var className = o.getClass().getName();
-        var clazz = buildersClassMap.get(className);
-        if (Objects.isNull(clazz)) {
-            throw new RuntimeException(format("No builder found for: %s", className));
-        }
-        return clazz;
     }
 
     public String getTitleStyle(String titleKey) {
