@@ -3,6 +3,7 @@ package com.alphasystem.docx.cli;
 import com.alphasystem.asciidoc.util.DocumentConverter;
 import com.alphasystem.docbook.DocumentBuilder;
 import com.alphasystem.docbook.util.FileUtil;
+import com.alphasystem.util.AppUtil;
 import com.alphasystem.util.ZipUtil;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FileUtils;
@@ -15,9 +16,9 @@ import java.nio.file.Paths;
 public class Main {
 
     public static void main(String[] args) {
-        var options = new Options();
+        final var options = new Options();
 
-        var srcOption = Option
+        final var srcOption = Option
                 .builder("s")
                 .argName("srcPath")
                 .hasArg()
@@ -26,7 +27,7 @@ public class Main {
                 .build();
         options.addOption(srcOption);
 
-        var destOption = Option
+        final var destOption = Option
                 .builder("d")
                 .argName("destPath")
                 .hasArg()
@@ -35,7 +36,16 @@ public class Main {
                 .build();
         options.addOption(destOption);
 
-        var extractPackage = Option
+        final var openDocument = Option
+                .builder("o")
+                .type(Boolean.class)
+                .argName("openDocument")
+                .required(false)
+                .desc("Open document")
+                .build();
+        options.addOption(openDocument);
+
+        final var extractPackage = Option
                 .builder("e")
                 .argName("extractedDocumentPath")
                 .hasArg()
@@ -53,15 +63,15 @@ public class Main {
             cmd = parser.parse(options, args);
 
             Path srcPath = null;
-            if(cmd.hasOption(srcOption)) {
+            if (cmd.hasOption(srcOption)) {
                 srcPath = toPath(cmd.getOptionValue(srcOption));
                 if (srcPath == null || !Files.exists(srcPath)) {
-                    printHelp("Source path does not exists", helper,options);
+                    printHelp("Source path does not exists", helper, options);
                 }
             }
 
             Path docxPath = null;
-            if(cmd.hasOption(destOption)) {
+            if (cmd.hasOption(destOption)) {
                 docxPath = toPath(cmd.getOptionValue(destOption));
             }
 
@@ -77,16 +87,19 @@ public class Main {
             if (cmd.hasOption(extractPackage)) {
                 extractPackage(docxPath, toPath(cmd.getOptionValue(extractPackage)));
             }
-            Desktop.getDesktop().open(destPath.toFile());
+
+            if (cmd.hasOption(openDocument)) {
+                Desktop.getDesktop().open(destPath.toFile());
+            }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            System.err.println(AppUtil.getStackTrace(ex));
             printHelp(ex.getMessage(), helper, options);
         }
     }
 
     private static Path toPath(String s) {
-        if(s != null && !s.isBlank()) {
-             return Paths.get(s);
+        if (s != null && !s.isBlank()) {
+            return Paths.get(s);
         }
         return null;
     }
