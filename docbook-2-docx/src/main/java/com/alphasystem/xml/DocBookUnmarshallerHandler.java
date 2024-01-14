@@ -94,6 +94,8 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         }
         if (StringUtils.isWhitespace(currentText)) {
             currentText = "";
+        } else {
+            endInline();
         }
         switch (localName) {
             case ARTICLE:
@@ -1023,44 +1025,125 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
 
     private void endInline() {
         if (StringUtils.isNotBlank(currentText)) {
-            final var obj = docbookObjects.pop();
-            if (isCrossReferenceType(obj)) {
+            final var parent = docbookObjects.pop();
+            if (isArticleType(parent)) {
+                throw new NotImplementedException(parent, currentText);
+            } else if (isCautionType(parent)) {
+                final var obj = (Caution) parent;
+                obj.getContent().add(currentText);
                 docbookObjects.push(obj);
-            } else if (isEmphasisType(obj)) {
-                final var emphasis = (Emphasis) obj;
-                emphasis.getContent().add(currentText);
-                docbookObjects.push(emphasis);
-            } else if (isLinkType(obj)) {
-                final var link = (Link) obj;
-                link.getContent().add(currentText);
-                docbookObjects.push(link);
-            } else if (isLiteralType(obj)) {
-                final var literal = (Literal) obj;
-                literal.getContent().add(currentText);
-                docbookObjects.push(literal);
-            } else if (isPhraseType(obj)) {
-                final var phrase = (Phrase) obj;
-                phrase.getContent().add(currentText);
-                docbookObjects.push(phrase);
-            } else if (isSubscriptType(obj)) {
-                final var subscript = (Subscript) obj;
+            } if (isCrossReferenceType(parent)) {
+                docbookObjects.push(parent);
+            } else if (isEmphasisType(parent)) {
+                final var obj = (Emphasis) parent;
+                obj.getContent().add(currentText);
+                docbookObjects.push(obj);
+            } else if (isEntryType(parent)) {
+                final var obj = (Entry) parent;
+                obj.getContent().add(currentText);
+                docbookObjects.push(obj);
+            } else if (isExampleType(parent)) {
+                final var obj = (Example) parent;
+                obj.getContent().add(currentText);
+                docbookObjects.push(obj);
+            }  else if (isImportantType(parent)) {
+                final var obj = (Important) parent;
+                obj.getContent().add(currentText);
+                docbookObjects.push(obj);
+            } else if (isInformalExampleType(parent)) {
+                final var obj = (InformalExample) parent;
+                obj.getContent().add(currentText);
+                docbookObjects.push(obj);
+            } else if (isItemizedListType(parent)) {
+                final var obj = (ItemizedList) parent;
+                obj.getContent().add(currentText);
+                docbookObjects.push(obj);
+            } else if (isLinkType(parent)) {
+                final var obj = (Link) parent;
+                obj.getContent().add(currentText);
+                docbookObjects.push(obj);
+            } else if (isListItemType(parent)) {
+                final var obj = (ListItem) parent;
+                obj.getContent().add(currentText);
+                docbookObjects.push(obj);
+            } else if (isLiteralType(parent)) {
+                final var obj = (Literal) parent;
+                obj.getContent().add(currentText);
+                docbookObjects.push(obj);
+            } else if (isNoteType(parent)) {
+                final var obj = (Note) parent;
+                obj.getContent().add(currentText);
+                docbookObjects.push(obj);
+            } else if (isOrderedListType(parent)) {
+                final var obj = (OrderedList) parent;
+                obj.getContent().add(currentText);
+                docbookObjects.push(obj);
+            } else if (isParaType(parent)) {
+                final var obj = (Para) parent;
+                obj.getContent().add(currentText);
+                docbookObjects.push(obj);
+            } else if (isPhraseType(parent)) {
+                final var obj = (Phrase) parent;
+                obj.getContent().add(currentText);
+                docbookObjects.push(obj);
+            } else if (isProgramListingType(parent)) {
+                final var obj = (ProgramListing) parent;
+                obj.getContent().add(currentText);
+                docbookObjects.push(obj);
+            } else if (isRowType(parent)) {
+                final var obj = (Row) parent;
+                obj.getContent().add(currentText);
+                docbookObjects.push(obj);
+            } else if (isSectionType(parent)) {
+                throw new NotImplementedException(parent, currentText);
+            } else if (isSideBarType(parent)) {
+                final var obj = (SideBar) parent;
+                obj.getContent().add(currentText);
+                docbookObjects.push(obj);
+            } else if (isSimpleParaType(parent)) {
+                final var obj = (SimplePara) parent;
+                obj.getContent().add(currentText);
+                docbookObjects.push(obj);
+            } else if (isSubscriptType(parent)) {
+                final var subscript = (Subscript) parent;
                 subscript.getContent().add(currentText);
                 docbookObjects.push(subscript);
-            } else if (isSuperscriptType(obj)) {
-                final var superscript = (Superscript) obj;
-                superscript.getContent().add(currentText);
-                docbookObjects.push(superscript);
-            } else if (isTermType(obj)) {
-                final var term = (Term) obj;
-                term.getContent().add(currentText);
-                docbookObjects.push(term);
+            } else if (isSuperscriptType(parent)) {
+                final var obj = (Superscript) parent;
+                obj.getContent().add(currentText);
+                docbookObjects.push(obj);
+            } else if (isTermType(parent)) {
+                final var obj = (Term) parent;
+                obj.getContent().add(currentText);
+                docbookObjects.push(obj);
+            } else if (isTipType(parent)) {
+                final var obj = (Tip) parent;
+                obj.getContent().add(currentText);
+                docbookObjects.push(obj);
+            } else if (isTitleType(parent)) {
+                final var obj = (Title) parent;
+                obj.getContent().add(currentText);
+                docbookObjects.push(obj);
+            } else if (isVariableListType(parent)) {
+                final var obj = (VariableList) parent;
+                obj.getContent().add(currentText);
+                docbookObjects.push(obj);
+            } else if (isWarningType(parent)) {
+                final var obj = (Warning) parent;
+                obj.getContent().add(currentText);
+                docbookObjects.push(obj);
+            } else if (isFormalParaType(parent) || isVariableListEntryType(parent) || isTableHeaderType(parent) ||
+                    isTableGroupType(parent) || isTableFooterType(parent) || isTableBodyType(parent) || isTableType(parent) ||
+                    isInformalTableType(parent)) {
+                logger.trace("No applicable");
             } else {
-                throw new IllegalArgumentException("Unhandled object: " + obj.getClass().getName());
+                throw new IllegalArgumentException("Unhandled text in endInline: " + parent.getClass().getName());
             }
         } else {
             final var obj = docbookObjects.peek();
             logger.warn("Current text is blank for: " + obj.getClass().getName());
         }
+        currentText = "";
     }
 
     private void processEndElement() {
