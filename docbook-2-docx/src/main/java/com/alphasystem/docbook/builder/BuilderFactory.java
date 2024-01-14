@@ -1,10 +1,11 @@
 package com.alphasystem.docbook.builder;
 
+import com.alphasystem.SystemException;
 import com.alphasystem.docbook.util.ConfigurationUtils;
+import com.alphasystem.docbook.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,13 +40,12 @@ public class BuilderFactory {
         if (Objects.isNull(o)) {
             throw new NullPointerException("Object cannot be null.");
         }
+        final var name = o.getClass().getName();
+        final var builderClass = buildersClassMap.get(name);
         try {
-            final var builderClass = buildersClassMap.get(o.getClass().getName());
-            final var constructor = builderClass.getConstructor(o.getClass(), Builder.class);
-            return (Builder<?>) constructor.newInstance(o, parent);
-        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
-                 IllegalAccessException e) {
-            logger.warn("No builder found for: {}", o.getClass().getName());
+            return (Builder<?>) Utils.initObject(builderClass, new Class<?>[]{o.getClass(), Builder.class}, new Object[]{o, parent});
+        } catch (SystemException e) {
+            logger.warn("No builder found for: {}", name);
             throw new RuntimeException(e);
         }
     }

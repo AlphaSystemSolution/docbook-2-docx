@@ -17,7 +17,7 @@ public class Utils {
     }
 
     public static File readResource(String resourceName) throws IOException {
-        try ( var is = AppUtil.getResourceAsStream(resourceName)) {
+        try (var is = AppUtil.getResourceAsStream(resourceName)) {
             var file = Files.createTempFile("system-defaults-", ".properties").toFile();
             file.deleteOnExit();
             final var os = new FileOutputStream(file);
@@ -32,12 +32,20 @@ public class Utils {
     }
 
     public static Object initObject(String fullQualifiedClassName,
-                                   Class<?>[] parameterTypes,
-                                   Object[] args) throws SystemException {
+                                    Class<?>[] parameterTypes,
+                                    Object[] args) throws SystemException {
         try {
-            return Class.forName(fullQualifiedClassName).getConstructor(parameterTypes).newInstance(args);
+            return initObject(Class.forName(fullQualifiedClassName), parameterTypes, args);
+        } catch (ClassNotFoundException ex) {
+            throw new SystemException(String.format("Could not initialize class of type \"%s\".", fullQualifiedClassName), ex);
+        }
+    }
+
+    public static Object initObject(Class<?> clazz, Class<?>[] parameterTypes, Object[] args) throws SystemException {
+        try {
+            return clazz.getConstructor(parameterTypes).newInstance(args);
         } catch (Exception ex) {
-            throw new SystemException(String.format("Could not initialize class of type \"%s\".", fullQualifiedClassName),ex);
+            throw new SystemException(String.format("Could not initialize class of type \"%s\".", clazz.getName()), ex);
         }
     }
 
