@@ -1,6 +1,5 @@
 package com.alphasystem.docbook.util;
 
-import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.model.Admonition;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
@@ -118,11 +117,6 @@ public class ConfigurationUtils {
             titleKey = format("%s.%s", titleKey, level);
         }
         return getTitleStyle(titleKey);
-    }
-
-    @Deprecated
-    public String getTitleStyle(Builder builder) {
-        return null;
     }
 
     public String getDefaultListStyle() {

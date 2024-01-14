@@ -1,7 +1,6 @@
 package com.alphasystem.xml;
 
 import com.alphasystem.SystemException;
-import com.alphasystem.docbook.ApplicationController;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
@@ -29,10 +28,4 @@ public class UnmarshallerTool {
             throw new SystemException(ex.getMessage(), ex);
         }
     }
-
-    @Deprecated
-    public <T> T unmarshal(String source, Class<T> declaredType) throws SystemException {
-        return null;
-    }
-
 }

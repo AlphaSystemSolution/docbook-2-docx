@@ -4,7 +4,7 @@ import com.alphasystem.docbook.builder2.Builder;
 import com.alphasystem.docbook.builder2.impl.InlineBuilder;
 import org.docbook.model.Literal;
 
-import static com.alphasystem.docbook.builder.DocumentBuilderHelper.LITERAL;
+import static com.alphasystem.docbook.handler.InlineHandlerFactory.LITERAL;
 
 public class LiteralBuilder extends InlineBuilder<Literal> {
 

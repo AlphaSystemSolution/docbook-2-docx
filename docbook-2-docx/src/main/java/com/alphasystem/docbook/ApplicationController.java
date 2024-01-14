@@ -1,14 +1,9 @@
 package com.alphasystem.docbook;
 
 import com.alphasystem.asciidoc.model.DocumentInfo;
-import com.alphasystem.docbook.handler.BlockHandlerFactory;
-import com.alphasystem.docbook.handler.BlockHandlerService;
-import com.alphasystem.docbook.handler.BuilderHandlerService;
 import com.alphasystem.docbook.handler.InlineHandlerService;
-import com.alphasystem.docbook.model.Admonition;
 import com.alphasystem.docbook.util.ConfigurationUtils;
 import com.alphasystem.docbook.util.Utils;
-import org.docx4j.wml.Tbl;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Source;
 
@@ -16,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ServiceLoader;
 
-import static com.alphasystem.docbook.handler.BlockHandlerFactory.*;
 import static java.util.ServiceLoader.load;
 
 /**
@@ -28,11 +22,6 @@ public final class ApplicationController {
 
     private static final ConfigurationUtils configurationUtils = ConfigurationUtils.getInstance();
     private static ApplicationController instance;
-
-    @Deprecated
-    public static void startContext(DocumentContext documentContext) {
-        CONTEXT.set(documentContext);
-    }
 
     public static void startContext(final DocumentInfo documentInfo) {
         CONTEXT.set(new DocumentContext(createDocumentInfo(documentInfo)));
@@ -67,23 +56,15 @@ public final class ApplicationController {
         return instance;
     }
 
-    private final BlockHandlerFactory blockHandlerFactory;
     private final Context context;
 
     /**
      * Do not let anyone instantiate this class
      */
     private ApplicationController() {
-        ServiceLoader<BlockHandlerService> blockHandlerServices = load(BlockHandlerService.class);
-        blockHandlerServices.forEach(BlockHandlerService::initializeHandlers);
-
         ServiceLoader<InlineHandlerService> inlineHandlerServices = load(InlineHandlerService.class);
         inlineHandlerServices.forEach(InlineHandlerService::initializeHandlers);
 
-        ServiceLoader<BuilderHandlerService> builderHandlerServices = load(BuilderHandlerService.class);
-        builderHandlerServices.forEach(BuilderHandlerService::initializeHandlers);
-
-        blockHandlerFactory = BlockHandlerFactory.getInstance();
         context = Context.newBuilder("js").allowAllAccess(true).build();
 
         // initialization of scripts
@@ -114,25 +95,4 @@ public final class ApplicationController {
     public Context getScriptEngine() {
         return context;
     }
-
-    public Tbl getExampleTable() {
-        return (Tbl) blockHandlerFactory.getHandler(EXAMPLE_KEY).handleBlock();
-    }
-
-    public Tbl getInformalExampleTable() {
-        return (Tbl) blockHandlerFactory.getHandler(INFORMAL_EXAMPLE_KEY).handleBlock();
-    }
-
-    public Tbl getSideBarTable() {
-        return (Tbl) blockHandlerFactory.getHandler(SIDE_BAR_KEY).handleBlock();
-    }
-
-    public Tbl getScreenTable() {
-        return (Tbl) blockHandlerFactory.getHandler(SCREEN_KEY).handleBlock();
-    }
-
-    public Tbl getAdmonitionTable(Admonition admonition) {
-        return (Tbl) blockHandlerFactory.getHandler(admonition.name()).handleBlock();
-    }
-
 }

@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import static com.alphasystem.docbook.builder.DocumentBuilderHelper.HYPER_LINK;
+import static com.alphasystem.docbook.handler.InlineHandlerFactory.HYPERLINK;
 
 public abstract class LinkSupportBuilder<S> extends InlineBuilder<S> {
 
@@ -21,7 +21,7 @@ public abstract class LinkSupportBuilder<S> extends InlineBuilder<S> {
     protected String href;
 
     protected LinkSupportBuilder(String childContentMethodName, S source, Builder<?> parent) {
-        super(childContentMethodName, HYPER_LINK, source, parent);
+        super(childContentMethodName, HYPERLINK, source, parent);
         initHref();
     }
 

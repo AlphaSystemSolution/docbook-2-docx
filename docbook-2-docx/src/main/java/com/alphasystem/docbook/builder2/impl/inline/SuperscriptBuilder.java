@@ -4,7 +4,7 @@ import com.alphasystem.docbook.builder2.Builder;
 import com.alphasystem.docbook.builder2.impl.InlineBuilder;
 import org.docbook.model.Superscript;
 
-import static com.alphasystem.docbook.builder.DocumentBuilderHelper.SUPERSCRIPT;
+import static com.alphasystem.docbook.handler.InlineHandlerFactory.SUPERSCRIPT;
 
 public class SuperscriptBuilder extends InlineBuilder<Superscript> {
 

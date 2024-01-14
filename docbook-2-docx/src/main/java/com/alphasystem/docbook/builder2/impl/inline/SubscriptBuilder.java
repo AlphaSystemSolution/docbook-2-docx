@@ -4,7 +4,7 @@ import com.alphasystem.docbook.builder2.Builder;
 import com.alphasystem.docbook.builder2.impl.InlineBuilder;
 import org.docbook.model.Subscript;
 
-import static com.alphasystem.docbook.builder.DocumentBuilderHelper.SUBSCRIPT;
+import static com.alphasystem.docbook.handler.InlineHandlerFactory.SUBSCRIPT;
 
 public class SubscriptBuilder extends InlineBuilder<Subscript> {
 
