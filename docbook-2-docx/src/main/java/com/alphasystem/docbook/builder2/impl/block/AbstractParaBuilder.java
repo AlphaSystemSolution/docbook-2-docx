@@ -50,7 +50,7 @@ public abstract class AbstractParaBuilder<S> extends BlockBuilder<S> {
             final var grandParent = listItemBuilder.getParent();
 
             var numberId = -1L;
-            var level =  -1L;
+            var level = -1L;
             var applyNumbering = false;
             if (AppUtil.isInstanceOf(ListBuilder.class, grandParent)) {
                 final var listBuilder = ((ListBuilder<?>) grandParent);
