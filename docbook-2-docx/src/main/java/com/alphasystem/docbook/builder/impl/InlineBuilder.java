@@ -3,7 +3,7 @@ package com.alphasystem.docbook.builder.impl;
 import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.handler.InlineHandlerFactory;
 import com.alphasystem.docbook.handler.InlineStyleHandler;
-import com.alphasystem.docbook.handler.impl.inline.NullHandler;
+import com.alphasystem.docbook.handler.impl.NullHandler;
 import com.alphasystem.openxml.builder.wml.RBuilder;
 import com.alphasystem.openxml.builder.wml.RPrBuilder;
 import com.alphasystem.openxml.builder.wml.WmlBuilderFactory;

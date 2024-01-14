@@ -1,4 +1,4 @@
-package com.alphasystem.docbook.handler.impl.inline;
+package com.alphasystem.docbook.handler.impl;
 
 /**
  * Handles "Hyperlink" style.

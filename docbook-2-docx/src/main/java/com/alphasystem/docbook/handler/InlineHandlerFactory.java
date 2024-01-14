@@ -1,8 +1,8 @@
 package com.alphasystem.docbook.handler;
 
 import com.alphasystem.docbook.ApplicationController;
-import com.alphasystem.docbook.handler.impl.inline.ColorHandler;
-import com.alphasystem.docbook.handler.impl.inline.StyleHandler;
+import com.alphasystem.docbook.handler.impl.ColorHandler;
+import com.alphasystem.docbook.handler.impl.StyleHandler;
 import com.alphasystem.docbook.model.ColorCode;
 
 /**
@@ -10,19 +10,17 @@ import com.alphasystem.docbook.model.ColorCode;
  */
 public final class InlineHandlerFactory extends HandlerFactory<InlineStyleHandler> {
 
-    public static final String BOLD = "bold";
-    public static final String STRONG = "strong";
     public static final String ITALIC = "italic";
-
-    public static final String MARKED = "marked";
-    public static final String UNDERLINE = "underline";
-    public static final String LINE_THROUGH = "line-through";
     public static final String LITERAL = "literal";
     public static final String SUBSCRIPT = "subscript";
     public static final String SUPERSCRIPT = "superscript";
     public static final String HYPERLINK = "hyperlink";
 
-    private static InlineHandlerFactory instance;
+    private static final InlineHandlerFactory instance;
+
+    static {
+        instance = new InlineHandlerFactory();
+    }
 
     /**
      * Do not let any one instantiate this class.
@@ -30,10 +28,7 @@ public final class InlineHandlerFactory extends HandlerFactory<InlineStyleHandle
     private InlineHandlerFactory() {
     }
 
-    public static synchronized InlineHandlerFactory getInstance() {
-        if (instance == null) {
-            instance = new InlineHandlerFactory();
-        }
+    public static InlineHandlerFactory getInstance() {
         return instance;
     }
 

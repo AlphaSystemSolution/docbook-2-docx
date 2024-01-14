@@ -1,4 +1,4 @@
-package com.alphasystem.docbook.handler.impl.inline;
+package com.alphasystem.docbook.handler.impl;
 
 import com.alphasystem.docbook.handler.InlineStyleHandler;
 import com.alphasystem.openxml.builder.wml.RPrBuilder;
