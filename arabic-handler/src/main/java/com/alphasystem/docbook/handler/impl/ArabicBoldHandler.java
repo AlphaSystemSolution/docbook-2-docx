@@ -2,11 +2,11 @@ package com.alphasystem.docbook.handler.impl;
 
 import com.alphasystem.openxml.builder.wml.RPrBuilder;
 
-class ArabicBoldHandler extends ArabicHandler {
+public class ArabicBoldHandler extends ArabicHandler {
 
-    ArabicBoldHandler(){}
+    public ArabicBoldHandler(){}
 
-    ArabicBoldHandler(long size) {
+    public ArabicBoldHandler(long size) {
         super(size);
     }
 

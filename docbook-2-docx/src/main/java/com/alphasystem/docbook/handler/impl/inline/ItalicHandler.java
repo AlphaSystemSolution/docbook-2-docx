@@ -8,10 +8,7 @@ import com.alphasystem.openxml.builder.wml.RPrBuilder;
  *
  * @author sali
  */
-class ItalicHandler implements InlineStyleHandler {
-
-    ItalicHandler() {
-    }
+public class ItalicHandler implements InlineStyleHandler {
 
     @Override
     public RPrBuilder applyStyle(RPrBuilder rprBuilder) {

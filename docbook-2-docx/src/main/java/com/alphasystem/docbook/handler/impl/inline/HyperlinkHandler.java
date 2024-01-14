@@ -5,9 +5,9 @@ package com.alphasystem.docbook.handler.impl.inline;
  *
  * @author sali
  */
-class HyperlinkHandler extends StyleHandler {
+public class HyperlinkHandler extends StyleHandler {
 
-    HyperlinkHandler() {
+    public HyperlinkHandler() {
         super("Hyperlink");
     }
 }

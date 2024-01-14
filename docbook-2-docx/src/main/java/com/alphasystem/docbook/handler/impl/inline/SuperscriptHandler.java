@@ -10,10 +10,7 @@ import static org.docx4j.wml.STVerticalAlignRun.SUPERSCRIPT;
  *
  * @author sali
  */
-class SuperscriptHandler implements InlineStyleHandler {
-
-    SuperscriptHandler() {
-    }
+public class SuperscriptHandler implements InlineStyleHandler {
 
     @Override
     public RPrBuilder applyStyle(RPrBuilder rprBuilder) {

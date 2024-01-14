@@ -10,12 +10,9 @@ import static com.alphasystem.openxml.builder.wml.WmlBuilderFactory.getRFontsBui
  *
  * @author sali
  */
-class LiteralHandler implements InlineStyleHandler {
+public class LiteralHandler implements InlineStyleHandler {
 
     private static final String COURIER_NEW = "Courier New";
-
-    LiteralHandler() {
-    }
 
     @Override
     public RPrBuilder applyStyle(RPrBuilder rprBuilder) {

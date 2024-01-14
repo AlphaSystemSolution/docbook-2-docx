@@ -1,5 +1,6 @@
 package com.alphasystem.docbook.util;
 
+import com.alphasystem.SystemException;
 import com.alphasystem.util.AppUtil;
 import com.alphasystem.util.nio.NIOFileUtils;
 
@@ -23,6 +24,20 @@ public class Utils {
             NIOFileUtils.fastCopy(is, os);
             os.close();
             return file;
+        }
+    }
+
+    public static Object initObject(String fullQualifiedClassName) throws SystemException {
+        return initObject(fullQualifiedClassName, null, null);
+    }
+
+    public static Object initObject(String fullQualifiedClassName,
+                                   Class<?>[] parameterTypes,
+                                   Object[] args) throws SystemException {
+        try {
+            return Class.forName(fullQualifiedClassName).getConstructor(parameterTypes).newInstance(args);
+        } catch (Exception ex) {
+            throw new SystemException(String.format("Could not initialize class of type \"%s\".", fullQualifiedClassName),ex);
         }
     }
 

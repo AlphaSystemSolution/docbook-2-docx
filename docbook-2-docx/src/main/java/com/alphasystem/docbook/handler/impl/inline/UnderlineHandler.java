@@ -11,10 +11,7 @@ import static org.docx4j.wml.UnderlineEnumeration.SINGLE;
  *
  * @author sali
  */
-class UnderlineHandler implements InlineStyleHandler {
-
-    UnderlineHandler() {
-    }
+public class UnderlineHandler implements InlineStyleHandler {
 
     @Override
     public RPrBuilder applyStyle(RPrBuilder rprBuilder) {

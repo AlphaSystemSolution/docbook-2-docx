@@ -8,10 +8,7 @@ import com.alphasystem.openxml.builder.wml.RPrBuilder;
  *
  * @author sali
  */
-class BoldHandler implements InlineStyleHandler {
-
-    BoldHandler() {
-    }
+public class BoldHandler implements InlineStyleHandler {
 
     @Override
     public RPrBuilder applyStyle(RPrBuilder rprBuilder) {

@@ -1,17 +1,17 @@
 package com.alphasystem.docbook;
 
+import com.alphasystem.SystemException;
 import com.alphasystem.asciidoc.model.DocumentInfo;
-import com.alphasystem.docbook.handler.InlineHandlerService;
+import com.alphasystem.docbook.handler.InlineHandlerFactory;
+import com.alphasystem.docbook.handler.InlineStyleHandler;
 import com.alphasystem.docbook.util.ConfigurationUtils;
 import com.alphasystem.docbook.util.Utils;
+import com.alphasystem.util.AppUtil;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Source;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ServiceLoader;
-
-import static java.util.ServiceLoader.load;
 
 /**
  * @author sali
@@ -21,6 +21,7 @@ public final class ApplicationController {
     private static final ThreadLocal<DocumentContext> CONTEXT = new ThreadLocal<>();
 
     private static final ConfigurationUtils configurationUtils = ConfigurationUtils.getInstance();
+    private final InlineHandlerFactory inlineHandlerFactory = InlineHandlerFactory.getInstance();
     private static ApplicationController instance;
 
     public static void startContext(final DocumentInfo documentInfo) {
@@ -62,9 +63,7 @@ public final class ApplicationController {
      * Do not let anyone instantiate this class
      */
     private ApplicationController() {
-        ServiceLoader<InlineHandlerService> inlineHandlerServices = load(InlineHandlerService.class);
-        inlineHandlerServices.forEach(InlineHandlerService::initializeHandlers);
-
+        loadHandlers();
         context = Context.newBuilder("js").allowAllAccess(true).build();
 
         // initialization of scripts
@@ -74,6 +73,23 @@ public final class ApplicationController {
                 .forEach(context::eval);
 
         Runtime.getRuntime().addShutdownHook(new Thread(context::close));
+    }
+
+    private void loadHandlers() {
+        final var config = configurationUtils.getConfig("docbook-docx.style-handlers");
+        config.entrySet().forEach(entry -> {
+            final var key = entry.getKey();
+            final var handlerClassName = entry.getValue().unwrapped().toString();
+            try {
+                final var obj = Utils.initObject(handlerClassName);
+                if (!AppUtil.isInstanceOf(InlineStyleHandler.class, obj)) {
+                    throw new RuntimeException(String.format("Type \"%s\" is not subclass of \"InlineStyleHandler\".", handlerClassName));
+                }
+                inlineHandlerFactory.registerHandler(key, (InlineStyleHandler) obj);
+            } catch (SystemException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     private static File readResource(String resourceName) {

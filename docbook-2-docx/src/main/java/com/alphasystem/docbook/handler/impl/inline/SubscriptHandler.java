@@ -10,10 +10,7 @@ import static org.docx4j.wml.STVerticalAlignRun.SUBSCRIPT;
  *
  * @author sali
  */
-class SubscriptHandler implements InlineStyleHandler {
-
-    SubscriptHandler() {
-    }
+public class SubscriptHandler implements InlineStyleHandler {
 
     @Override
     public RPrBuilder applyStyle(RPrBuilder rprBuilder) {

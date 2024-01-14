@@ -5,7 +5,6 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
-import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.lang3.StringUtils;
 import org.docbook.model.Section;
 import org.slf4j.Logger;
@@ -20,16 +19,13 @@ import static java.lang.String.format;
  */
 public class ConfigurationUtils {
 
-    private static ConfigurationUtils instance;
+    private static final ConfigurationUtils instance;
+
+    static {
+        instance = new ConfigurationUtils();
+    }
 
     public static synchronized ConfigurationUtils getInstance() {
-        if (instance == null) {
-            try {
-                instance = new ConfigurationUtils();
-            } catch (ConfigurationException e) {
-                throw new RuntimeException(e.getMessage(), e);
-            }
-        }
         return instance;
     }
 
@@ -49,7 +45,7 @@ public class ConfigurationUtils {
     /**
      * Do not let any one instantiate this class.
      */
-    private ConfigurationUtils() throws ConfigurationException {
+    private ConfigurationUtils() {
         mainConfig = ConfigFactory.load();
         appConfig = mainConfig.getConfig("docbook-docx");
         loadBuilders();

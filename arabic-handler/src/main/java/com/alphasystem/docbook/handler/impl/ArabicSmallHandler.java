@@ -3,9 +3,9 @@ package com.alphasystem.docbook.handler.impl;
 /**
  * @author sali
  */
-class ArabicSmallHandler extends ArabicHandler {
+public class ArabicSmallHandler extends ArabicHandler {
 
-    ArabicSmallHandler() {
+    public ArabicSmallHandler() {
         super(16);
     }
 }

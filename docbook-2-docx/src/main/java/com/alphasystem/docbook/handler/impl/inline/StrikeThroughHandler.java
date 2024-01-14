@@ -8,10 +8,7 @@ import com.alphasystem.openxml.builder.wml.RPrBuilder;
  *
  * @author sali
  */
-class StrikeThroughHandler implements InlineStyleHandler {
-
-    StrikeThroughHandler() {
-    }
+public class StrikeThroughHandler implements InlineStyleHandler {
 
     @Override
     public RPrBuilder applyStyle(RPrBuilder rprBuilder) {
