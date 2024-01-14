@@ -2,7 +2,7 @@ package com.alphasystem.docbook.builder.test;
 
 import org.testng.annotations.Test;
 
-public class ProgramListingTest extends AbstractTest2 {
+public class ProgramListingTest extends AbstractTest {
 
     public ProgramListingTest() {
         super("Program Listing");

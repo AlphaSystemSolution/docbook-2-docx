@@ -6,7 +6,7 @@ import org.testng.annotations.Test;
 /**
  * @author sali
  */
-public class OrderedListTest extends AbstractTest2 {
+public class OrderedListTest extends AbstractTest {
 
     public OrderedListTest() {
         super("Ordered List");

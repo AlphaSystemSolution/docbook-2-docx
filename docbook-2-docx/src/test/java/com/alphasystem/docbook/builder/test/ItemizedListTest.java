@@ -5,7 +5,7 @@ import org.testng.annotations.Test;
 /**
  * @author sali
  */
-public class ItemizedListTest extends AbstractTest2 {
+public class ItemizedListTest extends AbstractTest {
 
     public ItemizedListTest() {
         super("Itemized list");

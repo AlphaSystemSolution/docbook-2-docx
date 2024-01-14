@@ -7,7 +7,7 @@ import static com.alphasystem.docbook.builder.test.DataFactory.*;
 /**
  * @author sali
  */
-public class TitleTest extends AbstractTest2 {
+public class TitleTest extends AbstractTest {
 
     public TitleTest() {
         super("Titles");

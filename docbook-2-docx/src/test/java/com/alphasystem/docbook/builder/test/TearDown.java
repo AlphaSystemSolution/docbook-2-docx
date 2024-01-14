@@ -13,7 +13,7 @@ import static org.testng.Assert.fail;
 /**
  * @author sali
  */
-public class TearDown extends AbstractTest2 {
+public class TearDown extends AbstractTest {
 
     public TearDown() {
         super("");

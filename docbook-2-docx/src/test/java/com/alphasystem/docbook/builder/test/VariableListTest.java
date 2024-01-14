@@ -6,7 +6,7 @@ import org.testng.annotations.Test;
 /**
  * @author sali
  */
-public class VariableListTest extends AbstractTest2 {
+public class VariableListTest extends AbstractTest {
 
     public VariableListTest() {
         super("Variable List");

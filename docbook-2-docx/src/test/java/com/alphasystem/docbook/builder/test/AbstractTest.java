@@ -27,7 +27,7 @@ import static java.nio.file.Paths.get;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
-public abstract class AbstractTest2 {
+public abstract class AbstractTest {
 
     protected static final String DEFAULT_TITLE = "DefaultTitle";
     private static final String DATA_PATH = System.getProperty("data.path");
@@ -46,7 +46,7 @@ public abstract class AbstractTest2 {
 
     private final String testTitle;
 
-    public AbstractTest2(String testTitle) {
+    public AbstractTest(String testTitle) {
         this.testTitle = testTitle;
     }
 

@@ -8,7 +8,7 @@ import static org.testng.Assert.assertEquals;
 /**
  * @author sali
  */
-public class TableTest extends AbstractTest2 {
+public class TableTest extends AbstractTest {
 
     public TableTest() {
         super("Tables");

@@ -12,7 +12,7 @@ import static org.testng.Assert.fail;
 /**
  * @author sali
  */
-public class Setup extends AbstractTest2 {
+public class Setup extends AbstractTest {
 
     public Setup() {
         super("");

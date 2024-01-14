@@ -6,7 +6,7 @@ import org.testng.annotations.Test;
 
 import static com.alphasystem.docbook.builder.test.DataFactory.*;
 
-public class InlineTest extends AbstractTest2 {
+public class InlineTest extends AbstractTest {
 
     private final SimplePara paraWithXrefLabel = createSimplePara(IdGenerator.nextId(),
             "A paragraph with ",

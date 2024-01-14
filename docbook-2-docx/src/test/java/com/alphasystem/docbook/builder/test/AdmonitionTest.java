@@ -8,7 +8,7 @@ import static org.testng.Assert.assertEquals;
 /**
  * @author sali
  */
-public class AdmonitionTest extends AbstractTest2 {
+public class AdmonitionTest extends AbstractTest {
 
     public AdmonitionTest() {
         super("Admonitions");
