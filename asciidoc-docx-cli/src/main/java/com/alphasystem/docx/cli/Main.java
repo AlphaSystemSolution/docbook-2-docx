@@ -7,8 +7,10 @@ import com.alphasystem.util.AppUtil;
 import com.alphasystem.util.ZipUtil;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.awt.*;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -50,9 +52,19 @@ public class Main {
                 .argName("extractedDocumentPath")
                 .hasArg()
                 .required(false)
-                .desc("Extracted document path")
+                .desc("Extracted document path in the given directory")
                 .build();
         options.addOption(extractPackage);
+
+        final var saveDocBookContent = Option
+                .builder("x")
+                .argName("saveDocBookContent")
+                .hasArg()
+                .required(false)
+                .desc("Save DocBook content in the given directory")
+                .build();
+        options.addOption(saveDocBookContent);
+
 
         // define parser
         CommandLine cmd;
@@ -76,8 +88,16 @@ public class Main {
             }
 
             var documentInfo = DocumentConverter.convertToDocBook(srcPath).getDocumentInfo();
-            final var docBookFile = FileUtil.getDocBookFile(docxPath);
-            Files.writeString(docBookFile, documentInfo.getContent());
+
+            if(cmd.hasOption(saveDocBookContent)) {
+                final var value = cmd.getOptionValue(saveDocBookContent);
+                try {
+                    saveDocBookContent(value, docxPath, documentInfo.getContent());
+                } catch (IOException ex) {
+                    System.out.printf("Unable save DocBook content.%n");
+                }
+            }
+
             Path destPath;
             if (docxPath == null) {
                 destPath = DocumentBuilder.buildDocument(documentInfo);
@@ -119,5 +139,19 @@ public class Main {
             Files.createDirectory(dir);
         }
         ZipUtil.extractZipFile(dir.toFile(), docxPath.toString());
+    }
+
+    private static void saveDocBookContent(String value, Path docxPath, String content) throws IOException {
+        if (StringUtils.isNotBlank(value)) {
+            final var parentDir = toPath(value);
+            if (Files.isDirectory(parentDir)) {
+                final var fileName = FileUtil.getDocBookFile(docxPath).getFileName().toString();
+                final var dockBookFile = Paths.get(value, fileName);
+                Files.writeString(dockBookFile, content);
+            } else {
+                System.err.printf("\"%s\" is not a directory%n", parentDir);
+            }
+
+        }
     }
 }
