@@ -49,7 +49,6 @@ public abstract class LinkSupportBuilder<S> extends InlineBuilder<S> {
         if (StringUtils.isBlank(text)) {
             text = (String) Utils.invokeMethod(source, "getEndterm");
         }
-        logger.info("From endTerm: {}", text);
         if (StringUtils.isBlank(text)) {
             if (external) text = href;
             else text = ApplicationController.getContext().getLabel(href);

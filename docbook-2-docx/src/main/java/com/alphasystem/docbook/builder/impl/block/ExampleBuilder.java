@@ -9,7 +9,7 @@ import org.docx4j.wml.Tbl;
 
 import java.util.List;
 
-public class ExampleBuilder extends TableBasedBlockBuilder<Example> {
+public class ExampleBuilder extends JavaScriptBasedBuilder<Example, Tbl> {
 
     public ExampleBuilder(Example source, Builder<?> parent) {
         super(source, parent);

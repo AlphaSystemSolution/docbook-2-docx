@@ -18,10 +18,10 @@ public class AdmonitionTest extends AbstractTest {
     public void testCaution() {
         addTestTitle("Caution Admonition");
         processContent(readXml("caution"));
-        assertSize(3);
+        assertSize(1);
         final var content = mainDocumentPart.getContent();
         // number of content are 5, admonition caption + empty para in second column + content
-        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 2)), 5);
+        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 5);
         addHorizontalLine();
     }
 
@@ -29,9 +29,9 @@ public class AdmonitionTest extends AbstractTest {
     public void testImportant() {
         addTestTitle("Important Admonition");
         processContent(readXml("important"));
-        assertSize(3);
+        assertSize(1);
         final var content = mainDocumentPart.getContent();
-        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 2)), 6);
+        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 6);
         addHorizontalLine();
     }
 
@@ -39,9 +39,9 @@ public class AdmonitionTest extends AbstractTest {
     public void testNote() {
         addTestTitle("Note Admonition");
         processContent(readXml("note"));
-        assertSize(3);
+        assertSize(1);
         final var content = mainDocumentPart.getContent();
-        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 2)), 7);
+        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 7);
         addHorizontalLine();
     }
 
@@ -49,9 +49,9 @@ public class AdmonitionTest extends AbstractTest {
     public void testTip() {
         addTestTitle("Tip Admonition");
         processContent(readXml("tip"));
-        assertSize(3);
+        assertSize(1);
         final var content = mainDocumentPart.getContent();
-        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 2)), 8);
+        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 8);
         addHorizontalLine();
     }
 
@@ -59,9 +59,9 @@ public class AdmonitionTest extends AbstractTest {
     public void testWarning() {
         addTestTitle("Warning Admonition");
         processContent(readXml("warning"));
-        assertSize(3);
+        assertSize(1);
         final var content = mainDocumentPart.getContent();
-        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 2)), 5);
+        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 5);
         addHorizontalLine();
     }
 
@@ -69,7 +69,7 @@ public class AdmonitionTest extends AbstractTest {
     public void testSideBar() {
         addTestTitle("SideBar test");
         processContent(readXml("side-bar"));
-        assertSize(3);
+        assertSize(1);
         addHorizontalLine();
     }
 
@@ -77,25 +77,15 @@ public class AdmonitionTest extends AbstractTest {
     public void testExample() {
         addTestTitle("Example test");
         processContent(readXml("example"));
-        assertSize(4);
+        assertSize(2);
         addHorizontalLine();
     }
 
     @Test(dependsOnMethods = {"testExample"})
     public void testInformalExample() {
-        addTestTitle("Table with admonition text");
-        processContent(readXml("informal-example"));
-        assertSize(3);
-        addHorizontalLine();
-    }
-
-    @Test(dependsOnMethods = {"testInformalExample"})
-    public void testTableWithAdmonition() {
         addTestTitle("InformalExample text");
-        processContent(readXml("table-with-admonition"));
-        assertSize(4);
+        processContent(readXml("informal-example"));
+        assertSize(1);
         addHorizontalLine();
     }
-
-
 }

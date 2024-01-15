@@ -1,12 +1,13 @@
 package com.alphasystem.docbook.builder.impl.block;
 
 import com.alphasystem.docbook.builder.Builder;
+import com.alphasystem.docbook.builder.impl.JavaScriptBasedBuilder;
 import com.alphasystem.docbook.model.Admonition;
 import org.docx4j.wml.Tbl;
 
 import java.util.List;
 
-public abstract class AdmonitionBuilder<S> extends TableBasedBlockBuilder<S> {
+public abstract class AdmonitionBuilder<S> extends JavaScriptBasedBuilder<S, Tbl> {
 
     private final Admonition admonition;
 
