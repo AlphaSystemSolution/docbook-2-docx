@@ -1,40 +1,44 @@
 package com.alphasystem.docbook.builder.test;
 
-import com.alphasystem.docbook.builder.Builder;
-import org.docbook.model.Article;
-import org.docbook.model.Example;
-import org.docbook.model.Title;
 import org.testng.annotations.Test;
 
-import java.util.List;
-
 import static com.alphasystem.docbook.builder.test.DataFactory.*;
-import static org.testng.Assert.assertEquals;
 
 /**
  * @author sali
  */
 public class TitleTest extends AbstractTest {
 
+    public TitleTest() {
+        super("Titles");
+    }
+
     @Test
-    public void testDocumentTitle() {
-        final Builder parent = builderFactory.getBuilder(null, new Article(), -1);
-        final Title title = createTitle("Document Title");
-        final List<Object> content = buildContent(parent, 0, title);
-        assertEquals(content.size(), 1);
-        addResultToDocument("Document Title Test", content.toArray());
+    public void testTitle() {
+        addTestTitle("Title test with default style");
+        processContent(createArticle("Document title"));
+        final var content = mainDocumentPart.getContent();
+        assertSize( 1);
+        assertText(content.get(content.size() - 1), "Document title");
+        addHorizontalLine();
     }
 
-    @Test(dependsOnMethods = "testDocumentTitle")
-    public void testDocumentTitleWithCustomStyle() {
-        final Builder parent = builderFactory.getBuilder(null, new Article(), -1);
-        final Title title = createTitle("Document Title ", createPhrase("arabicHeading1", "س ل م"));
-        addResult(parent, 0, 1, "Document Title with custom style Test", title);
+    @Test(dependsOnMethods = "testTitle")
+    public void testTitleWithCustomStyle() {
+        addTestTitle("Title test with custom style");
+        final var info = createInfo("Document title ", createPhrase("arabicHeading1", "سلم"));
+        processContent(createArticle().withContent(info));
+        final var content = mainDocumentPart.getContent();
+        assertSize( 1);
+        assertText(content.get(content.size() - 1), "Document title سلم");
+        addHorizontalLine();
     }
 
-    @Test(dependsOnMethods = "testDocumentTitleWithCustomStyle")
-    public void testExampleTitle() {
-        final Builder parent = builderFactory.getBuilder(null, new Example(), -1);
-        addResult(parent, 0, 3, "Example Title Test", createExample("Example Title"));
+    @Test(dependsOnMethods = "testTitleWithCustomStyle")
+    public void testSectionLevelTitles() {
+        addTestTitle("Section Level title test");
+        processContent(readXml("sections"));
+        assertSize( 10);
+        addHorizontalLine();
     }
 }

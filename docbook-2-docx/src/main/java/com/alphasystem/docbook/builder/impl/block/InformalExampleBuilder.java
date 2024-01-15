@@ -1,29 +1,20 @@
 package com.alphasystem.docbook.builder.impl.block;
 
 import com.alphasystem.docbook.builder.Builder;
+import com.alphasystem.docbook.builder.impl.JavaScriptBasedBuilder;
 import org.docbook.model.InformalExample;
-import org.docx4j.wml.Tc;
-import org.docx4j.wml.Tr;
+import org.docx4j.wml.Tbl;
 
-/**
- * @author sali
- */
-public class InformalExampleBuilder extends TableBasedBlockBuilder<InformalExample> {
+import java.util.List;
 
-    public InformalExampleBuilder(Builder<?> parent, InformalExample informalExample, int indexInParent) {
-        super(parent, informalExample, indexInParent);
+public class InformalExampleBuilder extends JavaScriptBasedBuilder<InformalExample, Tbl> {
+
+    public InformalExampleBuilder(InformalExample source, Builder<?> parent) {
+        super(source, parent);
     }
 
     @Override
-    protected void initContent() {
-        content = source.getContent();
+    protected FunctionInput<Tbl> initFunctionInputs(List<Object> processedChildContent) {
+        return new FunctionInput<>(configurationUtils.getExampleFunctionName(), Tbl.class, new Object[]{processedChildContent});
     }
-
-    @Override
-    protected void preProcess() {
-        tbl = applicationController.getInformalExampleTable();
-        final Tr tr = (Tr) tbl.getContent().get(0);
-        tc = (Tc) tr.getContent().get(0);
-    }
-
 }

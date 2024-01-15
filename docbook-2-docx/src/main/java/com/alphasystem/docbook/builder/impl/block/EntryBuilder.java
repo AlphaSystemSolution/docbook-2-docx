@@ -1,98 +1,103 @@
 package com.alphasystem.docbook.builder.impl.block;
 
 import com.alphasystem.docbook.builder.Builder;
-import com.alphasystem.docbook.builder.impl.BlockBuilder;
+import com.alphasystem.docbook.builder.impl.AbstractBuilder;
+import com.alphasystem.docbook.util.Utils;
 import com.alphasystem.openxml.builder.wml.PPrBuilder;
-import com.alphasystem.openxml.builder.wml.TcBuilder;
+import com.alphasystem.openxml.builder.wml.WmlAdapter;
+import com.alphasystem.openxml.builder.wml.WmlBuilderFactory;
+import com.alphasystem.openxml.builder.wml.table.ColumnData;
 import com.alphasystem.openxml.builder.wml.table.TableAdapter;
 import com.alphasystem.openxml.builder.wml.table.VerticalMergeType;
+import com.alphasystem.util.AppUtil;
+import com.alphasystem.xml.UnmarshallerConstants;
 import org.docbook.model.Align;
 import org.docbook.model.BasicVerticalAlign;
 import org.docbook.model.Entry;
 import org.docbook.model.VerticalAlign;
-import org.docx4j.wml.*;
+import org.docx4j.wml.JcEnumeration;
+import org.docx4j.wml.P;
+import org.docx4j.wml.STVerticalJc;
+import org.docx4j.wml.TcPr;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
-import static com.alphasystem.openxml.builder.wml.WmlAdapter.getEmptyPara;
-import static com.alphasystem.openxml.builder.wml.WmlBuilderFactory.*;
-import static com.alphasystem.util.AppUtil.isInstanceOf;
-import static java.lang.String.format;
-import static java.util.Collections.singletonList;
+public class EntryBuilder extends AbstractBuilder<Entry> {
 
-/**
- * @author sali
- */
-public class EntryBuilder extends BlockBuilder<Entry> {
+    private TcPr tcPr;
+    private JcEnumeration align;
 
-    protected Tc column;
-
-    public EntryBuilder(Builder<?> parent, Entry entry, int indexInParent) {
-        super(parent, entry, indexInParent);
+    public EntryBuilder(Entry source, Builder<?> parent) {
+        super(source, parent);
     }
 
     @Override
-    protected void initContent() {
-        initializeColumn();
-        content = source.getContent();
-    }
+    protected void preProcess() {
+        super.preProcess();
 
-    private void initializeColumn() {
-        final AbstractTableBuilder<?> tableBuilder = getParent(AbstractTableBuilder.class);
-        TcPr tcPr = getTcPrBuilder().withVAlign(getVerticalAlign()).getObject();
-
-        int columnIndex = indexInParent;
-        int gridSpan = tableBuilder.getGridSpan(source.getNameStart(), source.getNameEnd());
-        ((RowBuilder) getParent()).updateNextColumnIndex(gridSpan);
-
-        final String moreRows = source.getMoreRows();
-        VerticalMergeType vMergeType = null;
-        if (moreRows != null) {
-            vMergeType = moreRows.endsWith("*") ? VerticalMergeType.CONTINUE : VerticalMergeType.RESTART;
-        }
-        tcPr = TableAdapter.getColumnProperties(tableBuilder.getTableType(), columnIndex, gridSpan, vMergeType, tcPr,
-                tableBuilder.getColumnInfos());
-        TcBuilder tcBuilder = getTcBuilder().withTcPr(tcPr);
-        column = tcBuilder.getObject();
-    }
-
-    @Override
-    protected List<Object> postProcess(List<Object> processedTitleContent, List<Object> processedChildContent) {
-        if (processedChildContent.isEmpty()) {
-            column.getContent().add(getEmptyPara());
-        } else {
-            JcEnumeration align = getAlign();
-            processedChildContent.forEach(o -> {
-                if (isInstanceOf(P.class, o)) {
-                    PPrBuilder pPrBuilder = getPPrBuilder().withJc(align);
-                    final P p = (P) o;
-                    pPrBuilder = new PPrBuilder(pPrBuilder.getObject(), p.getPPr());
-                    p.setPPr(pPrBuilder.getObject());
-                }
-                column.getContent().add(o);
-            });
-        }
-        return singletonList(column);
-    }
-
-    private STVerticalJc getVerticalAlign() {
-        final Builder<?> parent = getParent().getParent();
-        if (!isInstanceOf(TableContentBuilder.class, parent)) {
+        final var contentBuilder = getParent().getParent();
+        if (!AppUtil.isInstanceOf(TableContentBuilder.class, contentBuilder)) {
             // EntryBuilder immediate parent should be RowBuilder and RowBuilder parent must be either of TableBodyBuilder,
             // TableHeaderBuilder, or TableFooterBuilder, if not raise exception
-            throw new RuntimeException(format("Found different parent \"%s\".", parent.getClass().getName()));
+            throw new RuntimeException(String.format("Found different parent \"%s\".", contentBuilder.getClass().getName()));
         }
-        final Object parentSource = parent.getSource();
-        final VerticalAlign parentAlign = (VerticalAlign) invokeMethod(parentSource, "getVAlign");
-        BasicVerticalAlign vAlign = source.getValign();
 
-        if (vAlign == null && parentAlign != null) {
+        final var parentVAlign = (VerticalAlign) Utils.invokeMethod(contentBuilder.getSource(), "getVAlign");
+        final var verticalAlign = getVerticalAlign(source.getValign(), parentVAlign);
+
+        final var parentAlign = (Align) Utils.invokeMethod(contentBuilder.getSource(), "getAlign");
+        align = getAlign(source.getAlign(), parentAlign);
+
+        tcPr = WmlBuilderFactory.getTcPrBuilder().withVAlign(verticalAlign).getObject();
+    }
+
+    @Override
+    protected List<Object> processChildContent(List<Object> childContent) {
+        if (Objects.isNull(childContent) || childContent.isEmpty()) {
+            return Collections.singletonList(WmlAdapter.getEmptyPara());
+        } else {
+            return childContent.stream().map(content -> {
+                final var processedContent = builderFactory.process(content, this);
+                if (UnmarshallerConstants.isParaTypes(content)) {
+                    var p = (P) (processedContent.get(0));
+                    final var ppr = new PPrBuilder(WmlBuilderFactory.getPPrBuilder().withJc(align).getObject(), p.getPPr()).getObject();
+                    p.setPPr(ppr);
+                    return Collections.singletonList(p);
+                } else {
+                    return processedContent;
+                }
+            }).flatMap(Collection::stream).collect(Collectors.toList());
+        }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    protected List<Object> doProcess(List<Object> processedChildContent) {
+        final var tableBuilder = getParent(AbstractTableBuilder.class);
+
+        final var columnIndex = Integer.parseInt(source.getNameStart());
+        final var gridSpan = Integer.parseInt(source.getNameEnd());
+        final var vMergeType = VerticalMergeType.valueOf(source.getMoreRows());
+
+        var columnData = new ColumnData(columnIndex).withColumnProperties(tcPr).withGridSpanValue(gridSpan)
+                .withVerticalMergeType(vMergeType).withContent(processedChildContent.toArray());
+        final var tc = TableAdapter.createColumn(tableBuilder.getTableType(), columnData, tableBuilder.getColumnInfoList());
+        return Collections.singletonList(tc);
+    }
+
+    private static STVerticalJc getVerticalAlign(BasicVerticalAlign vAlign, VerticalAlign parentVerticalAlign) {
+        if (vAlign == null && parentVerticalAlign != null) {
             try {
-                vAlign = BasicVerticalAlign.fromValue(parentAlign.value());
+                vAlign = BasicVerticalAlign.fromValue(parentVerticalAlign.value());
             } catch (Exception e) {
                 // ignore, if the parent value is BASELINE, then there is no corresponding value for BasicVerticalAlign
             }
         }
+
         STVerticalJc val = null;
         if (vAlign != null) {
             switch (vAlign) {
@@ -110,9 +115,11 @@ public class EntryBuilder extends BlockBuilder<Entry> {
         return val;
     }
 
-    private JcEnumeration getAlign() {
+    private static JcEnumeration getAlign(Align align, Align parentAlign) {
+        if (align == null && parentAlign != null) {
+            align = parentAlign;
+        }
         JcEnumeration jcEnumeration = null;
-        Align align = source.getAlign();
         if (align != null) {
             switch (align) {
                 case LEFT:
@@ -131,5 +138,4 @@ public class EntryBuilder extends BlockBuilder<Entry> {
         }
         return jcEnumeration;
     }
-
 }

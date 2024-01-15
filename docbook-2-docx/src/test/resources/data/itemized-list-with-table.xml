@@ -1,0 +1,28 @@
+<article xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en">
+    <itemizedlist>
+        <listitem>
+            <simpara>Point #1</simpara>
+        </listitem>
+        <listitem>
+            <simpara>Point #2</simpara>
+        </listitem>
+        <listitem>
+            <simpara>Point #3</simpara>
+        </listitem>
+        <listitem>
+            <simpara>Table within list item</simpara>
+            <informaltable frame="all" rowsep="1" colsep="1">
+                <tgroup cols="1">
+                    <colspec colname="col_1" colwidth="100*"/>
+                    <tbody>
+                        <row>
+                            <entry align="center" valign="middle">
+                                <simpara>Row 1</simpara>
+                            </entry>
+                        </row>
+                    </tbody>
+                </tgroup>
+            </informaltable>
+        </listitem>
+    </itemizedlist>
+</article>

@@ -3,19 +3,9 @@ package com.alphasystem.docbook.builder.impl.block;
 import com.alphasystem.docbook.builder.Builder;
 import org.docbook.model.Para;
 
-/**
- * @author sali
- */
 public class ParaBuilder extends AbstractParaBuilder<Para> {
 
-    public ParaBuilder(Builder<?> parent, Para obj, int indexInParent) {
-        super(parent, obj, indexInParent);
-        this.role = source.getRole();
+    public ParaBuilder(Para source, Builder<?> parent) {
+        super(source, parent);
     }
-
-    @Override
-    protected void initContent() {
-        content = source.getContent();
-    }
-
 }

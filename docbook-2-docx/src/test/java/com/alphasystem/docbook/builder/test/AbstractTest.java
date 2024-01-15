@@ -1,151 +1,184 @@
 package com.alphasystem.docbook.builder.test;
 
 import com.alphasystem.SystemException;
-import com.alphasystem.docbook.DocumentBuilder;
-import com.alphasystem.docbook.DocumentContext;
-import com.alphasystem.docbook.builder.Builder;
-import com.alphasystem.docbook.builder.BuilderFactory;
-import com.alphasystem.openxml.builder.wml.PBuilder;
-import com.alphasystem.openxml.builder.wml.WmlBuilderFactory;
+import com.alphasystem.asciidoc.model.DocumentInfo;
+import com.alphasystem.docbook.ApplicationController;
+import com.alphasystem.openxml.builder.wml.WmlAdapter;
+import com.alphasystem.util.AppUtil;
+import com.alphasystem.util.IdGenerator;
 import com.alphasystem.xml.UnmarshallerTool;
-import org.apache.commons.lang3.ArrayUtils;
-import org.docx4j.openpackaging.exceptions.Docx4JException;
-import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
+import jakarta.xml.bind.JAXBElement;
+import org.apache.commons.lang3.StringUtils;
+import org.docbook.model.SimplePara;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
-import org.docx4j.wml.P;
-import org.docx4j.wml.R;
+import org.docx4j.wml.*;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeClass;
 
-import java.io.IOException;
-import java.lang.reflect.Method;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
-import static com.alphasystem.openxml.builder.wml.WmlAdapter.*;
+import static com.alphasystem.docbook.builder.test.DataFactory.*;
 import static java.lang.String.format;
-import static java.nio.file.Files.readAllBytes;
 import static java.nio.file.Paths.get;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
-import static org.testng.Reporter.log;
 
-/**
- * @author sali
- */
 public abstract class AbstractTest {
 
-    private static final String DEFAULT_TITLE = "DefaultTitle";
+    protected static final String DEFAULT_TITLE = "DefaultTitle";
     private static final String DATA_PATH = System.getProperty("data.path");
-    protected static final String TARGET_PATH = System.getProperty("target.path");
+    protected static final String FILE_NAME = "docbook_to_docx.docx";
+
+    private final UnmarshallerTool unmarshallerTool = new UnmarshallerTool();
+    protected final String targetPath = System.getProperty("target.path");
+    protected static int previousSize = 0;
+    protected static MainDocumentPart mainDocumentPart;
 
     static {
-        final Path path = get(TARGET_PATH);
-        if (!Files.exists(path)) {
-            try {
-                Files.createDirectory(path);
-            } catch (IOException e) {
-                fail(e.getMessage(), e);
+        ApplicationController.getInstance();
+        ApplicationController.startContext(new DocumentInfo());
+        mainDocumentPart = ApplicationController.getContext().getMainDocumentPart();
+    }
+
+    private final String testTitle;
+
+    public AbstractTest(String testTitle) {
+        this.testTitle = testTitle;
+    }
+
+    @BeforeClass
+    public void beforeClass() {
+        if (StringUtils.isNotBlank(testTitle)) {
+            processContent(createArticle(createTitle(testTitle)));
+            updateCount();
+        }
+    }
+
+    @AfterClass
+    public void afterClass() {
+        if (StringUtils.isNotBlank(testTitle)) {
+            mainDocumentPart.addObject(WmlAdapter.getPageBreak());
+            updateCount();
+        }
+    }
+
+    @AfterMethod
+    public void reset() {
+        updateCount();
+    }
+
+    void updateCount() {
+        previousSize = mainDocumentPart.getContent().size();
+    }
+
+    void processContent(Object obj) {
+        try {
+            final var xml = toXml(obj);
+            System.out.println(xml);
+            unmarshallerTool.unmarshal(xml);
+        } catch (SystemException ex) {
+            fail("Test failed", ex);
+        }
+    }
+
+    void processContent(String xml) {
+        try {
+            System.out.println(xml);
+            unmarshallerTool.unmarshal(xml);
+        } catch (SystemException ex) {
+            fail("Test failed", ex);
+        }
+    }
+
+    void addTestTitle(String title) {
+        final var titlePara = new SimplePara().withId(IdGenerator.nextId()).withRole(DEFAULT_TITLE).withContent(title);
+        processContent(createArticle(titlePara));
+        updateCount();
+    }
+
+    void addHorizontalLine() {
+        mainDocumentPart.addObject(WmlAdapter.getHorizontalLine());
+    }
+
+    void assertText(Object obj, String expected) {
+        assertEquals(getRawText(obj), expected);
+    }
+
+    private static String getRawText(Object content) {
+        if (AppUtil.isInstanceOf(P.class, content)) {
+            final var p = (P) content;
+            return getRawText("", p.getContent());
+        } else {
+            return content.getClass().getName() + " ";
+        }
+    }
+
+    private static String getRawText(String result, List<Object> contents) {
+        if (Objects.isNull(contents) || contents.isEmpty()) {
+            return result;
+        }
+
+        return contents.stream().map(content -> {
+            if (AppUtil.isInstanceOf(R.class, content)) {
+                final var r = (R) content;
+                return getRawText(result, r.getContent());
+            } else if (AppUtil.isInstanceOf(Text.class, content)) {
+                final var text = (Text) content;
+                return result + text.getValue();
+            } else if (AppUtil.isInstanceOf(P.Hyperlink.class, content)) {
+                final var hyperlink = (P.Hyperlink) content;
+                return getRawText(result, hyperlink.getContent());
+            } else if (AppUtil.isInstanceOf(CTBookmark.class, content) ||
+                    AppUtil.isInstanceOf(JAXBElement.class, content)) {
+                return "";
+            } else {
+                return content.getClass().getName() + " ";
             }
-        }
+        }).collect(Collectors.joining());
     }
 
-    @SuppressWarnings({"unused"})
-    protected static void build(String dir, String fileNamePrefix) {
-        final Path sourcePath = get(dir, format("%s.xml", fileNamePrefix));
+    String readXml(String name) {
+        final var sourcePath = get(DATA_PATH, format("%s.xml", name));
         try {
-            final DocumentContext context = DocumentBuilder.createContext(sourcePath);
-            final WordprocessingMLPackage wmlPackage = DocumentBuilder.buildDocument(context);
-            save(get(TARGET_PATH, format("%s.docx", fileNamePrefix)).toFile(), wmlPackage);
-        } catch (SystemException | Docx4JException e) {
-            fail(e.getMessage(), e);
-        }
-    }
-
-    protected static Object readXml(String name, Class<?> declaredType) {
-        UnmarshallerTool unmarshallerTool = new UnmarshallerTool();
-        final Path sourcePath = get(DATA_PATH, format("%s.xml", name));
-        try {
-            final String source = new String(readAllBytes(sourcePath));
-            return unmarshallerTool.unmarshal(source, declaredType);
-        } catch (Exception e) {
-            fail(e.getMessage(), e);
+            return new String(Files.readAllBytes(sourcePath));
+        } catch (Exception ex) {
+            fail(String.format("Fail to read file: %s", sourcePath.getFileName().toString()), ex);
         }
         return null;
     }
 
-    protected BuilderFactory builderFactory = BuilderFactory.getInstance();
-    protected static WordprocessingMLPackage wmlPackage;
-    protected static MainDocumentPart mainDocumentPart;
+    void assertSize(int expected) {
+        assertEquals(mainDocumentPart.getContent().size() - previousSize, expected);
+    }
 
-    P buildPara(R... runs) {
-        final PBuilder pBuilder = WmlBuilderFactory.getPBuilder();
-        for (R run : runs) {
-            pBuilder.addContent(run);
+    long getTableContentSize(Tbl table) {
+        return extractContent(0, io.vavr.collection.List.ofAll(table.getContent()));
+    }
+
+    private static long extractContent(int result, io.vavr.collection.List<Object> contents) {
+        if (contents.isEmpty()) {
+            return result;
         }
-        return pBuilder.getObject();
-    }
-
-    void addResultToDocument(String title, Object... content) {
-        mainDocumentPart.addObject(getParagraphWithStyle(DEFAULT_TITLE, title));
-        for (Object o : content) {
-            mainDocumentPart.addObject(o);
+        final var content = contents.head();
+        final var tail = contents.tail();
+        if (AppUtil.isInstanceOf(Tr.class, content)) {
+            return extractContent(result, tail.appendAll(((Tr) content).getContent()));
+        } else if (AppUtil.isInstanceOf(Tc.class, content)) {
+            return extractContent(result, tail.appendAll(((Tc) content).getContent()));
+        } else if (AppUtil.isInstanceOf(P.class, content)) {
+            return extractContent(result, tail.appendAll(((P) content).getContent()));
+        } else if (AppUtil.isInstanceOf(R.class, content)) {
+            return extractContent(result + 1, tail);
+        } else if (AppUtil.isInstanceOf(CTBookmark.class, content) ||
+                AppUtil.isInstanceOf(JAXBElement.class, content)) {
+            return extractContent(result, tail);
+        } else {
+            System.err.println("Unhandled type: " + content.getClass().getName());
+            return extractContent(result, tail);
         }
-        mainDocumentPart.addObject(getHorizontalLine());
     }
-
-    protected void addResult(Builder parent, int indexInParent, int expectedSize, String title, Object... content) {
-        final List<Object> childContent = buildContent(parent, indexInParent, content);
-        assertEquals(childContent.size(), expectedSize);
-        addResultToDocument(title, childContent.toArray());
-    }
-
-    void addResult(String title, R... runs) {
-        addResultToDocument(title, buildPara(runs));
-    }
-
-    @SuppressWarnings("unchecked")
-    List<Object> buildContent(Builder parent, int indexInParent, Object... objects) {
-        List<Object> content = new ArrayList<>();
-        if (!ArrayUtils.isEmpty(objects)) {
-            log("**************************************************************************", true);
-            for (Object o : objects) {
-                final Builder builder = builderFactory.getBuilder(parent, o, indexInParent);
-                if(builder == null) {
-                    log(format("No builder found for type: %s", o), true);
-                    continue;
-                }
-                final List c = builder.buildContent();
-                log(format("Getting builder \"%s\" for \"%s\", number of child content are \"%s\".", builder.getClass().getName(),
-                        o.getClass().getName(), c.size()), true);
-                content.addAll(c);
-            }
-            log("**************************************************************************", true);
-        }
-
-        return content;
-    }
-
-    R[] convertToRuns(List<Object> content) {
-        R[] runs = new R[content.size()];
-        for (int i = 0; i < content.size(); i++) {
-            runs[i] = (R) content.get(i);
-        }
-        return runs;
-    }
-
-    @BeforeMethod
-    public void startTest(Method method) {
-        log("-----------------------------------------------------------------------------------------", true);
-        log(format("Stating test \"%s\".", method.getName()), true);
-    }
-
-    @AfterMethod
-    public void endTest(Method method) {
-        log(format("Test \"%s\" end.", method.getName()), true);
-        log("-----------------------------------------------------------------------------------------", true);
-    }
-
 }

@@ -1,0 +1,21 @@
+<article xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en">
+    <orderedlist numeration="arabic" xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en">
+        <listitem>
+            <simpara>Step 1</simpara>
+        </listitem>
+        <listitem>
+            <simpara>Step 2</simpara>
+            <orderedlist numeration="loweralpha">
+                <listitem>
+                    <simpara>Step 2a</simpara>
+                </listitem>
+                <listitem>
+                    <simpara>Step 2b</simpara>
+                </listitem>
+            </orderedlist>
+        </listitem>
+        <listitem>
+            <simpara>Step 3</simpara>
+        </listitem>
+    </orderedlist>
+</article>

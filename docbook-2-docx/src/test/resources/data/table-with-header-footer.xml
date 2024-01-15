@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<article xmlns="http://docbook.org/ns/docbook">
+    <table colsep="1" rowsep="1" frame="all">
+        <title>Result of table with header and footer</title>
+        <tgroup cols="4">
+            <colspec colwidth="15*" colname="col_1"/>
+            <colspec colwidth="15*" colname="col_2"/>
+            <colspec colwidth="15*" colname="col_3"/>
+            <colspec colwidth="55*" colname="col_4"/>
+            <thead>
+                <row>
+                    <entry valign="top" align="left">
+                        <simpara>Header 1</simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara>Header 2</simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara>Header 3</simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara>Header 4</simpara>
+                    </entry>
+                </row>
+            </thead>
+            <tfoot>
+                <row>
+                    <entry valign="top" align="left">
+                        <simpara>Footer 1</simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara>Footer 2</simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara>Footer 3</simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara>Footer 4</simpara>
+                    </entry>
+                </row>
+            </tfoot>
+            <tbody>
+                <row>
+                    <entry valign="top" align="left">
+                        <simpara>Row 1, Column 1</simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara>Row 1, Column 2</simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara>Row 1, Column 3</simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara>Row 1, Column 4</simpara>
+                    </entry>
+                </row>
+            </tbody>
+        </tgroup>
+    </table>
+</article>

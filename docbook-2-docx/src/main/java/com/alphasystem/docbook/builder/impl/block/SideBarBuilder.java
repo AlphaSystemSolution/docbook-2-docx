@@ -1,33 +1,35 @@
 package com.alphasystem.docbook.builder.impl.block;
 
 import com.alphasystem.docbook.builder.Builder;
+import com.alphasystem.docbook.builder.impl.JavaScriptBasedBuilder;
+import com.alphasystem.xml.UnmarshallerConstants;
 import org.docbook.model.SideBar;
-import org.docx4j.wml.Tc;
-import org.docx4j.wml.Tr;
+import org.docbook.model.Title;
+import org.docx4j.wml.Tbl;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
-/**
- * @author sali
- */
-public class SideBarBuilder extends TableBasedBlockBuilder<SideBar> {
+public class SideBarBuilder extends JavaScriptBasedBuilder<SideBar, Tbl> {
 
-    public SideBarBuilder(Builder<?> parent, SideBar obj, int indexInParent) {
-        super(parent, obj, indexInParent);
+    public SideBarBuilder(SideBar source, Builder<?> parent) {
+        super(source, parent);
     }
 
     @Override
-    protected void initContent() {
-        content = new ArrayList<>();
-        content.addAll(source.getTitleContent());
-        content.addAll(source.getContent());
+    protected Title getTitle() {
+        return null;
     }
 
     @Override
-    protected void preProcess() {
-        tbl = applicationController.getSideBarTable();
-        final Tr tr = (Tr) tbl.getContent().get(0);
-        tc = (Tc) tr.getContent().get(0);
+    protected FunctionInput<Tbl> initFunctionInputs(List<Object> processedChildContent) {
+        final var title = (Title) source.getTitleContent().stream().filter(UnmarshallerConstants::isTitleType)
+                .findFirst().orElse(null);
+        final var args = new Object[2];
+        if (Objects.nonNull(title)) {
+           args[0] = builderFactory.process(title, this).get(0);
+        }
+        args[1] = processedChildContent;
+        return new FunctionInput<>(configurationUtils.getSideBarFunctionName(), Tbl.class, args);
     }
-
 }

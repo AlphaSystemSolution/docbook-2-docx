@@ -1,25 +1,24 @@
 package com.alphasystem.docbook.builder.impl.block;
 
 import com.alphasystem.docbook.builder.Builder;
-import com.alphasystem.docbook.builder.impl.BlockBuilder;
 import org.docbook.model.VariableList;
 
 import java.util.ArrayList;
+import java.util.List;
 
-/**
- * @author sali
- */
-public class VariableListBuilder extends BlockBuilder<VariableList> {
+public class VariableListBuilder extends ListBuilder<VariableList> {
 
-    public VariableListBuilder(Builder<?> parent, VariableList source, int indexInParent) {
-        super(parent, source, indexInParent);
+    public VariableListBuilder(VariableList source, Builder<?> parent) {
+        super(source, parent);
     }
 
     @Override
-    protected void initContent() {
-        titleContent = source.getTitleContent();
-        content = new ArrayList<>();
-        content.addAll(source.getContent());
-        content.addAll(source.getVariableListEntry());
+    protected void setListStyleName() {
+        listStyleName = "var-list";
+    }
+
+    @Override
+    protected List<Object> getChildContent() {
+        return new ArrayList<>(source.getVariableListEntry());
     }
 }

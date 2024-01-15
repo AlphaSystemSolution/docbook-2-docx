@@ -1,6 +1,0 @@
-<screen xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en">public class HelloWorld {
-    public static void main(String[] args) throws Exception {
-      System.out.println("Hello World!");
-    }
-}
-</screen>

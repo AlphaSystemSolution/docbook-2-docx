@@ -3,19 +3,16 @@ package com.alphasystem.docbook.builder.impl.block;
 import com.alphasystem.docbook.builder.Builder;
 import org.docbook.model.TableHeader;
 
-import java.util.ArrayList;
+import java.util.List;
 
-/**
- * @author sali
- */
 public class TableHeaderBuilder extends TableContentBuilder<TableHeader> {
 
-    public TableHeaderBuilder(Builder<?> parent, TableHeader source, int indexInParent) {
-        super(parent, source, indexInParent);
+    public TableHeaderBuilder(TableHeader source, Builder<?> parent) {
+        super(source, parent);
     }
 
     @Override
-    protected void initContent() {
-        content = new ArrayList<>(source.getRow());
+    protected List<Object> getChildContent() {
+        return sanitizeRows(source.getRow());
     }
 }

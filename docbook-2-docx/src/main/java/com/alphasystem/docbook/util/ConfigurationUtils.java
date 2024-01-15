@@ -1,118 +1,177 @@
 package com.alphasystem.docbook.util;
 
-import com.alphasystem.docbook.builder.Builder;
-import com.alphasystem.docbook.builder.impl.block.SectionBuilder;
-import com.alphasystem.docbook.builder.model.Admonition;
-import org.apache.commons.configuration2.CompositeConfiguration;
-import org.apache.commons.configuration2.PropertiesConfiguration;
-import org.apache.commons.configuration2.SystemConfiguration;
-import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
-import org.apache.commons.configuration2.builder.fluent.Parameters;
-import org.apache.commons.configuration2.ex.ConfigurationException;
+import com.alphasystem.docbook.model.Admonition;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import io.vavr.Tuple;
+import io.vavr.Tuple2;
 import org.apache.commons.lang3.StringUtils;
+import org.docbook.model.Section;
 
-import java.io.File;
+import java.util.*;
 
-import static com.alphasystem.docbook.ApplicationController.CONF_PATH_VALUE;
-import static com.alphasystem.util.AppUtil.isInstanceOf;
 import static java.lang.String.format;
-import static java.nio.file.Paths.get;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * @author sali
  */
 public class ConfigurationUtils {
 
-    private static ConfigurationUtils instance;
+    private static final ConfigurationUtils instance;
+
+    static {
+        instance = new ConfigurationUtils();
+    }
 
     public static synchronized ConfigurationUtils getInstance() {
-        if (instance == null) {
-            try {
-                instance = new ConfigurationUtils();
-            } catch (ConfigurationException e) {
-                throw new RuntimeException(e.getMessage(), e);
-            }
-        }
         return instance;
     }
 
-    private final CompositeConfiguration configuration;
+    private final Map<String, String> titlesMap = new HashMap<>();
+    private final Map<String, String> functionNames = new HashMap<>();
+    private final Map<Admonition, Tuple2<String, String>> admonitions = new HashMap<>();
+    private final Config mainConfig;
+    private final Config appConfig;
+    private String defaultListStyle;
+    private String tocCaption;
+    private String tableCaption;
+    private String exampleCaption;
+    private String varTermStyle;
 
     /**
      * Do not let any one instantiate this class.
-     *
-     * @throws ConfigurationException
      */
-    private ConfigurationUtils() throws ConfigurationException {
-        Parameters parameters = new Parameters();
-        final File file = get(CONF_PATH_VALUE, "system-defaults.properties").toFile();
-        FileBasedConfigurationBuilder<PropertiesConfiguration> builder = new FileBasedConfigurationBuilder<>(
-                PropertiesConfiguration.class).configure(parameters.fileBased().setFile(file));
-
-        configuration = new CompositeConfiguration();
-        configuration.addConfiguration(new SystemConfiguration());
-        configuration.addConfiguration(builder.getConfiguration());
+    private ConfigurationUtils() {
+        mainConfig = ConfigFactory.load();
+        appConfig = mainConfig.getConfig("docbook-docx");
+        loadTitles();
+        loadAdmonitions();
+        loadFunctionNames();
     }
 
-    public String getTitleStyle(Builder builder) {
-        String defaultTitle = configuration.getString("default.title");
-        String titleKey = format("%s", builder.getSource().getClass().getName());
-        if (isInstanceOf(SectionBuilder.class, builder)) {
-            SectionBuilder sectionBuilder = (SectionBuilder) builder;
-            int level = sectionBuilder.getLevel();
+    private void loadTitles() {
+        final var config = appConfig.getConfig("titles");
+        config.entrySet().forEach(entry -> {
+            final var key = entry.getKey();
+            final var value = entry.getValue().unwrapped().toString();
+            titlesMap.put(key, value);
+        });
+    }
+
+    private void loadAdmonitions() {
+        final var config = appConfig.getConfig("admonitions");
+        Arrays.stream(Admonition.values()).forEach(admonition -> {
+            final var c = config.getConfig(admonition.name().toLowerCase());
+            admonitions.put(admonition, Tuple.of(c.getString("caption"), c.getString("color")));
+        });
+    }
+
+    private void loadFunctionNames() {
+        final var config = appConfig.getConfig("script-function-names");
+        config.entrySet().forEach(entry -> {
+            final var key = entry.getKey();
+            final var value = entry.getValue().unwrapped().toString();
+            functionNames.put(key, value);
+        });
+    }
+
+    public String getTitleStyle(String titleKey) {
+        return titlesMap.getOrDefault(titleKey, titlesMap.get("default"));
+    }
+
+    public String getTitleStyle(int level, Class<?> parentClass) {
+        var titleKey = parentClass.getName();
+        if (parentClass.equals(Section.class)) {
             titleKey = format("%s.%s", titleKey, level);
         }
-        titleKey = format("%s.title", titleKey);
-        return configuration.getString(titleKey, defaultTitle);
+        return getTitleStyle(titleKey);
     }
 
     public String getDefaultListStyle() {
-        return getString("default.list.style");
+        if (Objects.isNull(defaultListStyle)) {
+            defaultListStyle = getString("list-style.default");
+        }
+        return defaultListStyle;
     }
 
-    public String getAdmonitionStyle(Admonition admonition) {
-        return getString(format("%s.style", admonition.name()));
+    public String getVarTermStyle() {
+        if (Objects.isNull(varTermStyle)) {
+            varTermStyle = getString("list-style.var-term");
+        }
+        return varTermStyle;
     }
 
-    public String getAdmonitionCaptionStyle(Admonition admonition) {
-        return getString(format("%s.caption.style", admonition.name()));
+    public Tuple2<String, String> getAdmonitionConfig(Admonition admonition) {
+        return admonitions.get(admonition);
     }
 
-    public String getAdmonitionListStyle(Admonition admonition) {
-        return getString(format("%s.list.style", admonition.name()));
+    public String getAdmonitionFunctionName() {
+        return functionNames.get("admonition");
     }
 
-    public String getAdmonitionCaption(Admonition admonition) {
-        return getString(format("%s.caption", admonition.name()));
+    public String getSideBarFunctionName() {
+        return functionNames.get("sidebar");
+    }
+
+    public String getExampleFunctionName() {
+        return functionNames.get("example");
     }
 
     public String getExampleCaption() {
-        return configuration.getString("example.caption");
+        if (Objects.isNull(exampleCaption)) {
+            exampleCaption = appConfig.getString("captions.example");
+        }
+        return exampleCaption;
     }
 
     public String getTableCaption() {
-        return configuration.getString("table.caption");
+        if (Objects.isNull(tableCaption)) {
+            tableCaption = appConfig.getString("captions.table");
+        }
+        return tableCaption;
     }
 
     public String getTableOfContentCaption() {
-        return configuration.getString("toc.caption");
+        if (Objects.isNull(tocCaption)) {
+            tocCaption = appConfig.getString("captions.toc");
+        }
+        return tocCaption;
     }
 
     public String getTableStyle(String ts) {
-        return isBlank(ts) ? null : configuration.getString(ts);
+        return getString(String.format("table.%s", ts));
     }
 
-    public String getTemplate(){
-        return configuration.getString("template");
+    public String getTemplate() {
+        return getString("template");
     }
 
     public String[] getStyles() {
-        final String _styles = configuration.getString("styles");
-        return StringUtils.isBlank(_styles) ? null : _styles.split(",");
+        final var defaultStyles = "default-styles.xml";
+        var _styles = getString("styles");
+        _styles = StringUtils.isBlank(_styles) ? defaultStyles : defaultStyles + "," + _styles;
+        return _styles.split(",");
     }
 
-    public String getString(String key) {
-        return configuration.getString(key);
+    public List<String> getScriptFiles() {
+        final var defaultJsFiles = appConfig.getStringList("scripts");
+        final var results = new ArrayList<>(defaultJsFiles);
+        try {
+            final var customScripts = getString("custom-scripts");
+            if (Objects.nonNull(customScripts)) {
+                results.addAll(Arrays.asList(customScripts.split(",")));
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace(System.out);
+        }
+        return results;
+    }
+
+    public Config getConfig(String path) {
+        return mainConfig.getConfig(path);
+    }
+
+    private String getString(String key) {
+        return appConfig.hasPath(key) ? appConfig.getString(key) : null;
     }
 }

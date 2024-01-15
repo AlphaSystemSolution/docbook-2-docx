@@ -1,156 +1,63 @@
 package com.alphasystem.docbook.builder.impl;
 
 import com.alphasystem.docbook.builder.Builder;
-import com.alphasystem.openxml.builder.wml.PBuilder;
-import com.alphasystem.openxml.builder.wml.WmlAdapter;
+import com.alphasystem.docbook.util.Utils;
 import com.alphasystem.openxml.builder.wml.WmlBuilderFactory;
-import org.docx4j.wml.P;
-import org.docx4j.wml.PPr;
+import com.alphasystem.util.AppUtil;
+import org.docbook.model.Title;
+import org.docx4j.wml.R;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
-import static com.alphasystem.util.AppUtil.isInstanceOf;
-import static java.util.Objects.isNull;
+public abstract class BlockBuilder<S> extends AbstractBuilder<S> {
 
-/**
- * @author sali
- */
-public abstract class BlockBuilder<T> extends AbstractBuilder<T> {
-
-    protected PPr paraProperties;
-    protected PPr listParaProperties;
-
-    protected BlockBuilder(Builder<?> parent, T source, int indexInParent) {
-        super(parent, source, indexInParent);
+    protected BlockBuilder(S source, Builder<?> parent) {
+        this("getContent", source, parent);
     }
 
-    public PPr getParaProperties() {
-        return paraProperties;
+    protected BlockBuilder(String childContentMethodName, S source, Builder<?> parent) {
+        super(childContentMethodName, source, parent);
     }
 
-    public PPr getListParaProperties() {
-        return listParaProperties;
+    protected Title getTitle() {
+        final var o = Utils.invokeMethod(source, "getTitle");
+        if (Objects.nonNull(o) && AppUtil.isInstanceOf(Title.class, o)) {
+            return (Title) o;
+        }
+        return null;
+    }
+
+    protected List<Object> processTitle() {
+        final var title = getTitle();
+        if (Objects.nonNull(title)) {
+            return builderFactory.process(title, this);
+        }
+        return Collections.emptyList();
     }
 
     @Override
-    public List<Object> buildContent() {
-        preProcess();
-
-        // process title first, if applicable
-        final List<Object> processedTitleContent = processTitleContent();
-
-        // process child content
-        final List<Object> processedChildContent = doProcess();
-
-        // do post processing here
-        return postProcess(processedTitleContent, processedChildContent);
-    }
-
-    /**
-     * Any pre processing before start parsing content.
-     */
-    protected void preProcess() {
-    }
-
-    /**
-     * Process any title content.
-     *
-     * @return processed list of title content.
-     */
-    protected List<Object> processTitleContent() {
-        List<Object> result = new ArrayList<>();
-        parseContent(titleContent, result);
-        return result;
-    }
-
-    /**
-     * Process any child content.
-     *
-     * @return processed list of content.
-     */
-    protected List<Object> doProcess() {
-        List<Object> result = new ArrayList<>();
-        parseContent(content, result);
-        return result;
-    }
-
-    /**
-     * Post process of result. Combines results of processing of title contents and child content in a fashion
-     * appropriate to current builder.
-     *
-     * @param processedTitleContent list of processed title content, optional
-     * @param processedChildContent list of processed child content
-     * @return final list of processed child content which will go in the out put
-     */
-    protected List<Object> postProcess(List<Object> processedTitleContent, List<Object> processedChildContent) {
-        List<Object> result = new ArrayList<>();
-        processedTitleContent.forEach(o -> result.add(postProcessContent(o)));
-        processedChildContent.forEach(o -> result.add(postProcessContent(o)));
-        return result;
-    }
-
-    protected Object postProcessContent(Object o) {
-        // String parentType = (parent == null) ? null : parent.getClass().getSimpleName();
-        //logger.info("Object Type: \"{}\", Parent Type: \"{}\"", o.getClass().getSimpleName(), parentType);
-        return o;
-    }
-
-    /**
-     * Iterates through the child content of source object calls {@link #buildContent()} on each builder and adds the
-     * processed content into the result.
-     *
-     * @param content the child content of the source object.
-     * @param target  list of all processed child content
-     */
-    @SuppressWarnings({"unchecked"})
-    protected void parseContent(List<Object> content, List<Object> target) {
-        if (isNull(content) || content.isEmpty()) {
-            return;
+    protected List<Object> doProcess(List<Object> processedChildContent) {
+        // at this stage child content should have been wrapped in one of block element, if not wrap in "P" object
+        final var onlyRunType = io.vavr.collection.List.ofAll(processedChildContent).forAll(BlockBuilder::isRunType);
+        if (onlyRunType) {
+            processedChildContent = Collections.singletonList(WmlBuilderFactory.getPBuilder()
+                    .addContent(processedChildContent.toArray()).getObject());
         }
-        PBuilder pBuilder = null;
-        for (int i = 0; i < content.size(); i++) {
-            final Object o = content.get(i);
-            final var builder = getChildBuilder(o, i);
-            if (builder == null) {
-                logUnhandledContentWarning(o);
-                continue;
-            }
-            final List<Object> childContent = builder.buildContent();
-
-            // take all consecutive inline items and create a para, if builder wants to have builder wants to combine
-            // inline elements
-            if (isInstanceOf(InlineBuilder.class, builder)) {
-                if (pBuilder == null) {
-                    pBuilder = WmlBuilderFactory.getPBuilder();
-                }
-                pBuilder.addContent(childContent.toArray());
-            } else {
-                // we found a BlockBuilder, we might have been updating pBuilder with the running text, now it is a
-                // good time to add that in the result
-                if (pBuilder != null) {
-                    addPara(pBuilder.getObject(), target);
-                    pBuilder = null;
-                }
-
-                // add content of block as well
-                target.addAll(childContent);
-            }
-        } // end of for loop
-
-        // at the end of all this me might not have added content of pBuilder into result, add it now
-        if (pBuilder != null) {
-            addPara(pBuilder.getObject(), target);
-        }
+        return super.doProcess(processedChildContent);
     }
 
-    protected Builder getChildBuilder(Object o, int index) {
-        return factory.getBuilder(this, o, index);
+    @Override
+    public List<Object> process() {
+        final var processed = super.process();
+        final var result = new ArrayList<>(processTitle());
+        result.addAll(processed);
+        return result;
     }
 
-    private void addPara(P p, List<Object> target) {
-        WmlAdapter.addBookMark(p, getId(source));
-        target.add(p);
+    private static boolean isRunType(Object o) {
+        return AppUtil.isInstanceOf(R.class, o);
     }
-
 }

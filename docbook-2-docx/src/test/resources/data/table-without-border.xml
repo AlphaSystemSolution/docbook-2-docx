@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<article xmlns="http://docbook.org/ns/docbook">
+    <informaltable colsep="0" rowsep="0" frame="none">
+        <tgroup cols="4">
+            <colspec colwidth="25*" colname="col_1"/>
+            <colspec colwidth="25*" colname="col_2"/>
+            <colspec colwidth="25*" colname="col_3"/>
+            <colspec colwidth="25*" colname="col_4"/>
+            <tbody>
+                <row>
+                    <entry valign="top" align="left">
+                        <simpara>Row 1, Column 1</simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara>Row 1, Column 2</simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara>Row 1, Column 3</simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara>Row 1, Column 4</simpara>
+                    </entry>
+                </row>
+                <row>
+                    <entry valign="top" align="left">
+                        <simpara>Row 2, Column 1</simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara>Row 2, Column 2</simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara>Row 2, Column 3</simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara>Row 2, Column 4</simpara>
+                    </entry>
+                </row>
+                <row>
+                    <entry valign="top" align="left">
+                        <simpara>Row 3, Column 1</simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara>Row 3, Column 2</simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara>Row 3, Column 3</simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara>Row 3, Column 4</simpara>
+                    </entry>
+                </row>
+            </tbody>
+        </tgroup>
+    </informaltable>
+</article>

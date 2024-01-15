@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<article xmlns="http://docbook.org/ns/docbook">
+    <informaltable colsep="1" rowsep="1" frame="all">
+        <tgroup cols="4">
+            <colspec colwidth="25*" colname="col_1"/>
+            <colspec colwidth="20*" colname="col_2"/>
+            <colspec colwidth="35*" colname="col_3"/>
+            <colspec colwidth="20*" colname="col_4"/>
+            <tbody>
+                <row>
+                    <entry valign="top" namest="col_1" nameend="col_4" align="left">
+                        <simpara>Row 1, Column Span 1 - 4</simpara>
+                    </entry>
+                </row>
+                <row>
+                    <entry valign="top" namest="col_1" nameend="col_2" align="left">
+                        <simpara>Row 2, Column Span 1 - 2</simpara>
+                    </entry>
+                    <entry valign="top" namest="col_3" nameend="col_4" align="left">
+                        <simpara>Row 2, Column Span 3 - 4</simpara>
+                    </entry>
+                </row>
+                <row>
+                    <entry valign="top" align="left">
+                        <simpara>Row 3, Column 1</simpara>
+                    </entry>
+                    <entry valign="top" namest="col_2" nameend="col_4" align="left">
+                        <simpara>Row 3, Column Span 2 - 4</simpara>
+                    </entry>
+                </row>
+                <row>
+                    <entry valign="top" namest="col_1" nameend="col_2" align="left">
+                        <simpara>Row 4, Column Span 1 - 2</simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara>Row 4, Column 3</simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara>Row 4, Column 4</simpara>
+                    </entry>
+                </row>
+                <row>
+                    <entry valign="top" align="left">
+                        <simpara>Row 5, Column 1</simpara>
+                    </entry>
+                    <entry valign="top" namest="col_2" nameend="col_3" align="left">
+                        <simpara>Row 5, Column Span 2 - 3</simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara>Row 5, Column 4</simpara>
+                    </entry>
+                </row>
+                <row>
+                    <entry valign="top" align="left">
+                        <simpara>Row 6, Column 1</simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara>Row 6, Column 2</simpara>
+                    </entry>
+                    <entry valign="top" namest="col_3" nameend="col_4" align="left">
+                        <simpara>Row 6, Column Span 3 - 4</simpara>
+                    </entry>
+                </row>
+                <row>
+                    <entry valign="top" align="left">
+                        <simpara>Row 7, Column 1</simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara>Row 7, Column 2</simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara>Row 7, Column 3</simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara>Row 7, Column 4</simpara>
+                    </entry>
+                </row>
+            </tbody>
+        </tgroup>
+    </informaltable>
+</article>

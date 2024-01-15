@@ -2,15 +2,10 @@ package com.alphasystem.docbook.builder;
 
 import java.util.List;
 
-/**
- * @author sali
- */
-public interface Builder<T> {
+public interface Builder<S> {
 
-    List<Object> buildContent();
-
-    T getSource();
-
+    S getSource();
     Builder<?> getParent();
-
+    String getRole();
+    List<Object> process();
 }

@@ -3,9 +3,9 @@ package com.alphasystem.docbook.handler.impl;
 /**
  * @author sali
  */
-class ArabicHeading1Handler extends ArabicHandler {
+public class ArabicHeading1Handler extends ArabicHandler {
 
-    ArabicHeading1Handler() {
+    public ArabicHeading1Handler() {
         super(32);
     }
 }

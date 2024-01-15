@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en">
+    <!-- Testing space between two elements, for example, <phrase role="underline">chocolate</phrase> <phrase role="underline">at home</phrase>
+      Should preserve space between "</phrase> <phrase".
+    -->
+    <simpara>Zayd ate <phrase role="underline">chocolate</phrase> <phrase role="underline">at home</phrase> <phrase role="underline">yesterday</phrase> <phrase role="underline">happily</phrase> <phrase role="underline">because he was hungry</phrase>.</simpara>
+</article>

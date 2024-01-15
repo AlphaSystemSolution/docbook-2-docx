@@ -1,38 +1,31 @@
 package com.alphasystem.docbook;
 
-import com.alphasystem.docbook.builder.model.Admonition;
-import com.alphasystem.docbook.handler.BlockHandlerFactory;
-import com.alphasystem.docbook.handler.BlockHandlerService;
-import com.alphasystem.docbook.handler.BuilderHandlerService;
-import com.alphasystem.docbook.handler.InlineHandlerService;
+import com.alphasystem.SystemException;
+import com.alphasystem.asciidoc.model.DocumentInfo;
+import com.alphasystem.docbook.handler.InlineHandlerFactory;
+import com.alphasystem.docbook.handler.InlineStyleHandler;
 import com.alphasystem.docbook.util.ConfigurationUtils;
-import org.docx4j.wml.Tbl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.alphasystem.docbook.util.Utils;
+import com.alphasystem.util.AppUtil;
+import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.Source;
 
-import java.nio.file.Path;
-import java.util.ServiceLoader;
-
-import static com.alphasystem.docbook.handler.BlockHandlerFactory.*;
-import static com.alphasystem.util.nio.NIOFileUtils.USER_DIR;
-import static java.nio.file.Paths.get;
-import static java.util.ServiceLoader.load;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * @author sali
  */
 public final class ApplicationController {
 
-    private static final String CONF = "conf";
-    private static final String CONF_DIR = System.getProperty("conf.path", USER_DIR);
-    private static final Path CONF_PATH = get(CONF_DIR, CONF);
-    public static final String CONF_PATH_VALUE = CONF_PATH.toString();
     private static final ThreadLocal<DocumentContext> CONTEXT = new ThreadLocal<>();
-    private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationController.class);
+
+    private static final ConfigurationUtils configurationUtils = ConfigurationUtils.getInstance();
+    private final InlineHandlerFactory inlineHandlerFactory = InlineHandlerFactory.getInstance();
     private static ApplicationController instance;
 
-    public static void startContext(DocumentContext documentContext) {
-        CONTEXT.set(documentContext);
+    public static void startContext(final DocumentInfo documentInfo) {
+        CONTEXT.set(new DocumentContext(createDocumentInfo(documentInfo)));
     }
 
     public static DocumentContext getContext() {
@@ -43,6 +36,20 @@ public final class ApplicationController {
         CONTEXT.remove();
     }
 
+    private static DocumentInfo createDocumentInfo(final DocumentInfo src) {
+        var documentInfo = new DocumentInfo(src);
+        documentInfo.setTocTitle(configurationUtils.getTableOfContentCaption());
+        // TODO: revisit whether we need these to be set here
+        /*documentInfo.setCautionCaption(configurationUtils.getAdmonitionCaption(Admonition.CAUTION));
+        documentInfo.setImportantCaption(configurationUtils.getAdmonitionCaption(Admonition.IMPORTANT));
+        documentInfo.setNoteCaption(configurationUtils.getAdmonitionCaption(Admonition.NOTE));
+        documentInfo.setTipCaption(configurationUtils.getAdmonitionCaption(Admonition.TIP));
+        documentInfo.setWarningCaption(configurationUtils.getAdmonitionCaption(Admonition.WARNING));*/
+        documentInfo.setExampleCaption(configurationUtils.getExampleCaption());
+        documentInfo.setTableCaption(configurationUtils.getTableCaption());
+        return documentInfo;
+    }
+
     public static synchronized ApplicationController getInstance() {
         if (instance == null) {
             instance = new ApplicationController();
@@ -50,45 +57,58 @@ public final class ApplicationController {
         return instance;
     }
 
-    private final BlockHandlerFactory blockHandlerFactory;
+    private final Context context;
 
     /**
      * Do not let anyone instantiate this class
      */
     private ApplicationController() {
-        // initialize singletons
-        ConfigurationUtils.getInstance();
+        loadHandlers();
+        context = Context.newBuilder("js").allowAllAccess(true).build();
 
-        ServiceLoader<BlockHandlerService> blockHandlerServices = load(BlockHandlerService.class);
-        blockHandlerServices.forEach(BlockHandlerService::initializeHandlers);
+        // initialization of scripts
+        configurationUtils.getScriptFiles().stream()
+                .map(ApplicationController::readResource)
+                .map(ApplicationController::loadSource)
+                .forEach(context::eval);
 
-        ServiceLoader<InlineHandlerService> inlineHandlerServices = load(InlineHandlerService.class);
-        inlineHandlerServices.forEach(InlineHandlerService::initializeHandlers);
-
-        ServiceLoader<BuilderHandlerService> builderHandlerServices = load(BuilderHandlerService.class);
-        builderHandlerServices.forEach(BuilderHandlerService::initializeHandlers);
-
-        blockHandlerFactory = BlockHandlerFactory.getInstance();
+        Runtime.getRuntime().addShutdownHook(new Thread(context::close));
     }
 
-    public Tbl getExampleTable() {
-        return (Tbl) blockHandlerFactory.getHandler(EXAMPLE_KEY).handleBlock();
+    private void loadHandlers() {
+        final var config = configurationUtils.getConfig("docbook-docx.style-handlers");
+        config.entrySet().forEach(entry -> {
+            final var key = entry.getKey();
+            final var handlerClassName = entry.getValue().unwrapped().toString();
+            try {
+                final var obj = Utils.initObject(handlerClassName);
+                if (!AppUtil.isInstanceOf(InlineStyleHandler.class, obj)) {
+                    throw new RuntimeException(String.format("Type \"%s\" is not subclass of \"InlineStyleHandler\".", handlerClassName));
+                }
+                inlineHandlerFactory.registerHandler(key, (InlineStyleHandler) obj);
+            } catch (SystemException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
-    public Tbl getInformalExampleTable() {
-        return (Tbl) blockHandlerFactory.getHandler(INFORMAL_EXAMPLE_KEY).handleBlock();
+    private static File readResource(String resourceName) {
+        try {
+            return Utils.readResource(resourceName);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public Tbl getSideBarTable() {
-        return (Tbl) blockHandlerFactory.getHandler(SIDE_BAR_KEY).handleBlock();
+    private static Source loadSource(File file) {
+        try {
+            return Source.newBuilder("js", file).build();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public Tbl getScreenTable() {
-        return (Tbl) blockHandlerFactory.getHandler(SCREEN_KEY).handleBlock();
+    public Context getScriptEngine() {
+        return context;
     }
-
-    public Tbl getAdmonitionTable(Admonition admonition) {
-        return (Tbl) blockHandlerFactory.getHandler(admonition.name()).handleBlock();
-    }
-
 }

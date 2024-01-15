@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<article xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en">
+    <variablelist>
+        <varlistentry>
+            <term>Dairy</term>
+            <listitem>
+                <itemizedlist>
+                    <listitem>
+                        <simpara>Milk</simpara>
+                    </listitem>
+                    <listitem>
+                        <simpara>Eggs</simpara>
+                    </listitem>
+                </itemizedlist>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term>Bakery</term>
+            <listitem>
+                <itemizedlist>
+                    <listitem>
+                        <simpara>Bread</simpara>
+                    </listitem>
+                </itemizedlist>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term>Produce</term>
+            <listitem>
+                <itemizedlist>
+                    <listitem>
+                        <simpara>Bananas</simpara>
+                    </listitem>
+                </itemizedlist>
+            </listitem>
+        </varlistentry>
+    </variablelist>
+</article>

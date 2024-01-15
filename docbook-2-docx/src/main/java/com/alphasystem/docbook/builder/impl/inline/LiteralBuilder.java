@@ -4,21 +4,11 @@ import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.builder.impl.InlineBuilder;
 import org.docbook.model.Literal;
 
-import static com.alphasystem.docbook.builder.DocumentBuilderHelper.LITERAL;
+import static com.alphasystem.docbook.handler.InlineHandlerFactory.LITERAL;
 
-/**
- * @author sali
- */
 public class LiteralBuilder extends InlineBuilder<Literal> {
 
-    public LiteralBuilder(Builder<?> parent, Literal literal, int indexInParent) {
-        super(parent, literal, indexInParent);
+    public LiteralBuilder(Literal source, Builder<?> parent) {
+        super(LITERAL, source, parent);
     }
-
-    @Override
-    protected void initContent() {
-        styles = new String[]{LITERAL};
-        content = source.getContent();
-    }
-
 }

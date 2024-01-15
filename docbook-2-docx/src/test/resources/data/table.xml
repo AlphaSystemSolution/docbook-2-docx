@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<article xmlns="http://docbook.org/ns/docbook">
+    <table colsep="1" rowsep="1" frame="all">
+        <title>Result: Rendered simple table</title>
+        <tgroup cols="2">
+            <colspec colwidth="50*" colname="col_1"/>
+            <colspec colwidth="50*" colname="col_2"/>
+            <tbody>
+                <row>
+                    <entry valign="top" align="left">
+                        <simpara>Cell in column 1, row 1</simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara>Cell in column 2, row 1</simpara>
+                    </entry>
+                </row>
+                <row>
+                    <entry valign="top" align="left">
+                        <simpara>Cell in column 1, row 2</simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara>Cell in column 2, row 2</simpara>
+                    </entry>
+                </row>
+                <row>
+                    <entry valign="top" align="left">
+                        <simpara>Cell in column 1, row 3</simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara>Cell in column 2, row 3</simpara>
+                    </entry>
+                </row>
+            </tbody>
+        </tgroup>
+    </table>
+</article>

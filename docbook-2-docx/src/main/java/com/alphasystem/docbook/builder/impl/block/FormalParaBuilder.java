@@ -1,23 +1,26 @@
 package com.alphasystem.docbook.builder.impl.block;
 
 import com.alphasystem.docbook.builder.Builder;
-import com.alphasystem.docbook.builder.impl.BlockBuilder;
+import com.alphasystem.xml.UnmarshallerConstants;
 import org.docbook.model.FormalPara;
+import org.docbook.model.Title;
 
-import java.util.Collections;
+import java.util.List;
 
-/**
- * @author sali
- */
-public class FormalParaBuilder extends BlockBuilder<FormalPara> {
+public class FormalParaBuilder extends AbstractParaBuilder<FormalPara> {
 
-    public FormalParaBuilder(Builder<?> parent, FormalPara obj, int indexInParent) {
-        super(parent, obj, indexInParent);
+    public FormalParaBuilder(FormalPara source, Builder<?> parent) {
+        super(null, source, parent);
     }
 
     @Override
-    protected void initContent() {
-        titleContent = source.getTitleContent();
-        content = Collections.singletonList(source.getPara());
+    protected Title getTitle() {
+        return (Title) source.getTitleContent().stream().filter(UnmarshallerConstants::isTitleType).findFirst()
+                .orElse(null);
+    }
+
+    @Override
+    protected List<Object> createPara(List<Object> processedChildContent) {
+        return builderFactory.process(source.getPara(), this);
     }
 }

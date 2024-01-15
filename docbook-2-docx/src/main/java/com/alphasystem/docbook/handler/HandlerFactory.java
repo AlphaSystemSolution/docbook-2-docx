@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * @author sali
  */
-public abstract class HandlerFactory<H extends Handler> {
+public abstract class HandlerFactory<H> {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     Map<String, H> handlers = Collections.synchronizedMap(new HashMap<>());

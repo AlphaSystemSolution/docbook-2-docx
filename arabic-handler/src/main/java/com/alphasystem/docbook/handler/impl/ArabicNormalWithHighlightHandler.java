@@ -5,9 +5,9 @@ import com.alphasystem.openxml.builder.wml.RPrBuilder;
 /**
  * @author sali
  */
-class ArabicNormalWithHighlightHandler extends ArabicHandler {
+public class ArabicNormalWithHighlightHandler extends ArabicHandler {
 
-    ArabicNormalWithHighlightHandler() {
+    public ArabicNormalWithHighlightHandler() {
     }
 
     @Override

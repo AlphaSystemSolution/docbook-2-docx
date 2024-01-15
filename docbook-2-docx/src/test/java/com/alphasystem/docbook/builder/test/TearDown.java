@@ -1,14 +1,12 @@
 package com.alphasystem.docbook.builder.test;
 
 import com.alphasystem.docbook.ApplicationController;
-import org.docx4j.openpackaging.exceptions.Docx4JException;
+import com.alphasystem.openxml.builder.wml.WmlAdapter;
 import org.testng.annotations.AfterSuite;
 
 import java.awt.*;
 import java.io.File;
-import java.io.IOException;
 
-import static com.alphasystem.openxml.builder.wml.WmlAdapter.save;
 import static java.nio.file.Paths.get;
 import static org.testng.Assert.fail;
 
@@ -17,17 +15,20 @@ import static org.testng.Assert.fail;
  */
 public class TearDown extends AbstractTest {
 
+    public TearDown() {
+        super("");
+    }
+
     @AfterSuite
     public void tearDown() {
-        ApplicationController.endContext();
         try {
-            final File file = get(TARGET_PATH, "builder.docx").toFile();
-            save(file, wmlPackage);
+            final File file = get(targetPath, FILE_NAME).toFile();
+            WmlAdapter.save(file, ApplicationController.getContext().getWordprocessingMLPackage());
             Desktop.getDesktop().open(file);
-        } catch (Docx4JException e) {
+        } catch (Exception e) {
             fail(e.getMessage(), e);
-        } catch (IOException e) {
-            e.printStackTrace();
+        } finally {
+            ApplicationController.endContext();
         }
     }
 }

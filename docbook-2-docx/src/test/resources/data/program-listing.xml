@@ -1,0 +1,8 @@
+<article xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en">
+<programlisting>public class HelloWorld {
+    public static void main(String[] args) throws Exception {
+      System.out.println("Hello World!");
+    }
+}
+</programlisting>
+</article>

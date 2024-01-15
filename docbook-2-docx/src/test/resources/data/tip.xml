@@ -1,3 +1,6 @@
-<tip xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en">
-    <simpara>A document title is an <emphasis>optional</emphasis> feature of an AsciiDoc document.</simpara>
-</tip>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<article xmlns="http://docbook.org/ns/docbook">
+    <tip>
+        <simpara>A document title is an <emphasis>optional</emphasis> feature of an <emphasis>AsciiDoc</emphasis> document.</simpara>
+    </tip>
+</article>

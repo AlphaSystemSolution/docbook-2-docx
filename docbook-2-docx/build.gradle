@@ -4,15 +4,17 @@ dependencies {
     api("org.glassfish.jaxb:jaxb-runtime:${jaxbRuntimeVersion}")
     api("jakarta.xml.bind:jakarta.xml.bind-api:${bindApiVersion}")
     api("com.alphasystem.openxml:openxml-builder:${openxmlBuilderVersion}")
+    api('io.vavr:vavr:0.10.4')
+    api('org.graalvm.js:js:22.3.4')
+    api('com.typesafe:config:1.4.3')
     testImplementation group: 'org.testng', name: 'testng', version: '7.7.0'
     testImplementation group: 'com.google.inject', name: 'guice', version: '7.0.0'
     testImplementation group: 'org.uncommons', name: 'reportng', version: '1.1.4'
 }
 
 tasks.withType(Test) {
-    systemProperty 'template', '../conf/default.dotx'
-    systemProperty 'styles', '../conf/styles.xml,META-INF/custom-styles.xml'
-    systemProperty 'conf.path', '.'
+    systemProperty 'docbook-docx.template', '../conf/default.dotx'
+    systemProperty 'docbook-docx.styles', 'META-INF/custom-styles.xml'
     systemProperty 'target.path', 'build/docs'
     systemProperty 'data.path', "${projectDir}/src/test/resources/data"
     systemProperty 'org.apache.commons.logging.Log', 'org.apache.commons.logging.impl.SimpleLog'
@@ -27,3 +29,12 @@ test {
         listeners << 'org.uncommons.reportng.JUnitXMLReporter'
     }
 }
+
+jacocoTestReport {
+    reports {
+        xml.required = true
+        html.required = false
+    }
+}
+
+check.dependsOn jacocoTestReport

@@ -4,12 +4,13 @@
 
 allprojects {
     group = 'com.alphasystem.docx'
-    version = '3.0.0-SNAPSHOT'
+    version = '4.0.0-SNAPSHOT'
 }
 
 subprojects {
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
+    apply plugin: 'jacoco'
 
     repositories {
         mavenLocal()

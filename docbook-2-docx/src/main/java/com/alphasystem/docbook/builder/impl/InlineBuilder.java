@@ -3,7 +3,7 @@ package com.alphasystem.docbook.builder.impl;
 import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.handler.InlineHandlerFactory;
 import com.alphasystem.docbook.handler.InlineStyleHandler;
-import com.alphasystem.docbook.handler.impl.inline.NullHandler;
+import com.alphasystem.docbook.handler.impl.NullHandler;
 import com.alphasystem.openxml.builder.wml.RBuilder;
 import com.alphasystem.openxml.builder.wml.RPrBuilder;
 import com.alphasystem.openxml.builder.wml.WmlBuilderFactory;
@@ -11,35 +11,30 @@ import org.docx4j.wml.R;
 import org.docx4j.wml.RPr;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.alphasystem.util.AppUtil.isInstanceOf;
-import static java.lang.String.format;
-import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
-/**
- * @author sali
- */
-public abstract class InlineBuilder<T> extends AbstractBuilder<T> {
+public abstract class InlineBuilder<S> extends AbstractBuilder<S> {
 
     protected String[] styles;
+    protected RBuilder runBuilder;
     protected InlineHandlerFactory handlerFactory = InlineHandlerFactory.getInstance();
 
-    protected InlineBuilder(Builder<?> parent, T obj, int indexInParent) {
-        super(parent, obj, indexInParent);
+    protected InlineBuilder(String defaultStyle, S source, Builder<?> parent) {
+        this("getContent", defaultStyle, source, parent);
     }
 
-    /**
-     * Creates run properties for the given styles.
-     *
-     * @return run properties for the given styles
-     */
+    protected InlineBuilder(String childContentMethodName, String defaultStyle, S source, Builder<?> parent) {
+        super(childContentMethodName, source, parent);
+        styles = isBlank(role) ? new String[]{defaultStyle} : role.split(" ");
+    }
+
     protected RPr handleStyles() {
         if (isEmpty(styles)) {
-            return null;
+            return WmlBuilderFactory.getRPrBuilder().getObject();
         }
         RPrBuilder rPrBuilder;
         RPr rPr = null;
@@ -65,50 +60,31 @@ public abstract class InlineBuilder<T> extends AbstractBuilder<T> {
             logger.warn("Not sure how to handle style \"{}\" in builder \"{}\".", style, getClass().getSimpleName());
             handler = new NullHandler();
         }
-        RPrBuilder rPrBuilder = WmlBuilderFactory.getRPrBuilder();
-        return handler.applyStyle(rPrBuilder).getObject();
+        return handler.applyStyle(WmlBuilderFactory.getRPrBuilder()).getObject();
     }
 
-    protected List<R> processChildContent(Object childContent, RPr runProperties, int indexInParent) {
-        final var builder = factory.getBuilder(this, childContent, indexInParent);
-        if (builder == null) {
-            logUnhandledContentWarning(childContent);
-            return Collections.emptyList();
-        }
-        if (!isInstanceOf(InlineBuilder.class, builder)) {
-            throw new RuntimeException(format("\"%s\" does not implement InlineBuilder in builder \"%s\"",
-                    childContent.getClass().getSimpleName(), getClass().getSimpleName()));
-        }
-        var inlineBuilder = (InlineBuilder<?>) builder;
-        final List<R> list = inlineBuilder.processContent();
-        return list.stream().map(r -> copyRun(r, null, runProperties)).collect(Collectors.toList());
-    }
-
-
-    protected List<R> processContent() {
-        if (isNull(content) || content.isEmpty()) {
-            return Collections.emptyList();
-        }
-        RPr rPr = handleStyles();
-        List<R> resultRuns = new ArrayList<>();
-        for (int i = 0; i < content.size(); i++) {
-            final Object o = content.get(i);
-            resultRuns.addAll(processChildContent(o, rPr, i));
-        }
-        return resultRuns;
-    }
-
-    private R copyRun(R src, R target, RPr rPr) {
-        RBuilder rBuilder = new RBuilder(src, target);
-        R result = rBuilder.getObject();
-        final RPr tRPr = result.getRPr();
-        rPr = (rPr == null) ? tRPr : new RPrBuilder(rPr, tRPr).getObject();
-        result.setRPr(rPr);
-        return result;
+    protected void createRunBuilder() {
+        runBuilder = WmlBuilderFactory.getRBuilder().withRsidR(getId());
+        final var rPr = new RPrBuilder(handleStyles(), runBuilder.getObject().getRPr()).getObject();
+        runBuilder.withRPr(rPr);
     }
 
     @Override
-    public List<Object> buildContent() {
-        return new ArrayList<>(processContent());
+    protected List<Object> doProcess(List<Object> processedChildContent) {
+        createRunBuilder();
+        final var r = runBuilder.getObject();
+        final var result = new ArrayList<>();
+        result.add(r);
+
+        final var rPr = r.getRPr();
+        final var updatedChildContent =
+                processedChildContent.stream().map(content -> {
+                    final var childR = (R) content;
+                    childR.setRPr(new RPrBuilder(rPr, childR.getRPr()).getObject());
+                    return childR;
+                }).collect(Collectors.toList());
+
+        result.addAll(updatedChildContent);
+        return result;
     }
 }

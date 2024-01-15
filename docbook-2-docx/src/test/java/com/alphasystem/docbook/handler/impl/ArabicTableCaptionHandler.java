@@ -9,9 +9,9 @@ import static org.docx4j.wml.STThemeColor.TEXT_2;
 /**
  * @author sali
  */
-class ArabicTableCaptionHandler extends ArabicHandler {
+public class ArabicTableCaptionHandler extends ArabicHandler {
 
-    ArabicTableCaptionHandler() {
+    public ArabicTableCaptionHandler() {
         super(40);
     }
 

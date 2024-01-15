@@ -1,37 +1,24 @@
 package com.alphasystem.docbook.builder.impl.block;
 
 import com.alphasystem.docbook.builder.Builder;
-import com.alphasystem.openxml.builder.wml.ListItem;
-import com.alphasystem.openxml.builder.wml.UnorderedList;
 import org.docbook.model.ItemizedList;
 
 import java.util.ArrayList;
+import java.util.List;
 
-/**
- * @author sali
- */
 public class ItemizedListBuilder extends ListBuilder<ItemizedList> {
 
-    public ItemizedListBuilder(Builder<?> parent, ItemizedList obj, int indexInParent) {
-        super(parent, obj, indexInParent);
+    public ItemizedListBuilder(ItemizedList source, Builder<?> parent) {
+        super(source, parent);
     }
 
     @Override
-    protected void initContent() {
-        titleContent = source.getTitleContent();
-        content = new ArrayList<>();
-        content.addAll(source.getContent());
-        content.addAll(source.getListItem());
+    protected void setListStyleName() {
+        this.listStyleName = source.getMark();
     }
 
     @Override
-    protected ListItem<?> getItemByName(String styleName) {
-        return UnorderedList.getByStyleName(styleName);
+    protected List<Object> getChildContent() {
+        return new ArrayList<>(source.getListItem());
     }
-
-    @Override
-    protected void preProcess() {
-        parseStyleAndLevel(source.getMark());
-    }
-
 }

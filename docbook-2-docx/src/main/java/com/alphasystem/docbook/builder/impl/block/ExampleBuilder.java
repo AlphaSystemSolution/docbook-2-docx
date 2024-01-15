@@ -1,30 +1,28 @@
 package com.alphasystem.docbook.builder.impl.block;
 
 import com.alphasystem.docbook.builder.Builder;
+import com.alphasystem.docbook.builder.impl.JavaScriptBasedBuilder;
+import com.alphasystem.xml.UnmarshallerConstants;
 import org.docbook.model.Example;
-import org.docx4j.wml.Tc;
-import org.docx4j.wml.Tr;
+import org.docbook.model.Title;
+import org.docx4j.wml.Tbl;
 
-/**
- * @author sali
- */
-public class ExampleBuilder extends TableBasedBlockBuilder<Example> {
+import java.util.List;
 
-    public ExampleBuilder(Builder<?> parent, Example example, int indexInParent) {
-        super(parent, example, indexInParent);
+public class ExampleBuilder extends JavaScriptBasedBuilder<Example, Tbl> {
+
+    public ExampleBuilder(Example source, Builder<?> parent) {
+        super(source, parent);
     }
 
     @Override
-    protected void initContent() {
-        titleContent = source.getTitleContent();
-        content = source.getContent();
+    protected Title getTitle() {
+        return (Title) source.getTitleContent().stream().filter(UnmarshallerConstants::isTitleType)
+                .findFirst().orElse(null);
     }
 
     @Override
-    protected void preProcess() {
-        tbl = applicationController.getExampleTable();
-        final Tr tr = (Tr) tbl.getContent().get(0);
-        tc = (Tc) tr.getContent().get(0);
+    protected FunctionInput<Tbl> initFunctionInputs(List<Object> processedChildContent) {
+        return new FunctionInput<>(configurationUtils.getExampleFunctionName(), Tbl.class, new Object[]{processedChildContent});
     }
-
 }

@@ -1,10 +1,10 @@
 package com.alphasystem.docbook.handler.impl;
 
-class TranslationHandler extends ArabicHandler {
+public class TranslationHandler extends ArabicHandler {
 
     private static final String FONT_NAME = "Arabic Typesetting";
 
-    TranslationHandler() {
+    public TranslationHandler() {
         super(20, FONT_NAME, false);
     }
 }

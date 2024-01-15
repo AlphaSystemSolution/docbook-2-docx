@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<article xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en">
+    <section xml:id="_section_level_1">
+        <title>Section Level I</title>
+        <simpara xml:id="_section_level_2">Some section level 1 text.</simpara>
+        <section xml:id="_8ED5EFF6">
+            <title>Section Level II</title>
+            <simpara>Some section level 2 text.</simpara>
+            <section xml:id="_section_level_3">
+                <title>Section Level III</title>
+                <simpara>Some section level 3 text.</simpara>
+                <section xml:id="_section_level_4">
+                    <title>Section Level IV</title>
+                    <simpara>Some section level 4 text.</simpara>
+                    <section xml:id="_section_level_5">
+                        <title>Section Level V</title>
+                        <simpara>Some section level 5 text.</simpara>
+                    </section>
+                </section>
+            </section>
+        </section>
+    </section>
+</article>

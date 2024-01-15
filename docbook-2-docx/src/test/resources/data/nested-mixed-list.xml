@@ -1,0 +1,35 @@
+<article xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en">
+    <orderedlist>
+        <listitem>
+            <simpara>Step 1</simpara>
+        </listitem>
+        <listitem>
+            <simpara>Step 2</simpara>
+            <orderedlist>
+                <listitem>
+                    <simpara>Step 2a</simpara>
+                </listitem>
+                <listitem>
+                    <simpara>Step 2b</simpara>
+                </listitem>
+            </orderedlist>
+        </listitem>
+        <listitem>
+            <simpara>Step 3</simpara>
+        </listitem>
+        <listitem>
+            <simpara>Step 4</simpara>
+            <itemizedlist>
+                <listitem>
+                    <simpara>First</simpara>
+                </listitem>
+                <listitem>
+                    <simpara>Second</simpara>
+                </listitem>
+                <listitem>
+                    <simpara>Third</simpara>
+                </listitem>
+            </itemizedlist>
+        </listitem>
+    </orderedlist>
+</article>

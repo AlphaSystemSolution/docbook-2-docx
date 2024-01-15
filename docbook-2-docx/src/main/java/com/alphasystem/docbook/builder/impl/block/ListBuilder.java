@@ -2,55 +2,63 @@ package com.alphasystem.docbook.builder.impl.block;
 
 import com.alphasystem.docbook.ApplicationController;
 import com.alphasystem.docbook.builder.Builder;
-import com.alphasystem.docbook.builder.impl.BlockBuilder;
+import com.alphasystem.docbook.builder.impl.AbstractBuilder;
+import com.alphasystem.docbook.model.ListInfo;
+import com.alphasystem.util.AppUtil;
 
-import java.util.List;
+import java.util.stream.Collectors;
 
-import static com.alphasystem.docbook.ApplicationController.getContext;
-import static com.alphasystem.util.AppUtil.isInstanceOf;
+public abstract class ListBuilder<S> extends AbstractBuilder<S> {
 
-/**
- * @author sali
- */
-public abstract class ListBuilder<T> extends BlockBuilder<T> {
+    protected ListInfo listInfo;
+    protected String listStyleName;
 
-    protected long number;
-    protected long level;
-
-    protected ListBuilder(Builder<?> parent, T obj, int indexInParent) {
-        super(parent, obj, indexInParent);
+    protected ListBuilder(S source, Builder<?> parent) {
+        super(null, source, parent);
     }
 
-    protected abstract com.alphasystem.openxml.builder.wml.ListItem<?> getItemByName(String styleName);
+    @Override
+    protected void preProcess() {
+        super.preProcess();
+        setListStyleName();
+        final var ancestorListBuilder = getParent(ListBuilder.class);
+        final var allParents = getParents();
+        final var variableListParents = allParents.stream().filter(ListBuilder::isVariableListBuilder).collect(Collectors.toList());
+        final var otherListBuilders = allParents.stream().filter(ListBuilder::isOtherListBuilder).collect(Collectors.toList());
+        final var noListBuilders = variableListParents.isEmpty() && otherListBuilders.isEmpty();
+        final var nestedVariableList = AppUtil.isInstanceOf(VariableListBuilder.class, this) && variableListParents.size() == 1;
+        final var varListCheck = variableListParents.size() == 1 && !nestedVariableList;
 
-    protected void parseStyleAndLevel(String styleName) {
-        final var listItemBuilder = getParent(ListItemBuilder.class);
-        if (listItemBuilder != null) {
-            // we have nested list, get the current list item and pass it down to
-            number = listItemBuilder.getNumber();
-            level = listItemBuilder.getLevel() + 1;
+        if (noListBuilders || varListCheck) {
+            final var level = 0;
+            final var numberId = ApplicationController.getContext().getListNumber(listStyleName, level);
+            this.listInfo = new ListInfo(numberId, level);
         } else {
-            number = getItemByName(styleName).getNumberId();
-            level = 0;
-            number = getContext().getListNumber(number, level);
+            // we have nested list, get the current list info, update the level, and pass it down
+            final var pli = ancestorListBuilder.getListInfo();
+            var numberId = pli.getNumber();
+            var level = pli.getLevel() + 1;
+            if (numberId <= -1 && isOtherListBuilder(this) && otherListBuilders.isEmpty()) {
+                // we are in most likely in nested variable list, don't increase the level
+                level = pli.getLevel();
+                numberId = ApplicationController.getContext().getListNumber(listStyleName, level);
+            }
+            this.listInfo = new ListInfo(numberId, level);
         }
-        ApplicationController.getContext().setCurrentListLevel(level);
     }
 
-    @Override
-    protected Builder<?> getChildBuilder(Object o, int index) {
-        final var builder = super.getChildBuilder(o, index);
-        if (isInstanceOf(ListItemBuilder.class, builder)) {
-            ListItemBuilder listItemBuilder = (ListItemBuilder) builder;
-            listItemBuilder.setNumber(number);
-            listItemBuilder.setLevel(level);
-        }
-        return builder;
+    protected abstract void setListStyleName();
+
+    public ListInfo getListInfo() {
+        return listInfo;
     }
 
-    @Override
-    protected List<Object> postProcess(List<Object> processedTitleContent, List<Object> processedChildContent) {
-        ApplicationController.getContext().setCurrentListLevel(-1);
-        return super.postProcess(processedTitleContent, processedChildContent);
+    private static boolean isVariableListBuilder(Builder<?> builder) {
+        return AppUtil.isInstanceOf(VariableListBuilder.class, builder);
+    }
+
+    private static boolean isOtherListBuilder(Builder<?> builder) {
+        return AppUtil.isInstanceOf(OrderedListBuilder.class, builder) ||
+                AppUtil.isInstanceOf(ItemizedListBuilder.class, builder);
     }
 }
