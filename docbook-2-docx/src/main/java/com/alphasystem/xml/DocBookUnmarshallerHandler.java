@@ -19,10 +19,8 @@ import org.xml.sax.Locator;
 
 import javax.xml.bind.UnmarshallerHandler;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 import java.util.Stack;
-import java.util.stream.Collectors;
 
 import static com.alphasystem.xml.UnmarshallerConstants.*;
 
@@ -30,6 +28,7 @@ import static com.alphasystem.xml.UnmarshallerConstants.*;
 public class DocBookUnmarshallerHandler implements UnmarshallerHandler, UnmarshallerConstants {
 
     private final static String NEW_LINE = System.lineSeparator();
+    public static final String X_LINK_NAME_SPACE = "http://www.w3.org/1999/xlink";
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final BuilderFactory builderFactory = BuilderFactory.getInstance();
@@ -37,6 +36,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     private final DocumentContext documentContext;
     private String currentText = "";
     private int sectionLevel = 0;
+    private String xLinkNameSpacePrefix = "xl";
     private final Stack<Object> docbookObjects = new Stack<>();
 
     public DocBookUnmarshallerHandler() {
@@ -77,6 +77,9 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     @Override
     public void startPrefixMapping(String prefix, String uri) {
         logger.trace("startPrefixMapping: prefix = {}, uri = {}", prefix, uri);
+        if (X_LINK_NAME_SPACE.equals(uri)) {
+            xLinkNameSpacePrefix = prefix;
+        }
     }
 
     @Override
@@ -524,7 +527,10 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
 
     private void startLink(String id, Attributes attributes) {
         pushText();
-        final var link = new Link().withId(id).withRole(getRole(attributes)).withLinkend(getAttributeValue("linkend", attributes)).withHref(getAttributeValue("href", attributes)).withEndterm(getAttributeValue("endterm", attributes));
+        final var link = new Link().withId(id).withRole(getRole(attributes))
+                .withLinkend(getAttributeValue("linkend", attributes))
+                .withHref(getAttributeValue(String.format("%s:href", xLinkNameSpacePrefix), attributes))
+                .withEndterm(getAttributeValue("endterm", attributes));
         docbookObjects.push(link);
     }
 
@@ -742,7 +748,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         pushText();
         // title is handled differently
         final var title = (Title) docbookObjects.peek();
-        final var linkText = getLinkText("", title.getContent());
+        final var linkText = Utils.getLinkText(title.getContent());
         if (StringUtils.isNotBlank(linkText)) {
             ApplicationController.getContext().putLabel(title.getId(), linkText);
         }
@@ -1032,7 +1038,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
                 final var obj = (Caution) parent;
                 obj.getContent().add(currentText);
                 docbookObjects.push(obj);
-            } if (isCrossReferenceType(parent)) {
+            } else if (isCrossReferenceType(parent)) {
                 docbookObjects.push(parent);
             } else if (isEmphasisType(parent)) {
                 final var obj = (Emphasis) parent;
@@ -1046,7 +1052,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
                 final var obj = (Example) parent;
                 obj.getContent().add(currentText);
                 docbookObjects.push(obj);
-            }  else if (isImportantType(parent)) {
+            } else if (isImportantType(parent)) {
                 final var obj = (Important) parent;
                 obj.getContent().add(currentText);
                 docbookObjects.push(obj);
@@ -1229,28 +1235,6 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         }
     }
 
-    private String getLinkText(String result, List<Object> contents) {
-        if (Objects.isNull(contents) || contents.isEmpty()) {
-            return result;
-        }
-        final var collectedText = contents.stream().map(content -> {
-            if (isStringType(content)) {
-                return (String) content;
-            } else if (isEmphasisType(content)) {
-                return getLinkText(result, ((Emphasis) content).getContent());
-            } else if (isPhraseType(content)) {
-                return getLinkText(result, ((Phrase) content).getContent());
-            } else if (isSuperscriptType(content)) {
-                return getLinkText(result, ((Superscript) content).getContent());
-            } else {
-                logger.warn("Not sure how to get text from: ");
-                return "";
-            }
-        }).collect(Collectors.joining(""));
-
-        return result + collectedText;
-    }
-
     private void processContent(Object content) {
         logger.debug("Processing content: {}", content.getClass().getName());
         final var processedContent = builderFactory.process(content, null);
@@ -1258,7 +1242,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
             processedContent.forEach(obj -> ApplicationController.getContext().getMainDocumentPart().addObject(obj));
         }
     }
-    
+
     private boolean canProcessText() {
         return StringUtils.isNotBlank(currentText) || currentText.length() == 1;
     }

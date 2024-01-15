@@ -8,7 +8,7 @@ import static com.alphasystem.docbook.builder.test.DataFactory.*;
 
 public class InlineTest extends AbstractTest {
 
-    private final SimplePara paraWithXrefLabel = createSimplePara(IdGenerator.nextId(),
+    private final SimplePara paraWithXrefLabel = createSimplePara("linked_section",
             "A paragraph with ",
             createLiteral(IdGenerator.nextId(), "xreflabel"),
             " (",
@@ -67,7 +67,7 @@ public class InlineTest extends AbstractTest {
         addHorizontalLine();
     }
 
-    @Test(dependsOnMethods = "testBasicInline")
+    @Test(dependsOnMethods = "testLiteralAndSubscriptTest")
     public void testParaWithXrefLabel() {
         addTestTitle("Simple Paragraph with \"XREFLABEL\" Test");
         processContent(createArticle(paraWithXrefLabel));
@@ -157,7 +157,7 @@ public class InlineTest extends AbstractTest {
                 createSimplePara(IdGenerator.nextId(), "Link to ", createCrossReference(paraWithXrefLabel), ".")
         );
 
-        addTestTitle("XREF with xreflabel test");
+        addTestTitle("XREF with \"reflabel\" test");
         processContent(article);
         final var content = mainDocumentPart.getContent();
         assertSize( 1);
@@ -166,6 +166,62 @@ public class InlineTest extends AbstractTest {
     }
 
     @Test(dependsOnMethods = "xrefWithXrefLabel")
+    public void linkWithLinkEndTest() {
+        final var link = createLink(paraWithXrefLabel, null, null);
+        final var article = createArticle(
+                createSimplePara(IdGenerator.nextId(), "Link to ", link, ".")
+        );
+
+        addTestTitle("Link with \"linkEnd\" Test");
+        processContent(article);
+        assertSize( 1);
+        final var content = mainDocumentPart.getContent();
+        assertText(content.get(content.size() - 1), "Link to Text to display.");
+        addHorizontalLine();
+    }
+
+    @Test(dependsOnMethods = "linkWithLinkEndTest")
+    public void externalLinkWithHrefWithNoLinkContentTest() {
+        addTestTitle("External link with \"href\" Test");
+        processContent(readXml("external-link-no-content"));
+        assertSize( 1);
+        final var content = mainDocumentPart.getContent();
+        assertText(content.get(content.size() - 1), "Link to https://tdg.docbook.org/.");
+        addHorizontalLine();
+    }
+
+    @Test(dependsOnMethods = "externalLinkWithHrefWithNoLinkContentTest")
+    public void externalLinkWithHrefWithLinkContentTest() {
+        addTestTitle("External link with \"href\" and link content Test");
+        processContent(readXml("external-link-with-content"));
+        assertSize( 1);
+        final var content = mainDocumentPart.getContent();
+        assertText(content.get(content.size() - 1), "Link to TDG.");
+        addHorizontalLine();
+    }
+
+    @Test(dependsOnMethods = "externalLinkWithHrefWithLinkContentTest")
+    public void internalLinkWithHrefWithNoLinkContentTest() {
+        addTestTitle("Internal link with \"href\" Test");
+        processContent(readXml("internal-link-no-content"));
+        assertSize( 1);
+        final var content = mainDocumentPart.getContent();
+        assertText(content.get(content.size() - 1), "Link to Text to display.");
+        addHorizontalLine();
+    }
+
+    @Test(dependsOnMethods = "internalLinkWithHrefWithNoLinkContentTest")
+    public void internalLinkWithHrefWithLinkContentTest() {
+        addTestTitle("Internal link with \"href\" and link content Test");
+        processContent(readXml("internal-link-with-content"));
+        assertSize( 1);
+        final var content = mainDocumentPart.getContent();
+        assertText(content.get(content.size() - 1), "Link to internal section.");
+        addHorizontalLine();
+    }
+
+
+    @Test(dependsOnMethods = "internalLinkWithHrefWithLinkContentTest")
     public void customParaStyleUsingParaTest() {
         final var article = createArticle(
                 createPara(IdGenerator.nextId(), "Paragraph with custom style.").withRole("Style1")
@@ -207,7 +263,7 @@ public class InlineTest extends AbstractTest {
     }
 
     @Test(dependsOnMethods = "lineBreakWithAsciidocBr")
-    public void tsetSingleSpace() {
+    public void testSingleSpace() {
         addTestTitle("Line break test");
         processContent(readXml("space-between-two-elements"));
         assertSize( 1);

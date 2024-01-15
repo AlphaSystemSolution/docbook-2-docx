@@ -72,6 +72,10 @@ public final class DataFactory {
         return new CrossReference().withLinkend(content);
     }
 
+    public static Link createLink(Object linkEnd, String endTerm, String href) {
+        return new Link().withLinkend(linkEnd).withEndterm(endTerm).withHref(href);
+    }
+
     public static Subscript createSubscript(String id, Object... content) {
         return objectFactory.createSubscript().withId(id).withContent(content);
     }

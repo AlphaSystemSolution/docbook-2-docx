@@ -11,7 +11,6 @@ import org.docx4j.wml.R;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import static com.alphasystem.docbook.handler.InlineHandlerFactory.HYPERLINK;
 
@@ -22,39 +21,56 @@ public abstract class LinkSupportBuilder<S> extends InlineBuilder<S> {
 
     protected LinkSupportBuilder(String childContentMethodName, S source, Builder<?> parent) {
         super(childContentMethodName, HYPERLINK, source, parent);
-        initHref();
     }
 
     protected void initHref() {
-        var href = (String) Utils.invokeMethod(source, "getLinkend");
+        href = (String) Utils.invokeMethod(source, "getLinkend");
         if (StringUtils.isBlank(href)) {
             href = (String) Utils.invokeMethod(source, "getHref");
-            this.external = true;
+            external = StringUtils.isNotBlank(href) && !href.startsWith("#");
+            if (!external) {
+                href = href.substring(1);
+            }
         }
-        this.href = href;
     }
 
-    protected R getLinkLabel() {
+    protected R getLinkLabel(List<Object> childContent) {
         createRunBuilder();
-        var text = (String) Utils.invokeMethod(source, "getEndterm");
+
+        // Try to populate link display text
+        // first get from child content
+        // then from getEndterm
+        // if link is external then use `href`
+        // if link is internal then get text from the linked text
+        // if all of the above fails the default to "here".
+
+        var text = Utils.getLinkText(childContent);
+
         if (StringUtils.isBlank(text)) {
-            text = ApplicationController.getContext().getLabel(href);
+            text = (String) Utils.invokeMethod(source, "getEndterm");
         }
+        logger.info("From endTerm: {}", text);
+        if (StringUtils.isBlank(text)) {
+            if (external) text = href;
+            else text = ApplicationController.getContext().getLabel(href);
 
-        if (StringUtils.isNotBlank(text)) {
-            runBuilder.addContent(WmlAdapter.getText(text));
         }
-
+        if (StringUtils.isBlank(text)) {
+            text = "here";
+        }
+        runBuilder.addContent(WmlAdapter.getText(text));
         return runBuilder.getObject();
     }
 
     @Override
+    protected void preProcess() {
+        super.preProcess();
+        initHref();
+    }
+
+    @Override
     protected List<Object> processChildContent(List<Object> childContent) {
-        var processedChildContent = super.processChildContent(childContent);
-        if (Objects.isNull(processedChildContent) || processedChildContent.isEmpty()) {
-            processedChildContent = Collections.singletonList(getLinkLabel());
-        }
-        return processedChildContent;
+        return Collections.singletonList(getLinkLabel(childContent));
     }
 
     @Override
