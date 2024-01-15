@@ -92,10 +92,10 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         if (StringUtils.isNotBlank(xrefLabel)) {
             ApplicationController.getContext().putLabel(id, xrefLabel);
         }
-        if (StringUtils.isWhitespace(currentText)) {
-            currentText = "";
-        } else {
+        if (canProcessText()) {
             endInline();
+        } else {
+            currentText = "";
         }
         switch (localName) {
             case ARTICLE:
@@ -399,7 +399,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     }
 
     private void pushText() {
-        if (StringUtils.isNotBlank(currentText)) {
+        if (canProcessText()) {
             docbookObjects.push(currentText);
             processEndElement();
             currentText = "";
@@ -1024,7 +1024,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     // HELPER FUNCTIONS
 
     private void endInline() {
-        if (StringUtils.isNotBlank(currentText)) {
+        if (canProcessText()) {
             final var parent = docbookObjects.pop();
             if (isArticleType(parent)) {
                 throw new NotImplementedException(parent, currentText);
@@ -1257,6 +1257,10 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         if (processedContent != null) {
             processedContent.forEach(obj -> ApplicationController.getContext().getMainDocumentPart().addObject(obj));
         }
+    }
+    
+    private boolean canProcessText() {
+        return StringUtils.isNotBlank(currentText) || currentText.length() == 1;
     }
 
     private static String getId(Attributes attributes) {

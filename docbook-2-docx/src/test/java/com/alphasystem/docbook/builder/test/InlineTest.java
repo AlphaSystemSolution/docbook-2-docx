@@ -205,4 +205,14 @@ public class InlineTest extends AbstractTest {
         assertSize( 2);
         addHorizontalLine();
     }
+
+    @Test(dependsOnMethods = "lineBreakWithAsciidocBr")
+    public void tsetSingleSpace() {
+        addTestTitle("Line break test");
+        processContent(readXml("space-between-two-elements"));
+        assertSize( 1);
+        final var content = mainDocumentPart.getContent();
+        assertText(content.get(content.size() - 1), "Zayd ate chocolate at home yesterday happily because he was hungry.");
+        addHorizontalLine();
+    }
 }
