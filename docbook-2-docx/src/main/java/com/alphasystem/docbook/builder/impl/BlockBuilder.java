@@ -3,7 +3,7 @@ package com.alphasystem.docbook.builder.impl;
 import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.util.Utils;
 import com.alphasystem.openxml.builder.wml.WmlBuilderFactory;
-import com.alphasystem.util.AppUtil;
+import com.alphasystem.commons.util.AppUtil;
 import org.docbook.model.Title;
 import org.docx4j.wml.R;
 

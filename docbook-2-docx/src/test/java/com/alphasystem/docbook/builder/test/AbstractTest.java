@@ -1,11 +1,11 @@
 package com.alphasystem.docbook.builder.test;
 
-import com.alphasystem.SystemException;
+import com.alphasystem.commons.SystemException;
 import com.alphasystem.asciidoc.model.DocumentInfo;
+import com.alphasystem.commons.util.IdGenerator;
 import com.alphasystem.docbook.ApplicationController;
 import com.alphasystem.openxml.builder.wml.WmlAdapter;
-import com.alphasystem.util.AppUtil;
-import com.alphasystem.util.IdGenerator;
+import com.alphasystem.commons.util.AppUtil;
 import com.alphasystem.xml.UnmarshallerTool;
 import jakarta.xml.bind.JAXBElement;
 import org.apache.commons.lang3.StringUtils;

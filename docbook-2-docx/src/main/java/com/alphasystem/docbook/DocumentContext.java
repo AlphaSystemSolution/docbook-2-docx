@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.alphasystem.util.AppUtil.isInstanceOf;
+import static com.alphasystem.commons.util.AppUtil.isInstanceOf;
 
 /**
  * @author sali

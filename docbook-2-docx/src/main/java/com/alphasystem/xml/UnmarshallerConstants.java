@@ -2,7 +2,7 @@ package com.alphasystem.xml;
 
 import org.docbook.model.*;
 
-import static com.alphasystem.util.AppUtil.isInstanceOf;
+import static com.alphasystem.commons.util.AppUtil.isInstanceOf;
 
 public interface UnmarshallerConstants {
 

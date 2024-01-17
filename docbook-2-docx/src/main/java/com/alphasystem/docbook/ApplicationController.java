@@ -1,12 +1,12 @@
 package com.alphasystem.docbook;
 
-import com.alphasystem.SystemException;
+import com.alphasystem.commons.SystemException;
 import com.alphasystem.asciidoc.model.DocumentInfo;
 import com.alphasystem.docbook.handler.InlineHandlerFactory;
 import com.alphasystem.docbook.handler.InlineStyleHandler;
 import com.alphasystem.docbook.util.ConfigurationUtils;
 import com.alphasystem.docbook.util.Utils;
-import com.alphasystem.util.AppUtil;
+import com.alphasystem.commons.util.AppUtil;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Source;
 

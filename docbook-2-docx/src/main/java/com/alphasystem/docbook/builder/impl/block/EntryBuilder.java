@@ -9,7 +9,7 @@ import com.alphasystem.openxml.builder.wml.WmlBuilderFactory;
 import com.alphasystem.openxml.builder.wml.table.ColumnData;
 import com.alphasystem.openxml.builder.wml.table.TableAdapter;
 import com.alphasystem.openxml.builder.wml.table.VerticalMergeType;
-import com.alphasystem.util.AppUtil;
+import com.alphasystem.commons.util.AppUtil;
 import com.alphasystem.xml.UnmarshallerConstants;
 import org.docbook.model.Align;
 import org.docbook.model.BasicVerticalAlign;

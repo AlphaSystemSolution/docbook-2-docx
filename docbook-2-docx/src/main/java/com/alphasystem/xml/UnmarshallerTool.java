@@ -1,6 +1,6 @@
 package com.alphasystem.xml;
 
-import com.alphasystem.SystemException;
+import com.alphasystem.commons.SystemException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;

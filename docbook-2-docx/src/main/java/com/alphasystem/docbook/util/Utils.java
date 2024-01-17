@@ -1,8 +1,8 @@
 package com.alphasystem.docbook.util;
 
-import com.alphasystem.SystemException;
-import com.alphasystem.util.AppUtil;
-import com.alphasystem.util.nio.NIOFileUtils;
+import com.alphasystem.commons.SystemException;
+import com.alphasystem.commons.util.AppUtil;
+import com.alphasystem.commons.util.nio.NIOFileUtils;
 import org.docbook.model.Emphasis;
 import org.docbook.model.Phrase;
 import org.docbook.model.Superscript;

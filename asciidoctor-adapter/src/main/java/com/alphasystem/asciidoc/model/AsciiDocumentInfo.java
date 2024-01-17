@@ -10,7 +10,7 @@ import org.asciidoctor.ast.Document;
 import java.io.File;
 import java.util.Map;
 
-import static com.alphasystem.util.AppUtil.USER_HOME_DIR;
+import static com.alphasystem.commons.util.AppUtil.USER_HOME_DIR;
 import static org.apache.commons.lang3.StringUtils.*;
 import static org.asciidoctor.SafeMode.UNSAFE;
 

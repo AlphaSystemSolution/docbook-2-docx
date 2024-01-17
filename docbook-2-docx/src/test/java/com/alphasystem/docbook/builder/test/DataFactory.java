@@ -1,7 +1,7 @@
 package com.alphasystem.docbook.builder.test;
 
+import com.alphasystem.docbook.util.JAXBTool;
 import com.alphasystem.util.IdGenerator;
-import com.alphasystem.util.JAXBTool;
 import org.apache.commons.lang3.StringUtils;
 import org.docbook.model.*;
 

@@ -4,7 +4,7 @@ import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.builder.BuilderFactory;
 import com.alphasystem.docbook.util.ConfigurationUtils;
 import com.alphasystem.docbook.util.Utils;
-import com.alphasystem.util.AppUtil;
+import com.alphasystem.commons.util.AppUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

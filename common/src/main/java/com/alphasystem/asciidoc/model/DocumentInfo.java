@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 
-import static com.alphasystem.util.AppUtil.USER_HOME_DIR;
+import static com.alphasystem.commons.util.AppUtil.USER_HOME_DIR;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**

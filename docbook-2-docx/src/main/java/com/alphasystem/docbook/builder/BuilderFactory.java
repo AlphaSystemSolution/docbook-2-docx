@@ -1,6 +1,6 @@
 package com.alphasystem.docbook.builder;
 
-import com.alphasystem.SystemException;
+import com.alphasystem.commons.SystemException;
 import com.alphasystem.docbook.util.ConfigurationUtils;
 import com.alphasystem.docbook.util.Utils;
 import org.slf4j.Logger;
