@@ -1,12 +1,11 @@
 package com.alphasystem.docbook;
 
-import com.alphasystem.commons.SystemException;
 import com.alphasystem.asciidoc.model.DocumentInfo;
+import com.alphasystem.commons.SystemException;
+import com.alphasystem.commons.util.AppUtil;
 import com.alphasystem.docbook.handler.InlineHandlerFactory;
 import com.alphasystem.docbook.handler.InlineStyleHandler;
 import com.alphasystem.docbook.util.ConfigurationUtils;
-import com.alphasystem.docbook.util.Utils;
-import com.alphasystem.commons.util.AppUtil;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Source;
 import org.slf4j.Logger;
@@ -96,7 +95,7 @@ public final class ApplicationController {
             final var key = entry.getKey();
             final var handlerClassName = entry.getValue().unwrapped().toString();
             try {
-                final var obj = Utils.initObject(handlerClassName);
+                final var obj = AppUtil.initObject(handlerClassName);
                 if (!AppUtil.isInstanceOf(InlineStyleHandler.class, obj)) {
                     throw new RuntimeException(String.format("Type \"%s\" is not subclass of \"InlineStyleHandler\".", handlerClassName));
                 }

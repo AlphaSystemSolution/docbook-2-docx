@@ -1,5 +1,6 @@
 package com.alphasystem.docbook.builder.impl.inline;
 
+import com.alphasystem.commons.util.AppUtil;
 import com.alphasystem.docbook.ApplicationController;
 import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.builder.impl.InlineBuilder;
@@ -24,9 +25,9 @@ public abstract class LinkSupportBuilder<S> extends InlineBuilder<S> {
     }
 
     protected void initHref() {
-        href = (String) Utils.invokeMethod(source, "getLinkend");
+        href = (String) AppUtil.invokeMethod(source, "getLinkend");
         if (StringUtils.isBlank(href)) {
-            href = (String) Utils.invokeMethod(source, "getHref");
+            href = (String) AppUtil.invokeMethod(source, "getHref");
             external = StringUtils.isNotBlank(href) && !href.startsWith("#");
             if (!external) {
                 href = href.substring(1);
@@ -47,7 +48,7 @@ public abstract class LinkSupportBuilder<S> extends InlineBuilder<S> {
         var text = Utils.getLinkText(childContent);
 
         if (StringUtils.isBlank(text)) {
-            text = (String) Utils.invokeMethod(source, "getEndterm");
+            text = (String) AppUtil.invokeMethod(source, "getEndterm");
         }
         if (StringUtils.isBlank(text)) {
             if (external) text = href;

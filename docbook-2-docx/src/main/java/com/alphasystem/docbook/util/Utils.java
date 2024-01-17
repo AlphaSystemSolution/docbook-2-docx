@@ -1,14 +1,12 @@
 package com.alphasystem.docbook.util;
 
-import com.alphasystem.commons.SystemException;
+import com.alphasystem.commons.util.AppUtil;
 import org.docbook.model.Emphasis;
 import org.docbook.model.Phrase;
 import org.docbook.model.Superscript;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -22,43 +20,9 @@ public class Utils {
     private Utils() {
     }
 
-    public static Object initObject(String fullQualifiedClassName) throws SystemException {
-        return initObject(fullQualifiedClassName, null, null);
-    }
-
-    public static Object initObject(String fullQualifiedClassName,
-                                    Class<?>[] parameterTypes,
-                                    Object[] args) throws SystemException {
-        try {
-            return initObject(Class.forName(fullQualifiedClassName), parameterTypes, args);
-        } catch (ClassNotFoundException ex) {
-            throw new SystemException(String.format("Could not initialize class of type \"%s\".", fullQualifiedClassName), ex);
-        }
-    }
-
-    public static Object initObject(Class<?> clazz, Class<?>[] parameterTypes, Object[] args) throws SystemException {
-        try {
-            return clazz.getConstructor(parameterTypes).newInstance(args);
-        } catch (Exception ex) {
-            throw new SystemException(String.format("Could not initialize class of type \"%s\".", clazz.getName()), ex);
-        }
-    }
-
-    public static Object invokeMethod(Object obj, String methodName) {
-        Object value = null;
-        final Method method = getMethod(obj, methodName);
-        if (method != null) {
-            try {
-                value = method.invoke(obj);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                // ignore
-            }
-        }
-        return value;
-    }
 
     public static String getId(Object source) {
-        return (String) invokeMethod(source, "getId");
+        return (String) AppUtil.invokeMethod(source, "getId");
     }
 
     public static String getLinkText(List<Object> contents) {
@@ -85,15 +49,5 @@ public class Utils {
         }).collect(Collectors.joining(""));
 
         return result + collectedText;
-    }
-
-    private static Method getMethod(Object obj, String methodName) {
-        Method method = null;
-        try {
-            method = obj.getClass().getMethod(methodName);
-        } catch (NoSuchMethodException e) {
-            // ignore
-        }
-        return method;
     }
 }

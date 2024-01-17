@@ -1,10 +1,10 @@
 package com.alphasystem.docbook.builder.impl;
 
+import com.alphasystem.commons.util.AppUtil;
 import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.builder.BuilderFactory;
 import com.alphasystem.docbook.util.ConfigurationUtils;
 import com.alphasystem.docbook.util.Utils;
-import com.alphasystem.commons.util.AppUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +35,7 @@ public abstract class AbstractBuilder<S> implements Builder<S> {
         this.source = source;
         this.parent = parent;
         this.id = Utils.getId(source);
-        this.role = (String) Utils.invokeMethod(source, "getRole");
+        this.role = (String) AppUtil.invokeMethod(source, "getRole");
         this.childContentMethodName = childContentMethodName;
     }
 
@@ -65,7 +65,7 @@ public abstract class AbstractBuilder<S> implements Builder<S> {
     @SuppressWarnings("unchecked")
     protected List<Object> getChildContent() {
         if (StringUtils.isNotBlank(childContentMethodName)) {
-            return (List<Object>) Utils.invokeMethod(source, childContentMethodName);
+            return (List<Object>) AppUtil.invokeMethod(source, childContentMethodName);
         } else {
             return Collections.emptyList();
         }
@@ -74,7 +74,7 @@ public abstract class AbstractBuilder<S> implements Builder<S> {
     @Override
     public String getRole() {
         if (Objects.isNull(role)) {
-            role = (String) Utils.invokeMethod(source, "getRole");
+            role = (String) AppUtil.invokeMethod(source, "getRole");
         }
         return role;
     }
