@@ -25,6 +25,7 @@ jar {
     dependsOn(":asciidoctor-adapter:jar")
     dependsOn(":docbook-2-docx:jar")
     dependsOn(":arabic-handler:jar")
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
     manifest {
         attributes "Main-Class": "com.alphasystem.docx.cli.Main"
     }
