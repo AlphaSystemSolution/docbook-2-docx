@@ -9,9 +9,13 @@ import com.alphasystem.docbook.util.Utils;
 import com.alphasystem.commons.util.AppUtil;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Source;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.util.function.Function;
 
 /**
  * @author sali
@@ -57,6 +61,7 @@ public final class ApplicationController {
         return instance;
     }
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private final Context context;
 
     /**
@@ -67,12 +72,22 @@ public final class ApplicationController {
         context = Context.newBuilder("js").allowAllAccess(true).build();
 
         // initialization of scripts
-        configurationUtils.getScriptFiles().stream()
-                .map(ApplicationController::readResource)
-                .map(ApplicationController::loadSource)
-                .forEach(context::eval);
+        loadScripts();
 
         Runtime.getRuntime().addShutdownHook(new Thread(context::close));
+    }
+
+    private void loadScripts() {
+        final var consumer = (Function<Path, Void>) path -> {
+            logger.info("Loading script: {}", path);
+            context.eval(loadSource(path.toFile()));
+            return null;
+        };
+        try {
+            AppUtil.processResourceDirectory("scripts", consumer);
+        } catch (SystemException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void loadHandlers() {
@@ -90,14 +105,6 @@ public final class ApplicationController {
                 throw new RuntimeException(e);
             }
         });
-    }
-
-    private static File readResource(String resourceName) {
-        try {
-            return Utils.readResource(resourceName);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private static Source loadSource(File file) {

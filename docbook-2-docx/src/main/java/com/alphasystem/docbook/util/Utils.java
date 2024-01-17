@@ -1,43 +1,25 @@
 package com.alphasystem.docbook.util;
 
 import com.alphasystem.commons.SystemException;
-import com.alphasystem.commons.util.AppUtil;
-import com.alphasystem.commons.util.nio.NIOFileUtils;
 import org.docbook.model.Emphasis;
 import org.docbook.model.Phrase;
 import org.docbook.model.Superscript;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.alphasystem.xml.UnmarshallerConstants.*;
-import static com.alphasystem.xml.UnmarshallerConstants.isSuperscriptType;
 
 public class Utils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("com.alphasystem.docbook");
 
     private Utils() {
-    }
-
-    public static File readResource(String resourceName) throws IOException {
-        try (var is = AppUtil.getResourceAsStream(resourceName)) {
-            var file = Files.createTempFile("system-defaults-", ".properties").toFile();
-            file.deleteOnExit();
-            final var os = new FileOutputStream(file);
-            NIOFileUtils.fastCopy(is, os);
-            os.close();
-            return file;
-        }
     }
 
     public static Object initObject(String fullQualifiedClassName) throws SystemException {
