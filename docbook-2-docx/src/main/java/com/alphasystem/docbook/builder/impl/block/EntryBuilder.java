@@ -97,21 +97,15 @@ public class EntryBuilder extends AbstractBuilder<Entry> {
             }
         }
 
-        STVerticalJc val = null;
+        STVerticalJc jc = null;
         if (vAlign != null) {
-            switch (vAlign) {
-                case BOTTOM:
-                    val = STVerticalJc.BOTTOM;
-                    break;
-                case MIDDLE:
-                    val = STVerticalJc.CENTER;
-                    break;
-                case TOP:
-                    val = STVerticalJc.TOP;
-                    break;
-            }
+            jc = switch (vAlign) {
+                case BOTTOM -> STVerticalJc.BOTTOM;
+                case MIDDLE -> STVerticalJc.CENTER;
+                case TOP -> STVerticalJc.TOP;
+            };
         }
-        return val;
+        return jc;
     }
 
     private static JcEnumeration getAlign(Align align, Align parentAlign) {
@@ -120,20 +114,13 @@ public class EntryBuilder extends AbstractBuilder<Entry> {
         }
         JcEnumeration jcEnumeration = null;
         if (align != null) {
-            switch (align) {
-                case LEFT:
-                    jcEnumeration = JcEnumeration.LEFT;
-                    break;
-                case CENTER:
-                    jcEnumeration = JcEnumeration.CENTER;
-                    break;
-                case RIGHT:
-                    jcEnumeration = JcEnumeration.RIGHT;
-                    break;
-                case JUSTIFY:
-                    jcEnumeration = JcEnumeration.BOTH;
-                    break;
-            }
+            jcEnumeration = switch (align) {
+                case LEFT -> JcEnumeration.LEFT;
+                case CENTER -> JcEnumeration.CENTER;
+                case RIGHT -> JcEnumeration.RIGHT;
+                case JUSTIFY -> JcEnumeration.BOTH;
+                default -> jcEnumeration;
+            };
         }
         return jcEnumeration;
     }

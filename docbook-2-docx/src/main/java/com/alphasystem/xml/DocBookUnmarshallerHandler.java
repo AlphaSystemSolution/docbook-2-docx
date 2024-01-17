@@ -101,128 +101,56 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
             currentText = "";
         }
         switch (localName) {
-            case ARTICLE:
+            case ARTICLE -> {
                 sectionLevel = 0;
                 docbookObjects.push(new Article().withId(id));
-                break;
-            case CAUTION:
-                startCaution(id, attributes);
-                break;
-            case COLUMN_SPEC:
-                startColumnSpec(attributes);
-                break;
-            case CROSS_REFERENCE:
-                startCrossReference(id, attributes);
-                break;
-            case EMPHASIS:
-                starEmphasis(id, attributes);
-                break;
-            case ENTRY:
-                startEntry(attributes);
-                break;
-            case EXAMPLE:
-                startExample(id);
-                break;
-            case FORMAL_PARA:
-                startFormalPara(id, attributes);
-                break;
-            case IMPORTANT:
-                startImportant(id, attributes);
-                break;
-            case INFORMAL_TABLE:
-                startInformalTable(id, attributes);
-                break;
-            case INFORMAL_EXAMPLE:
-                startInformalExample(id);
-                break;
-            case ITEMIZED_LIST:
-                startItemizedList(id, attributes);
-                break;
-            case LINK:
-                startLink(id, attributes);
-                break;
-            case LIST_ITEM:
-                startListItem();
-                break;
-            case LITERAL:
-                startLiteral(id, attributes);
-                break;
-            case NOTE:
-                startNote(id, attributes);
-                break;
-            case ORDERED_LIST:
-                startOrderedList(id, attributes);
-                break;
-            case PARA:
-                startPara(id, attributes);
-                break;
-            case PHRASE:
-                startPhrase(id, attributes);
-                break;
-            case PROGRAM_LISTING:
-                startProgramListing(id, attributes);
-                break;
-            case ROW:
-                startRow();
-                break;
-            case SECTION:
+            }
+            case CAUTION -> startCaution(id, attributes);
+            case COLUMN_SPEC -> startColumnSpec(attributes);
+            case CROSS_REFERENCE -> startCrossReference(id, attributes);
+            case EMPHASIS -> starEmphasis(id, attributes);
+            case ENTRY -> startEntry(attributes);
+            case EXAMPLE -> startExample(id);
+            case FORMAL_PARA -> startFormalPara(id, attributes);
+            case IMPORTANT -> startImportant(id, attributes);
+            case INFORMAL_TABLE -> startInformalTable(id, attributes);
+            case INFORMAL_EXAMPLE -> startInformalExample(id);
+            case ITEMIZED_LIST -> startItemizedList(id, attributes);
+            case LINK -> startLink(id, attributes);
+            case LIST_ITEM -> startListItem();
+            case LITERAL -> startLiteral(id, attributes);
+            case NOTE -> startNote(id, attributes);
+            case ORDERED_LIST -> startOrderedList(id, attributes);
+            case PARA -> startPara(id, attributes);
+            case PHRASE -> startPhrase(id, attributes);
+            case PROGRAM_LISTING -> startProgramListing(id, attributes);
+            case ROW -> startRow();
+            case SECTION -> {
                 sectionLevel += 1;
                 docbookObjects.push(new Section().withId(id));
-                break;
-            case SIDE_BAR:
-                startSideBar(id, attributes);
-                break;
-            case SIMPLE_PARA:
-                startSimplePara(id, attributes);
-                break;
-            case SUBSCRIPT:
-                startSubscript(id, attributes);
-                break;
-            case SUPERSCRIPT:
-                startSuperscript(id, attributes);
-                break;
-            case TABLE:
-                startTable(id, attributes);
-                break;
-            case TABLE_BODY:
-                startTableBody(attributes);
-                break;
-            case TABLE_FOOTER:
-                startTableFooter(attributes);
-                break;
-            case TABLE_GROUP:
-                startTableGroup(attributes);
-                break;
-            case TABLE_HEAD:
-                startTableHeader(attributes);
-                break;
-            case TERM:
-                startTerm(id, attributes);
-                break;
-            case TIP:
-                startTip(id, attributes);
-                break;
-            case TITLE:
-                startTitle();
-                break;
-            case VARIABLE_LIST:
-                startVariableList();
-                break;
-            case VARIABLE_LIST_ENTRY:
-                startVariableListEntry();
-                break;
-            case WARNING:
-                startWarning(id, attributes);
-                break;
-            case INFO:
-            case DATE:
+            }
+            case SIDE_BAR -> startSideBar(id, attributes);
+            case SIMPLE_PARA -> startSimplePara(id, attributes);
+            case SUBSCRIPT -> startSubscript(id, attributes);
+            case SUPERSCRIPT -> startSuperscript(id, attributes);
+            case TABLE -> startTable(id, attributes);
+            case TABLE_BODY -> startTableBody(attributes);
+            case TABLE_FOOTER -> startTableFooter(attributes);
+            case TABLE_GROUP -> startTableGroup(attributes);
+            case TABLE_HEAD -> startTableHeader(attributes);
+            case TERM -> startTerm(id, attributes);
+            case TIP -> startTip(id, attributes);
+            case TITLE -> startTitle();
+            case VARIABLE_LIST -> startVariableList();
+            case VARIABLE_LIST_ENTRY -> startVariableListEntry();
+            case WARNING -> startWarning(id, attributes);
+            case INFO, DATE ->
                 // ignored
-                currentText = "";
-                break;
-            default:
+                    currentText = "";
+            default -> {
                 logger.warn("Unhandled start element: localName = {}", localName);
                 currentText = "";
-                break;
+            }
         }
     }
 
@@ -230,119 +158,47 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     public void endElement(String uri, String localName, String qName) {
         logger.debug("End of element: localName = {}, qName = {}", localName, qName);
         switch (localName) {
-            case ARTICLE:
-            case SECTION:
+            case ARTICLE, SECTION -> {
                 sectionLevel -= 1;
                 docbookObjects.pop();
-                break;
-            case CAUTION:
-                endCaution();
-                break;
-            case CROSS_REFERENCE:
-                endCrossReference();
-                break;
-            case EMPHASIS:
-                endEmphasis();
-                break;
-            case ENTRY:
-                endEntry();
-                break;
-            case EXAMPLE:
-                endExample();
-                break;
-            case FORMAL_PARA:
-                endFormalPara();
-                break;
-            case IMPORTANT:
-                endImportant();
-                break;
-            case INFORMAL_EXAMPLE:
-                endInformalExample();
-                break;
-            case INFORMAL_TABLE:
-                endInformalTable();
-                break;
-            case ITEMIZED_LIST:
-            case ORDERED_LIST:
-                endList();
-                break;
-            case LINK:
-                endLink();
-                break;
-            case LIST_ITEM:
-                endListItem();
-                break;
-            case LITERAL:
-                endLiteral();
-                break;
-            case NOTE:
-                endNote();
-                break;
-            case PARA:
-                endPara();
-                break;
-            case PHRASE:
-                endPhrase();
-                break;
-            case PROGRAM_LISTING:
-                endProgramListing();
-                break;
-            case ROW:
-                endRow();
-                break;
-            case SIDE_BAR:
-                endSideBar();
-                break;
-            case SIMPLE_PARA:
-                endSimplePara();
-                break;
-            case SUBSCRIPT:
-                endSubscript();
-                break;
-            case SUPERSCRIPT:
-                endSuperscript();
-                break;
-            case TABLE:
-                endTable();
-                break;
-            case TABLE_BODY:
-                endTableBody();
-                break;
-            case TABLE_FOOTER:
-                endTableFooter();
-                break;
-            case TABLE_GROUP:
-                endTableGroup();
-                break;
-            case TABLE_HEAD:
-                endTableHeader();
-                break;
-            case TERM:
-                endTerm();
-                break;
-            case TIP:
-                endTip();
-                break;
-            case TITLE:
-                endTitle();
-                break;
-            case VARIABLE_LIST:
-                endVariableList();
-                break;
-            case VARIABLE_LIST_ENTRY:
-                endVariableListEntry();
-                break;
-            case WARNING:
-                endWarning();
-                break;
-            case INFO:
-            case DATE:
-            case COLUMN_SPEC:
+            }
+            case CAUTION -> endCaution();
+            case CROSS_REFERENCE -> endCrossReference();
+            case EMPHASIS -> endEmphasis();
+            case ENTRY -> endEntry();
+            case EXAMPLE -> endExample();
+            case FORMAL_PARA -> endFormalPara();
+            case IMPORTANT -> endImportant();
+            case INFORMAL_EXAMPLE -> endInformalExample();
+            case INFORMAL_TABLE -> endInformalTable();
+            case ITEMIZED_LIST, ORDERED_LIST -> endList();
+            case LINK -> endLink();
+            case LIST_ITEM -> endListItem();
+            case LITERAL -> endLiteral();
+            case NOTE -> endNote();
+            case PARA -> endPara();
+            case PHRASE -> endPhrase();
+            case PROGRAM_LISTING -> endProgramListing();
+            case ROW -> endRow();
+            case SIDE_BAR -> endSideBar();
+            case SIMPLE_PARA -> endSimplePara();
+            case SUBSCRIPT -> endSubscript();
+            case SUPERSCRIPT -> endSuperscript();
+            case TABLE -> endTable();
+            case TABLE_BODY -> endTableBody();
+            case TABLE_FOOTER -> endTableFooter();
+            case TABLE_GROUP -> endTableGroup();
+            case TABLE_HEAD -> endTableHeader();
+            case TERM -> endTerm();
+            case TIP -> endTip();
+            case TITLE -> endTitle();
+            case VARIABLE_LIST -> endVariableList();
+            case VARIABLE_LIST_ENTRY -> endVariableListEntry();
+            case WARNING -> endWarning();
+            case INFO, DATE, COLUMN_SPEC -> {
                 // ignored
-                break;
-            default:
-                logger.warn("Unhandled end element: localName = {}", localName);
-                break;
+            }
+            default -> logger.warn("Unhandled end element: localName = {}", localName);
         }
         currentText = "";
     }
@@ -376,23 +232,15 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     @Override
     public void processingInstruction(String target, String data) {
         switch (target) {
-            case "asciidoc-toc":
-                documentContext.getDocumentInfo().setToc(true);
-                break;
-            case "asciidoc-numbered":
+            case "asciidoc-toc" -> documentContext.getDocumentInfo().setToc(true);
+            case "asciidoc-numbered" -> {
                 documentContext.getDocumentInfo().setSectionNumbers(true);
                 ApplicationController.getContext().getWmlPackageBuilder().multiLevelHeading();
-                break;
-            case "asciidoc-pagebreak":
-                ApplicationController.getContext().getMainDocumentPart().addObject(WmlAdapter.getPageBreak());
-                break;
-            case "asciidoc-br":
-            case "linebreak":
-                currentText += System.lineSeparator();
-                break;
-            default:
-                logger.warn("Unhandled processing instruction: target = {}", target);
-                break;
+            }
+            case "asciidoc-pagebreak" ->
+                    ApplicationController.getContext().getMainDocumentPart().addObject(WmlAdapter.getPageBreak());
+            case "asciidoc-br", "linebreak" -> currentText += System.lineSeparator();
+            default -> logger.warn("Unhandled processing instruction: target = {}", target);
         }
     }
 

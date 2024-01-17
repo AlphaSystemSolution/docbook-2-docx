@@ -148,44 +148,28 @@ public abstract class AbstractTableBuilder<S> extends BlockBuilder<S> {
         CTBorder insideV = getNilBorder();
 
         switch (frame) {
-            case ABOVE:
-            case TOP:
-                top = getDefaultBorder();
-                break;
-            case BELOW:
-            case BOTTOM:
-                bottom = getDefaultBorder();
-                break;
-            case TOP_AND_BOTTOM:
+            case ABOVE, TOP -> top = getDefaultBorder();
+            case BELOW, BOTTOM -> bottom = getDefaultBorder();
+            case TOP_AND_BOTTOM -> {
                 top = getDefaultBorder();
                 bottom = getDefaultBorder();
-                break;
-            case LEFT_HAND_SIDE:
-                left = getDefaultBorder();
-                break;
-            case RIGHT_HAND_SIDE:
-                right = getDefaultBorder();
-                break;
-            case SIDES:
+            }
+            case LEFT_HAND_SIDE -> left = getDefaultBorder();
+            case RIGHT_HAND_SIDE -> right = getDefaultBorder();
+            case SIDES -> {
                 left = getDefaultBorder();
                 right = getDefaultBorder();
-                break;
-            case HORIZONTAL_SIDES:
-                insideH = getDefaultBorder();
-                break;
-            case VERTICAL_SIDES:
-                insideV = getDefaultBorder();
-                break;
-            case BOX:
-            case BORDER:
-            case ALL:
+            }
+            case HORIZONTAL_SIDES -> insideH = getDefaultBorder();
+            case VERTICAL_SIDES -> insideV = getDefaultBorder();
+            case BOX, BORDER, ALL -> {
                 top = getDefaultBorder();
                 left = getDefaultBorder();
                 bottom = getDefaultBorder();
                 right = getDefaultBorder();
-                break;
-            case NONE:
-                break;
+            }
+            case NONE -> {
+            }
         }
         if (ONE.equals(rowSep)) {
             insideH = getDefaultBorder();
@@ -239,7 +223,7 @@ public abstract class AbstractTableBuilder<S> extends BlockBuilder<S> {
 
     private ColumnInfo getColumnInfo(String name) {
         var columnInfos = columnInfoList.stream().filter(columnInfo -> columnInfo.getColumnName().equals(name))
-                .collect(Collectors.toList());
+                .toList();
         if (columnInfos.isEmpty()) {
             return null;
         } else {
