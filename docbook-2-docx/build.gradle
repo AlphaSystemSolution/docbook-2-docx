@@ -16,7 +16,6 @@ dependencies {
 }
 
 tasks.withType(Test).configureEach {
-    systemProperty 'docbook-docx.template', '../conf/default.dotx'
     systemProperty 'docbook-docx.styles', 'META-INF/custom-styles.xml'
     systemProperty 'target.path', 'build/docs'
     systemProperty 'data.path', "${projectDir}/src/test/resources/data"

@@ -143,7 +143,11 @@ public class ConfigurationUtils {
     }
 
     public String getTemplate() {
-        return getString("template");
+        var template = getString("template");
+        if (Objects.isNull(template)) {
+           template = "META-INF/docbook.dotx";
+        }
+        return template;
     }
 
     public String[] getStyles() {
