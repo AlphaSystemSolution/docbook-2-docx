@@ -29,6 +29,6 @@ sourceSets {
     }
 }
 
-jar {
+sourcesJar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
