@@ -4,14 +4,14 @@ dependencies {
     api("org.glassfish.jaxb:jaxb-runtime:${jaxbRuntimeVersion}")
     api("jakarta.xml.bind:jakarta.xml.bind-api:${bindApiVersion}")
     api("io.github.sfali23:open-xml-builder:${openxmlBuilderVersion}")
-    api('io.vavr:vavr:0.10.4')
-    api('org.graalvm.js:js:22.3.4')
-    api('com.typesafe:config:1.4.3')
+    api("io.vavr:vavr:${vavrVersion}")
+    api("org.graalvm.js:js:${graalvmJsVersion}")
+    api("com.typesafe:config:${typesafeConfigVersion}")
     api("org.slf4j:slf4j-api:${slf4jApiVersion}")
     api("ch.qos.logback:logback-classic:${logbackClassicVersion}")
-    testImplementation group: 'org.testng', name: 'testng', version: '7.7.0'
-    //testImplementation group: 'com.google.inject', name: 'guice', version: '7.0.0'
-    testImplementation group: 'org.uncommons', name: 'reportng', version: '1.1.4'
+    testImplementation("org.testng:testng:${testngVersion}")
+    testImplementation("com.google.inject:guice:${guiceVersion}")
+    testImplementation("org.uncommons:reportng:${reportngVersion}")
 }
 
 tasks.withType(Test).configureEach {
