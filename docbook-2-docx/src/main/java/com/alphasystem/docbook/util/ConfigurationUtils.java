@@ -143,11 +143,15 @@ public class ConfigurationUtils {
     }
 
     public String getTemplate() {
-        return getString("template");
+        var template = getString("template");
+        if (Objects.isNull(template)) {
+           template = "META-INF/docbook.dotx";
+        }
+        return template;
     }
 
     public String[] getStyles() {
-        final var defaultStyles = "default-styles.xml";
+        final var defaultStyles = "META-INF/docbook-styles.xml";
         var _styles = getString("styles");
         _styles = StringUtils.isBlank(_styles) ? defaultStyles : defaultStyles + "," + _styles;
         return _styles.split(",");
