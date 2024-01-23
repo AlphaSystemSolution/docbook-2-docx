@@ -28,3 +28,7 @@ sourceSets {
         }
     }
 }
+
+jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
