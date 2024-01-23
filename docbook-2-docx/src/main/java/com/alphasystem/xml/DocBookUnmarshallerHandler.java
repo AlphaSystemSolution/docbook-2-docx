@@ -1,15 +1,15 @@
 package com.alphasystem.xml;
 
+import com.alphasystem.commons.util.IdGenerator;
 import com.alphasystem.docbook.ApplicationController;
 import com.alphasystem.docbook.DocumentContext;
 import com.alphasystem.docbook.builder.BuilderFactory;
 import com.alphasystem.docbook.model.NotImplementedException;
 import com.alphasystem.docbook.util.ConfigurationUtils;
 import com.alphasystem.docbook.util.Utils;
-import com.alphasystem.openxml.builder.wml.TocGenerator;
-import com.alphasystem.openxml.builder.wml.UnorderedList;
-import com.alphasystem.openxml.builder.wml.WmlAdapter;
-import com.alphasystem.util.IdGenerator;
+import com.alphasystem.docx4j.builder.wml.TocGenerator;
+import com.alphasystem.docx4j.builder.wml.UnorderedList;
+import com.alphasystem.docx4j.builder.wml.WmlAdapter;
 import org.apache.commons.lang3.StringUtils;
 import org.docbook.model.*;
 import org.slf4j.Logger;

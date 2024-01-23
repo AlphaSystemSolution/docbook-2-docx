@@ -1,6 +1,6 @@
 package com.alphasystem.docbook.handler;
 
-import com.alphasystem.openxml.builder.wml.RPrBuilder;
+import com.alphasystem.docx4j.builder.wml.RPrBuilder;
 
 /**
  * Interface for handling style on current inline text.

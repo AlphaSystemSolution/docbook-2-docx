@@ -1,7 +1,7 @@
 package com.alphasystem.docbook.handler.impl;
 
 import com.alphasystem.docbook.handler.InlineStyleHandler;
-import com.alphasystem.openxml.builder.wml.RPrBuilder;
+import com.alphasystem.docx4j.builder.wml.RPrBuilder;
 
 /**
  * Handles "italic" style.

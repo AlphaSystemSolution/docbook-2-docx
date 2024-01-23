@@ -2,7 +2,7 @@ package com.alphasystem.docbook.builder.impl;
 
 import com.alphasystem.commons.util.AppUtil;
 import com.alphasystem.docbook.builder.Builder;
-import com.alphasystem.openxml.builder.wml.WmlBuilderFactory;
+import com.alphasystem.docx4j.builder.wml.WmlBuilderFactory;
 import org.docbook.model.Title;
 import org.docx4j.wml.R;
 

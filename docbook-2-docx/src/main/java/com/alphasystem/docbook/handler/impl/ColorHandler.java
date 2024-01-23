@@ -2,9 +2,8 @@ package com.alphasystem.docbook.handler.impl;
 
 import com.alphasystem.docbook.handler.InlineStyleHandler;
 import com.alphasystem.docbook.model.ColorCode;
-import com.alphasystem.openxml.builder.wml.RPrBuilder;
-
-import static com.alphasystem.openxml.builder.wml.WmlAdapter.getColor;
+import com.alphasystem.docx4j.builder.wml.RPrBuilder;
+import com.alphasystem.docx4j.builder.wml.WmlAdapter;
 
 /**
  * Handles style with given color name.
@@ -21,6 +20,6 @@ public class ColorHandler implements InlineStyleHandler {
 
     @Override
     public RPrBuilder applyStyle(RPrBuilder rprBuilder) {
-        return rprBuilder.withColor(getColor(colorCode.getCode()));
+        return rprBuilder.withColor(WmlAdapter.getColor(colorCode.getCode()));
     }
 }

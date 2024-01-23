@@ -2,8 +2,8 @@ package com.alphasystem.docbook.builder.impl.block;
 
 import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.builder.impl.AbstractBuilder;
-import com.alphasystem.openxml.builder.wml.table.VerticalMergeType;
 import com.alphasystem.commons.util.AppUtil;
+import com.alphasystem.docx4j.builder.wml.table.VerticalMergeType;
 import com.alphasystem.xml.UnmarshallerUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.docbook.model.Entry;

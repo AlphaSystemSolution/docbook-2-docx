@@ -4,9 +4,9 @@ import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.handler.InlineHandlerFactory;
 import com.alphasystem.docbook.handler.InlineStyleHandler;
 import com.alphasystem.docbook.handler.impl.NullHandler;
-import com.alphasystem.openxml.builder.wml.RBuilder;
-import com.alphasystem.openxml.builder.wml.RPrBuilder;
-import com.alphasystem.openxml.builder.wml.WmlBuilderFactory;
+import com.alphasystem.docx4j.builder.wml.RBuilder;
+import com.alphasystem.docx4j.builder.wml.RPrBuilder;
+import com.alphasystem.docx4j.builder.wml.WmlBuilderFactory;
 import org.docx4j.wml.R;
 import org.docx4j.wml.RPr;
 

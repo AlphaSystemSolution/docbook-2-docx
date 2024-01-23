@@ -3,10 +3,11 @@ package com.alphasystem.docbook.builder.impl.block;
 import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.builder.impl.BlockBuilder;
 import com.alphasystem.docbook.model.DocBookTableAdapter;
-import com.alphasystem.openxml.builder.wml.table.ColumnInfo;
-import com.alphasystem.openxml.builder.wml.table.ColumnInput;
-import com.alphasystem.openxml.builder.wml.table.TableAdapter;
-import com.alphasystem.openxml.builder.wml.table.TableType;
+import com.alphasystem.docx4j.builder.wml.WmlBuilderFactory;
+import com.alphasystem.docx4j.builder.wml.table.ColumnInfo;
+import com.alphasystem.docx4j.builder.wml.table.ColumnInput;
+import com.alphasystem.docx4j.builder.wml.table.TableAdapter;
+import com.alphasystem.docx4j.builder.wml.table.TableType;
 import org.docbook.model.Choice;
 import org.docbook.model.ColumnSpec;
 import org.docbook.model.Frame;
@@ -19,12 +20,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
-import static com.alphasystem.openxml.builder.wml.WmlAdapter.getDefaultBorder;
-import static com.alphasystem.openxml.builder.wml.WmlAdapter.getNilBorder;
-import static com.alphasystem.openxml.builder.wml.WmlBuilderFactory.getTblBordersBuilder;
-import static com.alphasystem.openxml.builder.wml.WmlBuilderFactory.getTblPrBuilder;
+import static com.alphasystem.docx4j.builder.wml.WmlAdapter.getDefaultBorder;
+import static com.alphasystem.docx4j.builder.wml.WmlAdapter.getNilBorder;
 import static java.lang.String.format;
 import static org.docbook.model.Choice.ONE;
 
@@ -108,7 +106,7 @@ public abstract class AbstractTableBuilder<S> extends BlockBuilder<S> {
         tableType = level <= -1 ? TableType.PCT : TableType.AUTO;
         var tableStyle = getTableStyle(tableGroup, styleName);
 
-        var tblPrBuilder = getTblPrBuilder().withTblBorders(createFrame(frame, rowSep, colSep));
+        var tblPrBuilder = WmlBuilderFactory.getTblPrBuilder().withTblBorders(createFrame(frame, rowSep, colSep));
 
         final var tableAdapter = new TableAdapter()
                 .withTableType(tableType)
@@ -177,7 +175,7 @@ public abstract class AbstractTableBuilder<S> extends BlockBuilder<S> {
         if (ONE.equals(colSep)) {
             insideV = getDefaultBorder();
         }
-        return getTblBordersBuilder().withTop(top).withLeft(left).withBottom(bottom)
+        return WmlBuilderFactory.getTblBordersBuilder().withTop(top).withLeft(left).withBottom(bottom)
                 .withRight(right).withInsideH(insideH).withInsideV(insideV).getObject();
     }
 

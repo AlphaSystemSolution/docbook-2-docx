@@ -1,7 +1,7 @@
 package com.alphasystem.docbook.builder.test;
 
 import com.alphasystem.docbook.ApplicationController;
-import com.alphasystem.openxml.builder.wml.WmlAdapter;
+import com.alphasystem.docx4j.builder.wml.WmlAdapter;
 import org.testng.annotations.AfterSuite;
 
 import java.awt.*;

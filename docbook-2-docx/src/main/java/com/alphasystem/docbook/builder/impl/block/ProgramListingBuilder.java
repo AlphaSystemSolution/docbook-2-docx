@@ -2,8 +2,8 @@ package com.alphasystem.docbook.builder.impl.block;
 
 import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.builder.impl.BlockBuilder;
-import com.alphasystem.openxml.builder.wml.table.ColumnData;
-import com.alphasystem.openxml.builder.wml.table.TableAdapter;
+import com.alphasystem.docx4j.builder.wml.table.ColumnData;
+import com.alphasystem.docx4j.builder.wml.table.TableAdapter;
 import org.docbook.model.ProgramListing;
 
 import java.util.Collections;

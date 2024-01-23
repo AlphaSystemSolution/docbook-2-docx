@@ -1,10 +1,10 @@
 package com.alphasystem.docbook.builder.impl.inline;
 
+import com.alphasystem.commons.util.IdGenerator;
 import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.builder.impl.InlineBuilder;
-import com.alphasystem.openxml.builder.wml.WmlAdapter;
-import com.alphasystem.openxml.builder.wml.WmlBuilderFactory;
-import com.alphasystem.util.IdGenerator;
+import com.alphasystem.docx4j.builder.wml.WmlAdapter;
+import com.alphasystem.docx4j.builder.wml.WmlBuilderFactory;
 
 public class TextBuilder extends InlineBuilder<String> {
 

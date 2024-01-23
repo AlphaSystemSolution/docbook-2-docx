@@ -1,9 +1,13 @@
+repositories {
+    mavenLocal()
+}
+
 dependencies {
     api project(":docbook-model")
     api project(":common")
     api("org.glassfish.jaxb:jaxb-runtime:${jaxbRuntimeVersion}")
     api("jakarta.xml.bind:jakarta.xml.bind-api:${bindApiVersion}")
-    api("com.alphasystem.openxml:openxml-builder:${openxmlBuilderVersion}")
+    api("io.github.sfali23:open-xml-builder:${openxmlBuilderVersion}")
     api('io.vavr:vavr:0.10.4')
     api('org.graalvm.js:js:22.3.4')
     api('com.typesafe:config:1.4.3')

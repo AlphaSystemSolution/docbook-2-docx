@@ -1,9 +1,8 @@
 package com.alphasystem.docbook.handler.impl;
 
 import com.alphasystem.docbook.handler.InlineStyleHandler;
-import com.alphasystem.openxml.builder.wml.RPrBuilder;
-
-import static com.alphasystem.openxml.builder.wml.WmlBuilderFactory.getRFontsBuilder;
+import com.alphasystem.docx4j.builder.wml.RPrBuilder;
+import com.alphasystem.docx4j.builder.wml.WmlBuilderFactory;
 
 /**
  * @author sali
@@ -41,7 +40,7 @@ abstract class ArabicHandler implements InlineStyleHandler {
 
     @Override
     public RPrBuilder applyStyle(RPrBuilder rprBuilder) {
-        final var rFonts = getRFontsBuilder().withAscii(fontName).withHAnsi(fontName)
+        final var rFonts = WmlBuilderFactory.getRFontsBuilder().withAscii(fontName).withHAnsi(fontName)
                 .withCs(fontName).getObject();
         return rprBuilder.withRFonts(rFonts).withSz(size).withSzCs(size).withRtl(rtl);
     }
