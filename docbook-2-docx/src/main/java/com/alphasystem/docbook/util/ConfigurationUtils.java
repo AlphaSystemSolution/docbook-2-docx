@@ -151,7 +151,7 @@ public class ConfigurationUtils {
     }
 
     public String[] getStyles() {
-        final var defaultStyles = "default-styles.xml";
+        final var defaultStyles = "META-INF/docbook-styles.xml";
         var _styles = getString("styles");
         _styles = StringUtils.isBlank(_styles) ? defaultStyles : defaultStyles + "," + _styles;
         return _styles.split(",");
