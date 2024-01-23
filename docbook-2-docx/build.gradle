@@ -14,7 +14,7 @@ dependencies {
     testImplementation group: 'org.uncommons', name: 'reportng', version: '1.1.4'
 }
 
-tasks.withType(Test) {
+tasks.withType(Test).configureEach {
     systemProperty 'docbook-docx.template', '../conf/default.dotx'
     systemProperty 'docbook-docx.styles', 'META-INF/custom-styles.xml'
     systemProperty 'target.path', 'build/docs'
