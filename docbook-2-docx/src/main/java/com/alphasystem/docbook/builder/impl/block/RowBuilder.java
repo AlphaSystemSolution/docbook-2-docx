@@ -2,7 +2,7 @@ package com.alphasystem.docbook.builder.impl.block;
 
 import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.builder.impl.AbstractBuilder;
-import com.alphasystem.openxml.builder.wml.WmlBuilderFactory;
+import com.alphasystem.docx4j.builder.wml.WmlBuilderFactory;
 import org.docbook.model.Row;
 
 import java.util.Collections;

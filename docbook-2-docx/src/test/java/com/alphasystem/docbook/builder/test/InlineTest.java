@@ -1,6 +1,6 @@
 package com.alphasystem.docbook.builder.test;
 
-import com.alphasystem.util.IdGenerator;
+import com.alphasystem.commons.util.IdGenerator;
 import org.docbook.model.SimplePara;
 import org.testng.annotations.Test;
 

@@ -16,11 +16,11 @@ plugins {
 dependencies {
     api project(":asciidoctor-adapter")
     api project(":arabic-handler")
-    api 'commons-cli:commons-cli:1.6.0'
+    api "commons-cli:commons-cli:${commonsCliVersion}"
 }
 
 jar {
-    dependsOn(":common:jar")
+    dependsOn(":docbook-2-docx-common:jar")
     dependsOn(":docbook-model:jar")
     dependsOn(":asciidoctor-adapter:jar")
     dependsOn(":docbook-2-docx:jar")

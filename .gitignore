@@ -4,6 +4,7 @@ target/
 .gradle
 **/.DS_Store
 *.iml
+**/*.docx
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup

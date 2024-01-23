@@ -5,8 +5,8 @@ import com.alphasystem.docbook.ApplicationController;
 import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.builder.impl.InlineBuilder;
 import com.alphasystem.docbook.util.Utils;
-import com.alphasystem.openxml.builder.wml.WmlAdapter;
-import com.alphasystem.openxml.builder.wml.WmlBuilderFactory;
+import com.alphasystem.docx4j.builder.wml.WmlAdapter;
+import com.alphasystem.docx4j.builder.wml.WmlBuilderFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.docx4j.wml.R;
 

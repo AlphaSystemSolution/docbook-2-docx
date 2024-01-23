@@ -1,12 +1,12 @@
 package com.alphasystem.docbook;
 
 import com.alphasystem.asciidoc.model.DocumentInfo;
+import com.alphasystem.commons.SystemException;
 import com.alphasystem.docbook.model.DocumentCaption;
 import com.alphasystem.docbook.util.ConfigurationUtils;
-import com.alphasystem.openxml.builder.wml.NumberingHelper;
-import com.alphasystem.openxml.builder.wml.WmlPackageBuilder;
+import com.alphasystem.docx4j.builder.wml.NumberingHelper;
+import com.alphasystem.docx4j.builder.wml.WmlPackageBuilder;
 import org.apache.commons.lang3.StringUtils;
-import org.docbook.model.Article;
 import org.docx4j.jaxb.Context;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
@@ -21,8 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.alphasystem.commons.util.AppUtil.isInstanceOf;
-
 /**
  * @author sali
  */
@@ -33,7 +31,6 @@ public final class DocumentContext {
     private final Map<String, String> idToLinkMap = new HashMap<>();
     private final ConfigurationUtils configurationUtils = ConfigurationUtils.getInstance();
     private final List<String> documentStyles;
-    private final Object document;
     private final DocumentInfo documentInfo;
     private final boolean article;
     private WmlPackageBuilder wmlPackageBuilder;
@@ -42,21 +39,17 @@ public final class DocumentContext {
     private final NumberingHelper numberingHelper = NumberingHelper.getInstance();
 
     public DocumentContext(final DocumentInfo documentInfo) {
-        this(documentInfo, null);
-    }
-
-    public DocumentContext(final DocumentInfo documentInfo, final Object document) {
         this.documentInfo = documentInfo;
-        this.document = document;
         this.documentStyles = new ArrayList<>();
-        article = isInstanceOf(Article.class, document);
+        article = true; // TODO:
         buildPackage();
     }
 
+
     private void buildPackage() {
         try {
-            wmlPackageBuilder = WmlPackageBuilder.createPackage(configurationUtils.getTemplate())
-                    .styles(configurationUtils.getStyles());
+            final var inputs = new WmlPackageBuilder.WmlPackageInputs().withTemplatePath(configurationUtils.getTemplate());
+            wmlPackageBuilder = new WmlPackageBuilder(inputs).styles(configurationUtils.getStyles());
             wordprocessingMLPackage = wmlPackageBuilder.getPackage();
             mainDocumentPart = wordprocessingMLPackage.getMainDocumentPart();
 
@@ -76,17 +69,13 @@ public final class DocumentContext {
             }
 
             updateDocumentCompatibility();
-        } catch (Docx4JException e) {
+        } catch (Docx4JException | SystemException e) {
             throw new RuntimeException(e);
         }
     }
 
     public DocumentInfo getDocumentInfo() {
         return documentInfo;
-    }
-
-    public Object getDocument() {
-        return document;
     }
 
     public List<String> getDocumentStyles() {
@@ -128,13 +117,6 @@ public final class DocumentContext {
             numberingHelper.update(styleName, numberId);
         }
         return numberId;
-    }
-
-    public long getCurrentListLevel() {
-        return -1;
-    }
-
-    public void setCurrentListLevel(long level) {
     }
 
     public void putLabel(String id, String label) {

@@ -3,9 +3,9 @@ package com.alphasystem.docbook.builder.impl.block;
 import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.builder.impl.BlockBuilder;
 import com.alphasystem.docbook.model.VariableListType;
-import com.alphasystem.openxml.builder.wml.WmlAdapter;
-import com.alphasystem.openxml.builder.wml.WmlBuilderFactory;
 import com.alphasystem.commons.util.AppUtil;
+import com.alphasystem.docx4j.builder.wml.WmlAdapter;
+import com.alphasystem.docx4j.builder.wml.WmlBuilderFactory;
 import org.docx4j.wml.PPr;
 
 import java.util.Collections;

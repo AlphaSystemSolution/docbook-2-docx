@@ -1,9 +1,8 @@
 package com.alphasystem.docbook.handler.impl;
 
 import com.alphasystem.docbook.handler.InlineStyleHandler;
-import com.alphasystem.openxml.builder.wml.RPrBuilder;
-
-import static com.alphasystem.openxml.builder.wml.WmlBuilderFactory.getRFontsBuilder;
+import com.alphasystem.docx4j.builder.wml.RPrBuilder;
+import com.alphasystem.docx4j.builder.wml.WmlBuilderFactory;
 
 /**
  * Handles "literal" style.
@@ -16,7 +15,7 @@ public class LiteralHandler implements InlineStyleHandler {
 
     @Override
     public RPrBuilder applyStyle(RPrBuilder rprBuilder) {
-        return rprBuilder.withRFonts(getRFontsBuilder().withAscii(COURIER_NEW).withHAnsi(COURIER_NEW).withCs(COURIER_NEW)
-                .getObject());
+        return rprBuilder.withRFonts(WmlBuilderFactory.getRFontsBuilder().withAscii(COURIER_NEW).withHAnsi(COURIER_NEW)
+                .withCs(COURIER_NEW).getObject());
     }
 }

@@ -3,12 +3,12 @@ package com.alphasystem.docbook;
 import com.alphasystem.commons.SystemException;
 import com.alphasystem.asciidoc.model.DocumentInfo;
 import com.alphasystem.docbook.util.FileUtil;
+import com.alphasystem.docx4j.builder.wml.WmlAdapter;
 import com.alphasystem.xml.UnmarshallerTool;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 
 import java.nio.file.Path;
 
-import static com.alphasystem.openxml.builder.wml.WmlAdapter.save;
 
 /**
  * @author sali
@@ -24,7 +24,7 @@ public class DocumentBuilder {
         ApplicationController.startContext(documentInfo);
         final var unmarshallerTool = new UnmarshallerTool();
         try {
-            save(docxPath.toFile(), unmarshallerTool.unmarshal(documentInfo.getContent()));
+            WmlAdapter.save(docxPath.toFile(), unmarshallerTool.unmarshal(documentInfo.getContent()));
         } catch (Docx4JException e) {
             throw new SystemException(e.getMessage(), e);
         } finally {

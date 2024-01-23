@@ -1,7 +1,8 @@
 package com.alphasystem.docbook.model;
 
-import com.alphasystem.openxml.builder.wml.AbstractListItem;
-import com.alphasystem.util.IdGenerator;
+
+import com.alphasystem.commons.util.IdGenerator;
+import com.alphasystem.docx4j.builder.wml.AbstractListItem;
 
 public class VariableListType extends AbstractListItem<VariableListType> {
 

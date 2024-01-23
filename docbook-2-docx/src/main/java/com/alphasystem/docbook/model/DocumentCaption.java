@@ -1,7 +1,7 @@
 package com.alphasystem.docbook.model;
 
 import com.alphasystem.docbook.util.ConfigurationUtils;
-import com.alphasystem.openxml.builder.wml.HeadingList;
+import com.alphasystem.docx4j.builder.wml.HeadingList;
 import org.docbook.model.Example;
 import org.docbook.model.Table;
 
