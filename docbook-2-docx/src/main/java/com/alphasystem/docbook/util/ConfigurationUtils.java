@@ -153,20 +153,6 @@ public class ConfigurationUtils {
         return _styles.split(",");
     }
 
-    public List<String> getScriptFiles() {
-        final var defaultJsFiles = appConfig.getStringList("scripts");
-        final var results = new ArrayList<>(defaultJsFiles);
-        try {
-            final var customScripts = getString("custom-scripts");
-            if (Objects.nonNull(customScripts)) {
-                results.addAll(Arrays.asList(customScripts.split(",")));
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace(System.out);
-        }
-        return results;
-    }
-
     public Config getConfig(String path) {
         return mainConfig.getConfig(path);
     }

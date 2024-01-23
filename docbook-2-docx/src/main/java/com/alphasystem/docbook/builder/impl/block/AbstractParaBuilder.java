@@ -5,7 +5,7 @@ import com.alphasystem.docbook.builder.impl.BlockBuilder;
 import com.alphasystem.docbook.model.VariableListType;
 import com.alphasystem.openxml.builder.wml.WmlAdapter;
 import com.alphasystem.openxml.builder.wml.WmlBuilderFactory;
-import com.alphasystem.util.AppUtil;
+import com.alphasystem.commons.util.AppUtil;
 import org.docx4j.wml.PPr;
 
 import java.util.Collections;

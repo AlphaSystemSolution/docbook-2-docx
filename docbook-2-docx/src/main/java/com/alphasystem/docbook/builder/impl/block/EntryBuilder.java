@@ -1,15 +1,14 @@
 package com.alphasystem.docbook.builder.impl.block;
 
+import com.alphasystem.commons.util.AppUtil;
 import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.builder.impl.AbstractBuilder;
-import com.alphasystem.docbook.util.Utils;
 import com.alphasystem.openxml.builder.wml.PPrBuilder;
 import com.alphasystem.openxml.builder.wml.WmlAdapter;
 import com.alphasystem.openxml.builder.wml.WmlBuilderFactory;
 import com.alphasystem.openxml.builder.wml.table.ColumnData;
 import com.alphasystem.openxml.builder.wml.table.TableAdapter;
 import com.alphasystem.openxml.builder.wml.table.VerticalMergeType;
-import com.alphasystem.util.AppUtil;
 import com.alphasystem.xml.UnmarshallerConstants;
 import org.docbook.model.Align;
 import org.docbook.model.BasicVerticalAlign;
@@ -46,10 +45,10 @@ public class EntryBuilder extends AbstractBuilder<Entry> {
             throw new RuntimeException(String.format("Found different parent \"%s\".", contentBuilder.getClass().getName()));
         }
 
-        final var parentVAlign = (VerticalAlign) Utils.invokeMethod(contentBuilder.getSource(), "getVAlign");
+        final var parentVAlign = (VerticalAlign) AppUtil.invokeMethod(contentBuilder.getSource(), "getVAlign");
         final var verticalAlign = getVerticalAlign(source.getValign(), parentVAlign);
 
-        final var parentAlign = (Align) Utils.invokeMethod(contentBuilder.getSource(), "getAlign");
+        final var parentAlign = (Align) AppUtil.invokeMethod(contentBuilder.getSource(), "getAlign");
         align = getAlign(source.getAlign(), parentAlign);
 
         tcPr = WmlBuilderFactory.getTcPrBuilder().withVAlign(verticalAlign).getObject();
@@ -98,21 +97,15 @@ public class EntryBuilder extends AbstractBuilder<Entry> {
             }
         }
 
-        STVerticalJc val = null;
+        STVerticalJc jc = null;
         if (vAlign != null) {
-            switch (vAlign) {
-                case BOTTOM:
-                    val = STVerticalJc.BOTTOM;
-                    break;
-                case MIDDLE:
-                    val = STVerticalJc.CENTER;
-                    break;
-                case TOP:
-                    val = STVerticalJc.TOP;
-                    break;
-            }
+            jc = switch (vAlign) {
+                case BOTTOM -> STVerticalJc.BOTTOM;
+                case MIDDLE -> STVerticalJc.CENTER;
+                case TOP -> STVerticalJc.TOP;
+            };
         }
-        return val;
+        return jc;
     }
 
     private static JcEnumeration getAlign(Align align, Align parentAlign) {
@@ -121,20 +114,13 @@ public class EntryBuilder extends AbstractBuilder<Entry> {
         }
         JcEnumeration jcEnumeration = null;
         if (align != null) {
-            switch (align) {
-                case LEFT:
-                    jcEnumeration = JcEnumeration.LEFT;
-                    break;
-                case CENTER:
-                    jcEnumeration = JcEnumeration.CENTER;
-                    break;
-                case RIGHT:
-                    jcEnumeration = JcEnumeration.RIGHT;
-                    break;
-                case JUSTIFY:
-                    jcEnumeration = JcEnumeration.BOTH;
-                    break;
-            }
+            jcEnumeration = switch (align) {
+                case LEFT -> JcEnumeration.LEFT;
+                case CENTER -> JcEnumeration.CENTER;
+                case RIGHT -> JcEnumeration.RIGHT;
+                case JUSTIFY -> JcEnumeration.BOTH;
+                default -> jcEnumeration;
+            };
         }
         return jcEnumeration;
     }

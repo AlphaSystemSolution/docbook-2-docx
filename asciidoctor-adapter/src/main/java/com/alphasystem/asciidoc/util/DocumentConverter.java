@@ -1,6 +1,6 @@
 package com.alphasystem.asciidoc.util;
 
-import com.alphasystem.SystemException;
+import com.alphasystem.commons.SystemException;
 import com.alphasystem.asciidoc.model.AsciiDocumentInfo;
 import org.asciidoctor.Asciidoctor;
 import org.asciidoctor.Options;

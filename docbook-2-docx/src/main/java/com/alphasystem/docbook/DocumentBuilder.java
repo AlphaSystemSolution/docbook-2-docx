@@ -1,6 +1,6 @@
 package com.alphasystem.docbook;
 
-import com.alphasystem.SystemException;
+import com.alphasystem.commons.SystemException;
 import com.alphasystem.asciidoc.model.DocumentInfo;
 import com.alphasystem.docbook.util.FileUtil;
 import com.alphasystem.xml.UnmarshallerTool;

@@ -4,9 +4,7 @@ import com.alphasystem.docbook.ApplicationController;
 import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.builder.impl.AbstractBuilder;
 import com.alphasystem.docbook.model.ListInfo;
-import com.alphasystem.util.AppUtil;
-
-import java.util.stream.Collectors;
+import com.alphasystem.commons.util.AppUtil;
 
 public abstract class ListBuilder<S> extends AbstractBuilder<S> {
 
@@ -23,8 +21,8 @@ public abstract class ListBuilder<S> extends AbstractBuilder<S> {
         setListStyleName();
         final var ancestorListBuilder = getParent(ListBuilder.class);
         final var allParents = getParents();
-        final var variableListParents = allParents.stream().filter(ListBuilder::isVariableListBuilder).collect(Collectors.toList());
-        final var otherListBuilders = allParents.stream().filter(ListBuilder::isOtherListBuilder).collect(Collectors.toList());
+        final var variableListParents = allParents.stream().filter(ListBuilder::isVariableListBuilder).toList();
+        final var otherListBuilders = allParents.stream().filter(ListBuilder::isOtherListBuilder).toList();
         final var noListBuilders = variableListParents.isEmpty() && otherListBuilders.isEmpty();
         final var nestedVariableList = AppUtil.isInstanceOf(VariableListBuilder.class, this) && variableListParents.size() == 1;
         final var varListCheck = variableListParents.size() == 1 && !nestedVariableList;

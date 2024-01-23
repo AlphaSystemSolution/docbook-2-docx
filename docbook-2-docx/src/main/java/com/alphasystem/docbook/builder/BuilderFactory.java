@@ -1,8 +1,8 @@
 package com.alphasystem.docbook.builder;
 
-import com.alphasystem.SystemException;
+import com.alphasystem.commons.SystemException;
+import com.alphasystem.commons.util.AppUtil;
 import com.alphasystem.docbook.util.ConfigurationUtils;
-import com.alphasystem.docbook.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +43,7 @@ public class BuilderFactory {
         final var name = o.getClass().getName();
         final var builderClass = buildersClassMap.get(name);
         try {
-            return (Builder<?>) Utils.initObject(builderClass, new Class<?>[]{o.getClass(), Builder.class}, new Object[]{o, parent});
+            return (Builder<?>) AppUtil.initObject(builderClass, new Class<?>[]{o.getClass(), Builder.class}, new Object[]{o, parent});
         } catch (SystemException e) {
             logger.warn("No builder found for: {}", name);
             throw new RuntimeException(e);

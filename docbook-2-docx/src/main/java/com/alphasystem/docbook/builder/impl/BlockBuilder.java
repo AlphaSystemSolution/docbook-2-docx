@@ -1,9 +1,8 @@
 package com.alphasystem.docbook.builder.impl;
 
+import com.alphasystem.commons.util.AppUtil;
 import com.alphasystem.docbook.builder.Builder;
-import com.alphasystem.docbook.util.Utils;
 import com.alphasystem.openxml.builder.wml.WmlBuilderFactory;
-import com.alphasystem.util.AppUtil;
 import org.docbook.model.Title;
 import org.docx4j.wml.R;
 
@@ -23,7 +22,7 @@ public abstract class BlockBuilder<S> extends AbstractBuilder<S> {
     }
 
     protected Title getTitle() {
-        final var o = Utils.invokeMethod(source, "getTitle");
+        final var o = AppUtil.invokeMethod(source, "getTitle");
         if (Objects.nonNull(o) && AppUtil.isInstanceOf(Title.class, o)) {
             return (Title) o;
         }
