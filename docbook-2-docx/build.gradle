@@ -1,6 +1,6 @@
 dependencies {
     api project(":docbook-model")
-    api project(":common")
+    api project(":docbook-2-docx-common")
     api("org.glassfish.jaxb:jaxb-runtime:${jaxbRuntimeVersion}")
     api("jakarta.xml.bind:jakarta.xml.bind-api:${bindApiVersion}")
     api("io.github.sfali23:open-xml-builder:${openxmlBuilderVersion}")
@@ -11,6 +11,7 @@ dependencies {
     api("ch.qos.logback:logback-classic:${logbackClassicVersion}")
     testImplementation("org.testng:testng:${testngVersion}")
     testImplementation("com.google.inject:guice:${guiceVersion}")
+    testImplementation "com.google.guava:guava:${guavaVersion}"
     testImplementation("org.uncommons:reportng:${reportngVersion}")
 }
 

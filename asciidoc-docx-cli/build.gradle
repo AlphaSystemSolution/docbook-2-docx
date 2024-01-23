@@ -20,7 +20,7 @@ dependencies {
 }
 
 jar {
-    dependsOn(":common:jar")
+    dependsOn(":docbook-2-docx-common:jar")
     dependsOn(":docbook-model:jar")
     dependsOn(":asciidoctor-adapter:jar")
     dependsOn(":docbook-2-docx:jar")
