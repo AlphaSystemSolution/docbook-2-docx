@@ -2,10 +2,10 @@ package com.alphasystem.docbook.builder.impl;
 
 import com.alphasystem.docbook.ApplicationController;
 import com.alphasystem.docbook.builder.Builder;
+import com.alphasystem.docbook.model.FunctionInput;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 public abstract class JavaScriptBasedBuilder<S, T> extends BlockBuilder<S> {
 
@@ -24,38 +24,13 @@ public abstract class JavaScriptBasedBuilder<S, T> extends BlockBuilder<S> {
     protected T initTarget(List<Object> processedChildContent) {
         final var functionInput = initFunctionInputs(processedChildContent);
         final var binding = ApplicationController.getInstance().getScriptEngine().getBindings("js");
-        return binding.getMember(functionInput.getFunctionName()).execute(functionInput.getArgs())
-                .as(functionInput.getTargetType());
+        return binding.getMember(functionInput.functionName()).execute(functionInput.args())
+                .as(functionInput.targetType());
     }
 
     @Override
     protected List<Object> doProcess(List<Object> processedChildContent) {
         return Collections.singletonList(initTarget(processedChildContent));
-    }
-
-    protected static class FunctionInput<T> {
-
-        private final String functionName;
-        private final Class<T> targetType;
-        private final Object[] args;
-
-        public FunctionInput(String functionName, Class<T> targetType, Object[] args) {
-            this.functionName = functionName;
-            this.targetType = targetType;
-            this.args = Objects.isNull(args) ? new Object[0] : args;
-        }
-
-        public String getFunctionName() {
-            return functionName;
-        }
-
-        public Class<T> getTargetType() {
-            return targetType;
-        }
-
-        public Object[] getArgs() {
-            return args;
-        }
     }
 
 }
