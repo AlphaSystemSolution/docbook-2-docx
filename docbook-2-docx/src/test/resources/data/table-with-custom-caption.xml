@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0" xml:lang="en">
+    <informaltable frame="all" rowsep="1" colsep="1">
+        <tgroup cols="3">
+            <colspec colname="col_1" colwidth="33.3333*"/>
+            <colspec colname="col_2" colwidth="33.3333*"/>
+            <colspec colname="col_3" colwidth="33.3334*"/>
+            <tbody>
+                <row>
+                    <entry align="center" valign="middle">
+                        <simpara><phrase role="arabicTableCaption">1</phrase></simpara>
+                    </entry>
+                    <entry align="center" valign="middle">
+                        <simpara><phrase role="arabicTableCaption">2</phrase></simpara>
+                    </entry>
+                    <entry align="center" valign="middle">
+                        <simpara><phrase role="arabicTableCaption">3</phrase></simpara>
+                    </entry>
+                </row>
+                <row>
+                    <entry align="left" valign="top">
+                        <simpara><phrase role="translation">Row 2 Column1</phrase></simpara>
+                    </entry>
+                    <entry align="left" valign="top">
+                        <simpara><phrase role="translation">Row 2 Column2</phrase></simpara>
+                    </entry>
+                    <entry align="left" valign="top">
+                        <simpara><phrase role="translation">Row 2 Column3</phrase></simpara>
+                    </entry>
+                </row>
+            </tbody>
+        </tgroup>
+    </informaltable>
+</article>
