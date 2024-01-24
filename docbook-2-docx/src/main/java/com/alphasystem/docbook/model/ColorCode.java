@@ -28,8 +28,8 @@ public enum ColorCode {
     WHITE("white", "FFFFFF"),
     YELLOW("yellow", "FFFF00");
 
-    private static Map<String, ColorCode> codeMap = new LinkedHashMap<>();
-    private static Map<String, ColorCode> nameMap = new LinkedHashMap<>();
+    private static final Map<String, ColorCode> codeMap = new LinkedHashMap<>();
+    private static final Map<String, ColorCode> nameMap = new LinkedHashMap<>();
 
     static {
         for (ColorCode colorCode : values()) {
