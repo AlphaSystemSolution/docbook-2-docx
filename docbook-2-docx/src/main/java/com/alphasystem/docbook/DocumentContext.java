@@ -16,10 +16,7 @@ import org.docx4j.wml.CTCompat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author sali
@@ -48,8 +45,12 @@ public final class DocumentContext {
 
     private void buildPackage() {
         try {
-            final var inputs = new WmlPackageBuilder.WmlPackageInputs().withTemplatePath(configurationUtils.getTemplate());
-            wmlPackageBuilder = new WmlPackageBuilder(inputs).styles(configurationUtils.getStyles());
+            final var template = configurationUtils.getTemplate();
+            final var styleFiles = configurationUtils.getStyles();
+            LOGGER.info("Loading template \"{}\" and styles: \"{}\".", template, Arrays.toString(styleFiles));
+
+            final var inputs = new WmlPackageBuilder.WmlPackageInputs().withTemplatePath(template);
+            wmlPackageBuilder = new WmlPackageBuilder(inputs).styles(styleFiles);
             wordprocessingMLPackage = wmlPackageBuilder.getPackage();
             mainDocumentPart = wordprocessingMLPackage.getMainDocumentPart();
 
