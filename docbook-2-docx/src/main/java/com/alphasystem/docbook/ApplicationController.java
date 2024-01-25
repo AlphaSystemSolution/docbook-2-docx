@@ -84,7 +84,7 @@ public final class ApplicationController {
             return null;
         };
         try {
-            AppUtil.processResourceDirectory("scripts", consumer);
+            AppUtil.processResourceDirectory("META-INF/scripts", consumer);
         } catch (SystemException e) {
             throw new RuntimeException(e);
         }
