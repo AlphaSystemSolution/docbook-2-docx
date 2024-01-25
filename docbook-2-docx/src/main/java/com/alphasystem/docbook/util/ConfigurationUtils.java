@@ -23,7 +23,7 @@ public class ConfigurationUtils {
         instance = new ConfigurationUtils();
     }
 
-    public static synchronized ConfigurationUtils getInstance() {
+    public static ConfigurationUtils getInstance() {
         return instance;
     }
 

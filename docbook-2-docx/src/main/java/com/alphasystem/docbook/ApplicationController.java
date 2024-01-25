@@ -5,6 +5,7 @@ import com.alphasystem.commons.SystemException;
 import com.alphasystem.commons.util.AppUtil;
 import com.alphasystem.docbook.handler.InlineHandlerFactory;
 import com.alphasystem.docbook.handler.InlineStyleHandler;
+import com.alphasystem.docbook.handler.impl.JavaScriptBasedStyleHandler;
 import com.alphasystem.docbook.util.ConfigurationUtils;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Source;
@@ -83,7 +84,7 @@ public final class ApplicationController {
             return null;
         };
         try {
-            AppUtil.processResourceDirectory("scripts", consumer);
+            AppUtil.processResourceDirectory("META-INF/scripts", consumer);
         } catch (SystemException e) {
             throw new RuntimeException(e);
         }
@@ -94,15 +95,21 @@ public final class ApplicationController {
         config.entrySet().forEach(entry -> {
             final var key = entry.getKey();
             final var handlerClassName = entry.getValue().unwrapped().toString();
-            try {
-                final var obj = AppUtil.initObject(handlerClassName);
-                if (!AppUtil.isInstanceOf(InlineStyleHandler.class, obj)) {
-                    throw new RuntimeException(String.format("Type \"%s\" is not subclass of \"InlineStyleHandler\".", handlerClassName));
+            InlineStyleHandler handler;
+            if (handlerClassName.equals(JavaScriptBasedStyleHandler.class.getName())) {
+                handler = new JavaScriptBasedStyleHandler(key);
+            } else {
+                try {
+                    final var obj = AppUtil.initObject(handlerClassName);
+                    if (!AppUtil.isInstanceOf(InlineStyleHandler.class, obj)) {
+                        throw new RuntimeException(String.format("Type \"%s\" is not subclass of \"InlineStyleHandler\".", handlerClassName));
+                    }
+                    handler = (InlineStyleHandler) obj;
+                } catch (SystemException e) {
+                    throw new RuntimeException(e);
                 }
-                inlineHandlerFactory.registerHandler(key, (InlineStyleHandler) obj);
-            } catch (SystemException e) {
-                throw new RuntimeException(e);
             }
+            inlineHandlerFactory.registerHandler(key, handler);
         });
     }
 

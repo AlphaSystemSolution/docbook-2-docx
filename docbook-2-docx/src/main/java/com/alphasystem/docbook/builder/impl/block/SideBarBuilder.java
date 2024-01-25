@@ -2,6 +2,7 @@ package com.alphasystem.docbook.builder.impl.block;
 
 import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.builder.impl.JavaScriptBasedBuilder;
+import com.alphasystem.docbook.model.FunctionInput;
 import com.alphasystem.xml.UnmarshallerConstants;
 import org.docbook.model.SideBar;
 import org.docbook.model.Title;

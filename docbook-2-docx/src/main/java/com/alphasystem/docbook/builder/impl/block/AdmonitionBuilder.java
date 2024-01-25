@@ -3,6 +3,7 @@ package com.alphasystem.docbook.builder.impl.block;
 import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.builder.impl.JavaScriptBasedBuilder;
 import com.alphasystem.docbook.model.Admonition;
+import com.alphasystem.docbook.model.FunctionInput;
 import org.docx4j.wml.Tbl;
 
 import java.util.List;
