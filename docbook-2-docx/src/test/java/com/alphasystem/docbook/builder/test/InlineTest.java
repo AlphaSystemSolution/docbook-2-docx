@@ -29,8 +29,16 @@ public class InlineTest extends AbstractTest {
                         createBold("bold text"),
                         ", some ",
                         createEmphasis(null, "italic text"),
-                        ", and some ",
-                        createEmphasis("marked", "highlighted text"),
+                        ", and ",
+                        createEmphasis("marked", "default highlighted text"),
+                        ", and few highlighted texts with custom colors: ",
+                        createPhrase("highlight-red", "Red"),
+                        ", ",
+                        createPhrase("highlight-cyan", "Cyan"),
+                        ", ",
+                        createPhrase("highlight-magenta", "Magenta"),
+                        ", ",
+                        createPhrase("highlight-green", "Green"),
                         "."
                 );
 
@@ -40,7 +48,8 @@ public class InlineTest extends AbstractTest {
 
         // validate
         assertSize( 1);
-        assertText(content.get(content.size() - 1), "This paragraph contains some bold text, some italic text, and some highlighted text.");
+        assertText(content.get(content.size() - 1), "This paragraph contains some bold text, some italic text, " +
+                "and default highlighted text, and few highlighted texts with custom colors: Red, Cyan, Magenta, Green.");
         addHorizontalLine();
     }
 

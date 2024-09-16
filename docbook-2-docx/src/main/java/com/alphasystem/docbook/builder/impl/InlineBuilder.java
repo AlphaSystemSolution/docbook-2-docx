@@ -12,7 +12,6 @@ import org.docx4j.wml.RPr;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -82,7 +81,7 @@ public abstract class InlineBuilder<S> extends AbstractBuilder<S> {
                     final var childR = (R) content;
                     childR.setRPr(new RPrBuilder(rPr, childR.getRPr()).getObject());
                     return childR;
-                }).collect(Collectors.toList());
+                }).toList();
 
         result.addAll(updatedChildContent);
         return result;
