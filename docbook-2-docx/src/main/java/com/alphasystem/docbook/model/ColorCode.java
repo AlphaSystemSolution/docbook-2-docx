@@ -13,6 +13,7 @@ public enum ColorCode {
     AQUA("aqua", "00FFFF"),
     BLACK("black", "000000"),
     BLUE("blue", "0000FF"),
+    CYAN("cyan", "#00FFFF"),
     FUCHSIA("fuchsia", "FF0080"),
     GRAY("gray", "808080"),
     GREY("grey", "808080"),
