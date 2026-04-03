@@ -7,7 +7,17 @@ allprojects {
     group = "io.github.sfali23"
 }
 
-apply(from = "${rootDir}/scripts/nexus-publish.gradle.kts")
+apply(from = "${rootDir}/scripts/nexus-publish.gradle")
+
+configure<net.researchgate.release.ReleaseExtension> {
+    tagTemplate.set("v\${version}")
+}
+
+afterEvaluate {
+    tasks.named("afterReleaseBuild") {
+        dependsOn("publishToSonatype", "closeAndReleaseSonatypeStagingRepository")
+    }
+}
 
 subprojects {
     apply(plugin = "maven-publish")
@@ -23,7 +33,7 @@ subprojects {
         }
     }
 
-    apply(from = "${rootDir}/scripts/publishing.gradle.kts")
+    apply(from = "${rootDir}/scripts/publishing.gradle")
 
     tasks.withType<JavaCompile>().configureEach {
         options.encoding = "UTF-8"
@@ -34,15 +44,5 @@ subprojects {
         targetCompatibility = JavaVersion.VERSION_21
         withJavadocJar()
         withSourcesJar()
-    }
-
-    configure<net.researchgate.release.ReleaseExtension> {
-        tagTemplate.set("v\${version}")
-    }
-
-    afterEvaluate {
-        tasks.named("afterReleaseBuild") {
-            dependsOn("publishToSonatype", "closeAndReleaseSonatypeStagingRepository")
-        }
     }
 }

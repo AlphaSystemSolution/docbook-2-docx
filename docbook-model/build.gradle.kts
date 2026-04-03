@@ -16,7 +16,7 @@ dependencies {
 }
 
 configure<com.github.bjornvester.xjc.XjcExtension> {
-    bindingFiles.setFrom(project.files("$projectDir/src/main/resources/docbook.xjb"))
+    bindingFiles = project.files("$projectDir/src/main/resources/docbook.xjb")
     options.add("-Xfluent-api")
     options.add("-Xdefault-value")
 }
@@ -24,7 +24,7 @@ configure<com.github.bjornvester.xjc.XjcExtension> {
 sourceSets {
     main {
         java {
-            srcDir("$buildDir/generated/sources/xjc/java")
+            srcDir("${layout.buildDirectory.get()}/generated/sources/xjc/java")
         }
     }
 }
