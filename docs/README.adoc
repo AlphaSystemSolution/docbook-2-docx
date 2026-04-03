@@ -1,0 +1,60 @@
+= Documentation Index
+:toc:
+:icons: font
+
+== Welcome to the Documentation
+
+This directory contains comprehensive documentation for the AsciiDoc to Word Converter project.
+
+== Documentation Files
+
+=== User Documentation
+
+* link:index.adoc[*Main Documentation*] - Project overview, quick start, and general information
+* link:cli-guide.adoc[*CLI User Guide*] - Complete command-line interface documentation with examples
+* link:elements-reference.adoc[*Supported Elements Reference*] - Comprehensive list of all supported AsciiDoc elements
+
+=== Developer Documentation
+
+* link:developer-guide.adoc[*Developer Guide*] - Architecture, modules, building, and contributing
+* link:api-reference.adoc[*API Reference*] - Programmatic usage and library integration
+
+== Example Documents
+
+The link:examples/[examples directory] contains sample AsciiDoc files:
+
+* link:examples/basic-example.adoc[*Basic Example*] - Simple document with common elements
+* link:examples/technical-doc.adoc[*Technical Documentation*] - REST API documentation example
+* link:examples/user-guide.adoc[*User Guide*] - Software user manual example
+
+== Converting Documentation to Word
+
+You can convert any of these AsciiDoc files to Word format using the CLI tool:
+
+[source,bash]
+----
+# Convert a documentation file
+java -jar ../asciidoc-docx-cli/build/libs/asciidoc-docx-cli-0.5.5-SNAPSHOT-all.jar \
+  -s index.adoc \
+  -d index.docx
+
+# Convert an example
+java -jar ../asciidoc-docx-cli/build/libs/asciidoc-docx-cli-0.5.5-SNAPSHOT-all.jar \
+  -s examples/basic-example.adoc
+----
+
+== Quick Links
+
+* link:../README.md[Project README]
+* link:../LICENSE.md[License]
+* https://github.com/AlphaSystemSolution/docbook-2-docx[GitHub Repository]
+
+== Contributing to Documentation
+
+To improve the documentation:
+
+. Edit the relevant `.adoc` file
+. Test the conversion to Word
+. Submit a pull request
+
+Documentation follows AsciiDoc best practices and uses consistent formatting throughout.

@@ -1,0 +1,138 @@
+= AsciiDoc to Word Converter
+:toc: left
+:toclevels: 3
+:sectnums:
+:icons: font
+:source-highlighter: rouge
+:version: 0.5.5-SNAPSHOT
+
+== Overview
+
+The AsciiDoc to Word Converter is a powerful library and command-line tool that converts AsciiDoc documents into Office 365 Word® (DOCX) format. This tool provides a seamless way to create professional Word documents from AsciiDoc source files while preserving formatting, structure, and styling.
+
+=== Key Features
+
+* **Full AsciiDoc Support**: Convert AsciiDoc documents with comprehensive element support
+* **DocBook Pipeline**: Uses DocBook as an intermediate format for robust conversion
+* **Rich Formatting**: Preserves text formatting, lists, tables, admonitions, and more
+* **Arabic Text Support**: Built-in support for Arabic text rendering
+* **Command-Line Interface**: Easy-to-use CLI for batch processing and automation
+* **Programmatic API**: Use as a library in your Java applications
+* **Customizable Output**: Control output paths, styling, and document structure
+
+=== How It Works
+
+The conversion process follows a three-stage pipeline:
+
+[source]
+----
+AsciiDoc → DocBook XML → DOCX (Word)
+----
+
+1. **AsciiDoc to DocBook**: The AsciiDoctor library converts your AsciiDoc source to DocBook XML
+2. **DocBook to DOCX**: The custom conversion engine transforms DocBook elements into Word document structures
+3. **Output**: A fully formatted DOCX file ready to open in Microsoft Word or compatible applications
+
+== Quick Start
+
+=== Prerequisites
+
+* Java 17 or higher
+* Gradle 9.4.1 (included via wrapper)
+
+=== Building from Source
+
+Clone the repository and build the project:
+
+[source,bash]
+----
+git clone https://github.com/AlphaSystemSolution/docbook-2-docx.git
+cd docbook-2-docx
+./gradlew build
+----
+
+=== Creating the CLI Tool
+
+Build the shadow JAR (fat JAR with all dependencies):
+
+[source,bash]
+----
+./gradlew :asciidoc-docx-cli:shadowJar
+----
+
+The executable JAR will be created at:
+----
+asciidoc-docx-cli/build/libs/asciidoc-docx-cli-{version}-all.jar
+----
+
+=== Basic Usage
+
+Convert an AsciiDoc file to Word:
+
+[source,bash]
+----
+java -jar asciidoc-docx-cli-0.5.5-SNAPSHOT-all.jar -s input.adoc
+----
+
+This creates `input.docx` in the same directory as the source file.
+
+== Documentation
+
+=== User Documentation
+
+* link:cli-guide.adoc[CLI User Guide] - Complete command-line interface documentation
+* link:elements-reference.adoc[Supported Elements] - Reference for all supported AsciiDoc elements
+
+=== Developer Documentation
+
+* link:developer-guide.adoc[Developer Guide] - Architecture, modules, and contribution guidelines
+* link:api-reference.adoc[API Reference] - Programmatic usage and library integration
+
+== Project Modules
+
+The project is organized into six modules:
+
+[cols="1,3"]
+|===
+|Module |Description
+
+|`docbook-2-docx-common`
+|Shared models, utilities, and common interfaces
+
+|`docbook-model`
+|JAXB-generated DocBook XML model classes
+
+|`asciidoctor-adapter`
+|AsciiDoc to DocBook conversion using AsciidoctorJ
+
+|`docbook-2-docx`
+|Core DocBook to DOCX conversion engine
+
+|`arabic-handler`
+|Arabic text processing and rendering support
+
+|`asciidoc-docx-cli`
+|Command-line interface application
+|===
+
+== Examples
+
+See the link:examples/[examples directory] for sample AsciiDoc files demonstrating various features.
+
+== License
+
+This project is licensed under the Apache License 2.0. See link:../LICENSE.md[LICENSE.md] for details.
+
+== Version
+
+Current version: *{version}*
+
+== Support
+
+For issues, questions, or contributions, please visit the project repository.
+
+== See Also
+
+* https://asciidoc.org/[AsciiDoc Documentation]
+* https://asciidoctor.org/[Asciidoctor Project]
+* https://docbook.org/[DocBook Project]

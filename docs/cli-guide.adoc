@@ -1,0 +1,361 @@
+= CLI User Guide
+:toc: left
+:toclevels: 3
+:sectnums:
+:icons: font
+:source-highlighter: rouge
+
+== Introduction
+
+The AsciiDoc to Word CLI tool provides a command-line interface for converting AsciiDoc documents to Microsoft Word (DOCX) format. This guide covers installation, usage, and troubleshooting.
+
+== Installation
+
+=== Building the Shadow JAR
+
+The CLI tool is distributed as a "shadow JAR" (also known as a fat JAR or uber JAR), which includes all dependencies in a single executable file.
+
+To build the shadow JAR:
+
+[source,bash]
+----
+cd docbook-2-docx
+./gradlew :asciidoc-docx-cli:shadowJar
+----
+
+The JAR file will be created at:
+----
+asciidoc-docx-cli/build/libs/asciidoc-docx-cli-0.5.5-SNAPSHOT-all.jar
+----
+
+=== System Requirements
+
+* *Java*: Version 17 or higher
+* *Operating System*: Windows, macOS, or Linux
+* *Memory*: Minimum 512MB RAM (1GB+ recommended for large documents)
+
+=== Verifying Installation
+
+Test the installation by running:
+
+[source,bash]
+----
+java -jar asciidoc-docx-cli-0.5.5-SNAPSHOT-all.jar
+----
+
+You should see the usage help message.
+
+== Command-Line Options
+
+=== Overview
+
+[source,bash]
+----
+java -jar asciidoc-docx-cli-{version}-all.jar [OPTIONS]
+----
+
+=== Required Options
+
+==== `-s <srcPath>` - Source File Path
+
+Specifies the path to the source AsciiDoc file.
+
+[source,bash]
+----
+-s /path/to/document.adoc
+----
+
+[NOTE]
+====
+This option is *required*. The file must exist and be readable.
+====
+
+=== Optional Options
+
+==== `-d <destPath>` - Destination File Path
+
+Specifies the output path for the generated DOCX file.
+
+[source,bash]
+----
+-d /path/to/output.docx
+----
+
+[TIP]
+====
+If not specified, the output file will be created in the same directory as the source file with a `.docx` extension.
+====
+
+==== `-o` - Open Document
+
+Automatically opens the generated document in the default application after conversion.
+
+[source,bash]
+----
+-o
+----
+
+[WARNING]
+====
+This option requires a desktop environment. It may not work in headless server environments.
+====
+
+==== `-e <extractedDocumentPath>` - Extract Package
+
+Extracts the DOCX package (which is a ZIP archive) to the specified directory for inspection.
+
+[source,bash]
+----
+-e /path/to/extract/directory
+----
+
+[NOTE]
+====
+This is useful for debugging or examining the internal structure of the generated Word document. The directory will be created if it doesn't exist, or cleaned if it does.
+====
+
+==== `-x <saveDocBookContent>` - Save DocBook Content
+
+Saves the intermediate DocBook XML content to a file in the specified directory.
+
+[source,bash]
+----
+-x /path/to/docbook/directory
+----
+
+[TIP]
+====
+Use this option to debug conversion issues or to examine the intermediate DocBook representation.
+====
+
+== Usage Examples
+
+=== Basic Conversion
+
+Convert an AsciiDoc file to Word using default settings:
+
+[source,bash]
+----
+java -jar asciidoc-docx-cli-0.5.5-SNAPSHOT-all.jar \
+  -s my-document.adoc
+----
+
+*Result*: Creates `my-document.docx` in the same directory.
+
+=== Custom Output Path
+
+Specify a custom output location:
+
+[source,bash]
+----
+java -jar asciidoc-docx-cli-0.5.5-SNAPSHOT-all.jar \
+  -s ~/Documents/source.adoc \
+  -d ~/Desktop/output.docx
+----
+
+=== Auto-Open Document
+
+Convert and automatically open the result:
+
+[source,bash]
+----
+java -jar asciidoc-docx-cli-0.5.5-SNAPSHOT-all.jar \
+  -s report.adoc \
+  -o
+----
+
+=== Debug Mode with DocBook Extraction
+
+Save the intermediate DocBook XML for debugging:
+
+[source,bash]
+----
+java -jar asciidoc-docx-cli-0.5.5-SNAPSHOT-all.jar \
+  -s document.adoc \
+  -x ./debug \
+  -e ./extracted
+----
+
+This will:
+
+1. Convert `document.adoc` to `document.docx`
+2. Save the DocBook XML to `./debug/document.xml`
+3. Extract the DOCX package contents to `./extracted/`
+
+=== Complete Workflow Example
+
+A comprehensive example using all options:
+
+[source,bash]
+----
+java -jar asciidoc-docx-cli-0.5.5-SNAPSHOT-all.jar \
+  -s /home/user/docs/manual.adoc \
+  -d /home/user/output/manual-v1.docx \
+  -x /home/user/debug \
+  -e /home/user/extracted \
+  -o
+----
+
+== Batch Processing
+
+=== Processing Multiple Files (Bash)
+
+[source,bash]
+----
+#!/bin/bash
+for file in *.adoc; do
+  java -jar asciidoc-docx-cli-0.5.5-SNAPSHOT-all.jar -s "$file"
+done
+----
+
+=== Processing Multiple Files (PowerShell)
+
+[source,powershell]
+----
+Get-ChildItem -Filter *.adoc | ForEach-Object {
+  java -jar asciidoc-docx-cli-0.5.5-SNAPSHOT-all.jar -s $_.FullName
+}
+----
+
+== Troubleshooting
+
+=== Common Errors
+
+==== "Missing required option: s"
+
+*Cause*: The `-s` option was not provided.
+
+*Solution*: Always specify the source file with `-s`:
+
+[source,bash]
+----
+java -jar asciidoc-docx-cli-0.5.5-SNAPSHOT-all.jar -s document.adoc
+----
+
+==== "Source path does not exists"
+
+*Cause*: The specified source file cannot be found.
+
+*Solution*: Verify the file path is correct and the file exists:
+
+[source,bash]
+----
+ls -l /path/to/file.adoc
+----
+
+==== "Unable save DocBook content"
+
+*Cause*: The directory specified with `-x` is not writable or doesn't exist.
+
+*Solution*: Ensure the directory exists and has write permissions:
+
+[source,bash]
+----
+mkdir -p /path/to/docbook
+chmod 755 /path/to/docbook
+----
+
+==== OutOfMemoryError
+
+*Cause*: Large documents may require more memory.
+
+*Solution*: Increase the Java heap size:
+
+[source,bash]
+----
+java -Xmx2g -jar asciidoc-docx-cli-0.5.5-SNAPSHOT-all.jar -s large-doc.adoc
+----
+
+=== File Path Issues
+
+==== Spaces in Paths
+
+Always quote paths containing spaces:
+
+[source,bash]
+----
+java -jar asciidoc-docx-cli-0.5.5-SNAPSHOT-all.jar \
+  -s "My Documents/report.adoc" \
+  -d "My Documents/report.docx"
+----
+
+==== Relative vs Absolute Paths
+
+Both relative and absolute paths are supported:
+
+[source,bash]
+----
+# Relative path
+java -jar asciidoc-docx-cli-0.5.5-SNAPSHOT-all.jar -s ./docs/file.adoc
+
+# Absolute path
+java -jar asciidoc-docx-cli-0.5.5-SNAPSHOT-all.jar -s /home/user/docs/file.adoc
+----
+
+=== Getting Help
+
+Display usage information:
+
+[source,bash]
+----
+java -jar asciidoc-docx-cli-0.5.5-SNAPSHOT-all.jar
+----
+
+== Performance Tips
+
+=== Large Documents
+
+For large documents (>100 pages):
+
+1. Increase heap size: `-Xmx2g` or higher
+2. Process in sections if possible
+3. Disable auto-open (`-o`) to save time
+
+=== Batch Processing
+
+When processing many files:
+
+1. Use a shell script for automation
+2. Consider parallel processing for independent files
+3. Monitor memory usage
+
+== Advanced Usage
+
+=== Creating an Alias (Unix/Linux/macOS)
+
+Add to your `.bashrc` or `.zshrc`:
+
+[source,bash]
+----
+alias adoc2docx='java -jar /path/to/asciidoc-docx-cli-0.5.5-SNAPSHOT-all.jar'
+----
+
+Then use:
+
+[source,bash]
+----
+adoc2docx -s document.adoc -o
+----
+
+=== Windows Batch File
+
+Create `adoc2docx.bat`:
+
+[source,batch]
+----
+@echo off
+java -jar "C:\path\to\asciidoc-docx-cli-0.5.5-SNAPSHOT-all.jar" %*
+----
+
+Then use:
+
+[source,cmd]
+----
+adoc2docx -s document.adoc -o
+----
+
+== See Also
+
+* link:index.adoc[Main Documentation]
+* link:elements-reference.adoc[Supported Elements Reference]
+* link:api-reference.adoc[API Reference]

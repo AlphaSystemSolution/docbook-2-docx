@@ -1,0 +1,342 @@
+= Software User Guide
+Documentation Team
+v3.5, 2024-01-20
+:toc: left
+:toclevels: 2
+:sectnums:
+:icons: font
+
+== Welcome
+
+Welcome to the Software User Guide. This guide will help you get started and make the most of the application.
+
+== Getting Started
+
+=== System Requirements
+
+Before installing, ensure your system meets these requirements:
+
+* *Operating System*: Windows 10+, macOS 10.15+, or Linux
+* *Memory*: Minimum 4GB RAM (8GB recommended)
+* *Disk Space*: 500MB free space
+* *Display*: 1280x720 or higher resolution
+
+=== Installation
+
+==== Windows
+
+. Download the installer from https://example.com/download
+. Run the `.exe` file
+. Follow the installation wizard
+. Launch the application from the Start menu
+
+==== macOS
+
+. Download the `.dmg` file
+. Open the disk image
+. Drag the application to your Applications folder
+. Launch from Applications
+
+==== Linux
+
+[source,bash]
+----
+# Ubuntu/Debian
+sudo apt-get install example-app
+
+# Fedora/RHEL
+sudo dnf install example-app
+----
+
+=== First Launch
+
+When you first launch the application:
+
+. You'll see the welcome screen
+. Click "Create Account" or "Sign In"
+. Complete the setup wizard
+. You're ready to start!
+
+TIP: Take the tour on first launch to learn about key features.
+
+== Main Features
+
+=== Dashboard
+
+The dashboard is your central hub for all activities.
+
+.Dashboard Components
+[cols="1,3"]
+|===
+|Component |Description
+
+|Quick Actions
+|Frequently used actions for fast access
+
+|Recent Items
+|Your most recently accessed items
+
+|Notifications
+|Important updates and alerts
+
+|Statistics
+|Overview of your activity and metrics
+|===
+
+=== Creating Projects
+
+To create a new project:
+
+. Click the *New Project* button
+. Enter project details:
+.. Project name
+.. Description
+.. Category
+. Choose a template (optional)
+. Click *Create*
+
+[NOTE]
+====
+Project names must be unique within your workspace.
+====
+
+=== Managing Files
+
+==== Uploading Files
+
+You can upload files in several ways:
+
+* Drag and drop files into the window
+* Click *Upload* and select files
+* Use the keyboard shortcut: `Ctrl+U` (Windows/Linux) or `Cmd+U` (macOS)
+
+*Supported file types:*
+
+* Documents: `.pdf`, `.docx`, `.txt`
+* Images: `.jpg`, `.png`, `.gif`
+* Archives: `.zip`, `.tar.gz`
+
+IMPORTANT: Maximum file size is 100MB per file.
+
+==== Organizing Files
+
+Use folders to organize your files:
+
+. Right-click in the file area
+. Select *New Folder*
+. Name your folder
+. Drag files into the folder
+
+=== Collaboration
+
+==== Sharing
+
+To share a project with others:
+
+. Open the project
+. Click the *Share* button
+. Enter email addresses
+. Set permissions:
+** *View*: Can only view content
+** *Edit*: Can modify content
+** *Admin*: Full control
+. Click *Send Invitations*
+
+==== Comments
+
+Add comments to collaborate:
+
+. Select the item to comment on
+. Click the comment icon
+. Type your comment
+. Click *Post*
+
+TIP: Use @mentions to notify specific team members.
+
+== Advanced Features
+
+=== Keyboard Shortcuts
+
+.Common Shortcuts
+[cols="1,1,2"]
+|===
+|Action |Windows/Linux |macOS
+
+|New Project
+|Ctrl+N
+|Cmd+N
+
+|Save
+|Ctrl+S
+|Cmd+S
+
+|Search
+|Ctrl+F
+|Cmd+F
+
+|Upload
+|Ctrl+U
+|Cmd+U
+
+|Help
+|F1
+|F1
+|===
+
+=== Automation
+
+Create automated workflows:
+
+. Go to *Settings* > *Automation*
+. Click *New Workflow*
+. Define triggers:
+** When a file is uploaded
+** When a project is created
+** On a schedule
+. Define actions:
+** Send notification
+** Move to folder
+** Run script
+. Save and activate
+
+=== Integration
+
+Connect with other tools:
+
+* *Cloud Storage*: Dropbox, Google Drive, OneDrive
+* *Communication*: Slack, Microsoft Teams
+* *Project Management*: Jira, Trello
+* *Version Control*: GitHub, GitLab
+
+== Troubleshooting
+
+=== Common Issues
+
+==== Application Won't Start
+
+*Problem*: Application fails to launch
+
+*Solutions*:
+
+. Check system requirements
+. Restart your computer
+. Reinstall the application
+. Check antivirus settings
+
+==== Files Won't Upload
+
+*Problem*: File upload fails
+
+*Solutions*:
+
+. Check file size (max 100MB)
+. Verify file type is supported
+. Check internet connection
+. Clear browser cache (web version)
+
+==== Sync Issues
+
+*Problem*: Changes not syncing
+
+*Solutions*:
+
+. Check internet connection
+. Sign out and sign back in
+. Force sync: *Settings* > *Sync* > *Force Sync*
+. Contact support if issue persists
+
+WARNING: Forcing sync may overwrite local changes.
+
+=== Getting Help
+
+If you need assistance:
+
+* *Help Center*: https://help.example.com
+* *Email Support*: support@example.com
+* *Live Chat*: Available 9 AM - 5 PM EST
+* *Community Forum*: https://community.example.com
+
+== Tips and Tricks
+
+[TIP]
+====
+*Power User Tips:*
+
+* Use keyboard shortcuts for faster navigation
+* Create templates for recurring projects
+* Set up automation for repetitive tasks
+* Use tags to organize and find items quickly
+* Enable dark mode in Settings for reduced eye strain
+====
+
+== Privacy and Security
+
+=== Data Protection
+
+Your data is protected with:
+
+* *Encryption*: AES-256 encryption at rest and in transit
+* *Backups*: Daily automated backups
+* *Access Control*: Role-based permissions
+* *Audit Logs*: Complete activity tracking
+
+=== Best Practices
+
+. Use a strong, unique password
+. Enable two-factor authentication
+. Review sharing permissions regularly
+. Don't share your account credentials
+. Log out on shared computers
+
+== Appendix
+
+=== Glossary
+
+Project::
+A container for related files and activities
+
+Workspace::
+Your personal or team environment
+
+Template::
+A pre-configured project structure
+
+Workflow::
+An automated sequence of actions
+
+=== Keyboard Shortcuts Reference
+
+See the complete list in *Help* > *Keyboard Shortcuts* or press `?` in the application.
+
+=== Version History
+
+[cols="1,1,3"]
+|===
+|Version |Date |Changes
+
+|3.5
+|2024-01-20
+|Added automation features, improved performance
+
+|3.0
+|2023-10-15
+|New dashboard design, collaboration features
+
+|2.0
+|2023-04-01
+|Cloud sync, mobile apps
+
+|1.0
+|2022-12-01
+|Initial release
+|===
+
+== Contact
+
+For questions or feedback:
+
+* Email: feedback@example.com
+* Twitter: @exampleapp
+* Website: https://example.com
+
+Thank you for using our software!

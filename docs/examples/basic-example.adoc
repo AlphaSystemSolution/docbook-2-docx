@@ -1,0 +1,100 @@
+= Basic Document Example
+John Doe <john@example.com>
+v1.0, 2024-01-01
+:toc:
+:icons: font
+
+== Introduction
+
+This is a basic example demonstrating common AsciiDoc elements that can be converted to Word format.
+
+== Text Formatting
+
+You can use *bold*, _italic_, and `monospace` text.
+
+You can also combine them: *_bold italic_* or `*bold monospace*`.
+
+== Lists
+
+=== Unordered Lists
+
+* First item
+* Second item
+** Nested item
+** Another nested item
+* Third item
+
+=== Ordered Lists
+
+. First step
+. Second step
+.. Nested step
+.. Another nested step
+. Third step
+
+=== Definition List
+
+Term 1::
+This is the definition for term 1.
+
+Term 2::
+This is the definition for term 2.
+
+== Tables
+
+.Sample Table
+[cols="1,2,1"]
+|===
+|Name |Description |Status
+
+|Item 1
+|First item description
+|Active
+
+|Item 2
+|Second item description
+|Pending
+
+|Item 3
+|Third item description
+|Complete
+|===
+
+== Code Blocks
+
+Here's a Java code example:
+
+[source,java]
+----
+public class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+    }
+}
+----
+
+== Admonitions
+
+NOTE: This is a note providing additional information.
+
+TIP: This is a helpful tip for the reader.
+
+IMPORTANT: This is important information that shouldn't be missed.
+
+WARNING: This is a warning about potential issues.
+
+CAUTION: Proceed with caution in this scenario.
+
+== Links
+
+Visit https://asciidoc.org[AsciiDoc] for more information.
+
+== Special Characters
+
+Copyright (C), Registered (R), Trademark (TM)
+
+Arrows: -> <- =>
+
+== Conclusion
+
+This example demonstrates the basic elements supported by the AsciiDoc to Word converter.
