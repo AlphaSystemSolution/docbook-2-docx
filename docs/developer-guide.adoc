@@ -1,0 +1,689 @@
+= Developer Guide
+:toc: left
+:toclevels: 3
+:sectnums:
+:icons: font
+:source-highlighter: rouge
+
+== Introduction
+
+This guide provides comprehensive information for developers who want to contribute to the AsciiDoc to Word Converter project or understand its internal architecture.
+
+== Project Structure
+
+The project is organized as a multi-module Gradle build with six distinct modules:
+
+[source]
+----
+docbook-2-docx-parent/
+├── docbook-2-docx-common/     # Shared models and utilities
+├── docbook-model/             # JAXB-generated DocBook models
+├── asciidoctor-adapter/       # AsciiDoc to DocBook conversion
+├── docbook-2-docx/            # Core conversion engine
+├── arabic-handler/            # Arabic text support
+└── asciidoc-docx-cli/         # Command-line interface
+----
+
+=== Module Dependencies
+
+[source]
+----
+asciidoc-docx-cli
+    ├── asciidoctor-adapter
+    │   └── docbook-2-docx-common
+    ├── docbook-2-docx
+    │   ├── docbook-model
+    │   └── docbook-2-docx-common
+    └── arabic-handler
+----
+
+== Module Details
+
+=== docbook-2-docx-common
+
+*Purpose*: Shared models, utilities, and common interfaces used across modules.
+
+*Key Classes*:
+
+* `DocumentInfo` - Base document metadata and configuration
+* `Backend` - Enumeration of supported backends (DocBook, etc.)
+
+*Dependencies*: Minimal - only common utilities
+
+=== docbook-model
+
+*Purpose*: JAXB-generated Java classes representing the DocBook XML schema.
+
+*Generation*: Classes are generated from DocBook XSD schemas using the JAXB XJC compiler.
+
+*Key Packages*:
+
+* `org.docbook.model` - All DocBook element classes
+
+*Note*: This module is auto-generated. Do not manually edit classes in this module.
+
+=== asciidoctor-adapter
+
+*Purpose*: Converts AsciiDoc documents to DocBook XML format using AsciidoctorJ.
+
+*Key Classes*:
+
+* `DocumentConverter` - Main conversion entry point
+* `AsciiDocumentInfo` - Extended document info with AsciiDoc-specific metadata
+
+*Dependencies*:
+
+* AsciidoctorJ {asciidoctorjVersion}
+* docbook-2-docx-common
+
+*Conversion Process*:
+
+1. Load AsciiDoc file using AsciidoctorJ
+2. Extract document attributes and metadata
+3. Convert to DocBook XML using AsciidoctorJ's DocBook backend
+4. Return `AsciiDocumentInfo` with DocBook content
+
+=== docbook-2-docx
+
+*Purpose*: Core conversion engine that transforms DocBook XML into DOCX (Word) format.
+
+*Architecture*: Uses the Builder pattern to convert DocBook elements to Word structures.
+
+*Key Components*:
+
+==== ApplicationController
+
+Manages the conversion context and lifecycle.
+
+[source,java]
+----
+ApplicationController.startContext(documentInfo);
+try {
+    // Conversion logic
+} finally {
+    ApplicationController.endContext();
+}
+----
+
+==== DocumentBuilder
+
+Main entry point for DocBook to DOCX conversion.
+
+[source,java]
+----
+Path buildDocument(DocumentInfo documentInfo)
+Path buildDocument(DocumentInfo documentInfo, Path docxPath)
+----
+
+==== Builder Pattern
+
+Each DocBook element has a corresponding builder:
+
+* *Block Builders*: Para, List, Table, Admonition, etc.
+* *Inline Builders*: Emphasis, Link, Literal, etc.
+
+*Base Classes*:
+
+* `AbstractBuilder` - Base for all builders
+* `BlockBuilder` - Base for block-level elements
+* `InlineBuilder` - Base for inline elements
+
+==== Handler Pattern
+
+Handlers apply formatting to text runs:
+
+* `BoldHandler` - Bold text
+* `ItalicHandler` - Italic text
+* `ColorHandler` - Text color
+* `HighlightHandler` - Background highlighting
+* `HyperlinkHandler` - Hyperlinks
+
+=== arabic-handler
+
+*Purpose*: Provides specialized support for Arabic text rendering and processing.
+
+*Features*:
+
+* Right-to-left text direction
+* Arabic character shaping
+* Proper font handling
+
+=== asciidoc-docx-cli
+
+*Purpose*: Command-line interface for the conversion tool.
+
+*Main Class*: `com.alphasystem.docx.cli.Main`
+
+*Features*:
+
+* Apache Commons CLI for argument parsing
+* File path validation
+* Document extraction and debugging options
+
+== Building the Project
+
+=== Prerequisites
+
+* JDK 17 or higher
+* Gradle 9.4.1 (wrapper included)
+
+=== Build Commands
+
+==== Full Build
+
+[source,bash]
+----
+./gradlew build
+----
+
+This will:
+
+1. Compile all modules
+2. Run tests
+3. Generate JARs
+4. Run code quality checks
+
+==== Clean Build
+
+[source,bash]
+----
+./gradlew clean build
+----
+
+==== Build Specific Module
+
+[source,bash]
+----
+./gradlew :docbook-2-docx:build
+----
+
+==== Skip Tests
+
+[source,bash]
+----
+./gradlew build -x test
+----
+
+==== Create Shadow JAR
+
+[source,bash]
+----
+./gradlew :asciidoc-docx-cli:shadowJar
+----
+
+=== Running Tests
+
+==== All Tests
+
+[source,bash]
+----
+./gradlew test
+----
+
+==== Specific Module Tests
+
+[source,bash]
+----
+./gradlew :docbook-2-docx:test
+----
+
+==== Test with Coverage
+
+[source,bash]
+----
+./gradlew test jacocoTestReport
+----
+
+Coverage reports are generated in `build/reports/jacoco/test/html/`.
+
+== Architecture
+
+=== Conversion Pipeline
+
+The conversion follows a three-stage pipeline:
+
+[source]
+----
+┌─────────────┐      ┌──────────────┐      ┌─────────────┐
+│  AsciiDoc   │ ───> │ DocBook XML  │ ───> │    DOCX     │
+│   (.adoc)   │      │    (.xml)    │      │   (.docx)   │
+└─────────────┘      └──────────────┘      └─────────────┘
+     Stage 1              Stage 2              Stage 3
+  AsciidoctorJ      Custom Conversion      docx4j Library
+----
+
+==== Stage 1: AsciiDoc to DocBook
+
+* *Component*: `asciidoctor-adapter`
+* *Library*: AsciidoctorJ
+* *Process*: Uses AsciidoctorJ's built-in DocBook backend
+
+==== Stage 2: DocBook to Word Structures
+
+* *Component*: `docbook-2-docx`
+* *Pattern*: Builder pattern
+* *Process*: Each DocBook element is converted by a specialized builder
+
+==== Stage 3: Word Document Generation
+
+* *Library*: docx4j
+* *Process*: Word structures are serialized to DOCX format
+
+=== Design Patterns
+
+==== Builder Pattern
+
+Each DocBook element type has a dedicated builder class:
+
+[source,java]
+----
+public interface Builder<T> {
+    List<Object> buildInternal(T source);
+}
+----
+
+Example builders:
+
+* `ParaBuilder` - Converts `<para>` elements
+* `TableBuilder` - Converts `<table>` elements
+* `EmphasisBuilder` - Converts `<emphasis>` elements
+
+==== Factory Pattern
+
+`BuilderFactory` creates appropriate builders for each element type:
+
+[source,java]
+----
+Builder<?> builder = BuilderFactory.getBuilder(docBookElement);
+List<Object> wordElements = builder.buildInternal(docBookElement);
+----
+
+==== Handler Pattern
+
+Handlers apply formatting to text runs:
+
+[source,java]
+----
+public interface Handler {
+    void handle(R run, Object source);
+}
+----
+
+==== Context Pattern
+
+`DocumentContext` maintains conversion state:
+
+* Current document metadata
+* Style definitions
+* Cross-reference mappings
+* Configuration options
+
+=== Element Conversion
+
+==== Block Elements
+
+Block elements are converted to Word paragraphs or tables:
+
+[source,java]
+----
+public class ParaBuilder extends BlockBuilder<Para> {
+    @Override
+    public List<Object> buildInternal(Para source) {
+        P paragraph = new P();
+        // Process inline content
+        // Apply paragraph styles
+        return List.of(paragraph);
+    }
+}
+----
+
+==== Inline Elements
+
+Inline elements are converted to Word runs within paragraphs:
+
+[source,java]
+----
+public class EmphasisBuilder extends InlineBuilder<Emphasis> {
+    @Override
+    public List<Object> buildInternal(Emphasis source) {
+        R run = new R();
+        // Apply italic formatting
+        // Process text content
+        return List.of(run);
+    }
+}
+----
+
+==== Tables
+
+Tables are converted to Word table structures:
+
+* `<table>` → `Tbl`
+* `<thead>` → Table header rows
+* `<tbody>` → Table body rows
+* `<row>` → `Tr`
+* `<entry>` → `Tc`
+
+== Development Workflow
+
+=== Setting Up Development Environment
+
+1. Clone the repository:
++
+[source,bash]
+----
+git clone https://github.com/AlphaSystemSolution/docbook-2-docx.git
+cd docbook-2-docx
+----
+
+2. Import into your IDE (IntelliJ IDEA, Eclipse, VS Code)
+
+3. Build the project:
++
+[source,bash]
+----
+./gradlew build
+----
+
+=== Making Changes
+
+1. Create a feature branch:
++
+[source,bash]
+----
+git checkout -b feature/my-new-feature
+----
+
+2. Make your changes
+
+3. Run tests:
++
+[source,bash]
+----
+./gradlew test
+----
+
+4. Commit your changes:
++
+[source,bash]
+----
+git add .
+git commit -m "Add new feature"
+----
+
+=== Code Style
+
+* Follow standard Java conventions
+* Use meaningful variable and method names
+* Add Javadoc comments for public APIs
+* Keep methods focused and concise
+* Use builder pattern for complex object construction
+
+=== Testing Guidelines
+
+* Write unit tests for new functionality
+* Maintain or improve code coverage
+* Test edge cases and error conditions
+* Use descriptive test method names
+
+Example test structure:
+
+[source,java]
+----
+@Test
+public void testParaConversion() {
+    // Given
+    Para para = createTestPara();
+    
+    // When
+    List<Object> result = builder.buildInternal(para);
+    
+    // Then
+    assertNotNull(result);
+    assertEquals(1, result.size());
+    assertTrue(result.get(0) instanceof P);
+}
+----
+
+== Adding New Features
+
+=== Adding Support for a New DocBook Element
+
+1. Create a new builder class in the appropriate package:
++
+[source,java]
+----
+public class MyElementBuilder extends BlockBuilder<MyElement> {
+    @Override
+    public List<Object> buildInternal(MyElement source) {
+        // Conversion logic
+    }
+}
+----
+
+2. Register the builder in `BuilderFactory`
+
+3. Add tests for the new builder
+
+4. Update documentation
+
+=== Adding a New Text Handler
+
+1. Create a handler class:
++
+[source,java]
+----
+public class MyHandler implements Handler {
+    @Override
+    public void handle(R run, Object source) {
+        // Formatting logic
+    }
+}
+----
+
+2. Register the handler in the handler registry
+
+3. Add tests
+
+=== Customizing Styles
+
+Styles are defined in configuration files. To add custom styles:
+
+1. Define the style in the style configuration
+2. Apply the style in the appropriate builder
+3. Test the style application
+
+== Debugging
+
+=== Enabling Debug Output
+
+Use the `-x` option to save intermediate DocBook XML:
+
+[source,bash]
+----
+java -jar asciidoc-docx-cli.jar -s input.adoc -x ./debug
+----
+
+=== Examining DOCX Structure
+
+Use the `-e` option to extract the DOCX package:
+
+[source,bash]
+----
+java -jar asciidoc-docx-cli.jar -s input.adoc -e ./extracted
+----
+
+The extracted directory contains:
+
+* `word/document.xml` - Main document content
+* `word/styles.xml` - Style definitions
+* `word/_rels/` - Relationships
+* `[Content_Types].xml` - Content type mappings
+
+=== Common Debugging Scenarios
+
+==== Element Not Converting
+
+1. Check if builder exists for the element
+2. Verify builder is registered in `BuilderFactory`
+3. Add logging to the builder
+4. Examine intermediate DocBook XML
+
+==== Formatting Issues
+
+1. Check handler implementation
+2. Verify style definitions
+3. Examine generated `word/document.xml`
+
+==== Performance Issues
+
+1. Profile with JProfiler or VisualVM
+2. Check for unnecessary object creation
+3. Optimize builder implementations
+
+== Publishing
+
+=== Maven Central
+
+The project is published to Maven Central via Sonatype OSSRH.
+
+Configuration:
+
+* Group ID: `io.github.sfali23`
+* Artifact IDs: Module names
+* Version: Defined in `gradle.properties`
+
+=== Release Process
+
+1. Update version in `gradle.properties`
+2. Build and test:
++
+[source,bash]
+----
+./gradlew clean build
+----
+
+3. Publish to staging:
++
+[source,bash]
+----
+./gradlew publishToSonatype
+----
+
+4. Close and release staging repository:
++
+[source,bash]
+----
+./gradlew closeAndReleaseSonatypeStagingRepository
+----
+
+== Contributing
+
+=== Pull Request Process
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Update documentation
+6. Submit a pull request
+
+=== Code Review Guidelines
+
+* Code must pass all tests
+* Code coverage should not decrease
+* Follow existing code style
+* Include meaningful commit messages
+* Update documentation as needed
+
+== Dependencies
+
+=== Key Dependencies
+
+[cols="1,1,2"]
+|===
+|Library |Version |Purpose
+
+|AsciidoctorJ
+|{asciidoctorjVersion}
+|AsciiDoc processing
+
+|docx4j
+|Varies
+|Word document generation
+
+|JAXB
+|{jaxbRuntimeVersion}
+|XML binding
+
+|Commons CLI
+|{commonsCliVersion}
+|Command-line parsing
+
+|Guice
+|{guiceVersion}
+|Dependency injection
+
+|Logback
+|{logbackClassicVersion}
+|Logging
+|===
+
+=== Updating Dependencies
+
+Dependencies are defined in `gradle.properties`. To update:
+
+1. Modify version in `gradle.properties`
+2. Test thoroughly
+3. Update documentation if API changes
+
+== Troubleshooting
+
+=== Build Issues
+
+==== Gradle Version Mismatch
+
+Ensure you're using the wrapper:
+
+[source,bash]
+----
+./gradlew --version
+----
+
+==== Dependency Resolution Failures
+
+Clear Gradle cache:
+
+[source,bash]
+----
+./gradlew clean --refresh-dependencies
+----
+
+=== Runtime Issues
+
+==== ClassNotFoundException
+
+Ensure all dependencies are included in the shadow JAR:
+
+[source,bash]
+----
+./gradlew :asciidoc-docx-cli:shadowJar
+----
+
+==== OutOfMemoryError
+
+Increase heap size:
+
+[source,bash]
+----
+export GRADLE_OPTS="-Xmx2g"
+./gradlew build
+----
+
+== Resources
+
+* link:index.adoc[Main Documentation]
+* link:api-reference.adoc[API Reference]
+* link:cli-guide.adoc[CLI Guide]
+* https://asciidoctor.org/[Asciidoctor Documentation]
+* https://www.docbook.org/[DocBook Documentation]

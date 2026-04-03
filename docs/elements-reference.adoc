@@ -1,0 +1,779 @@
+= Supported Elements Reference
+:toc: left
+:toclevels: 3
+:sectnums:
+:icons: font
+:source-highlighter: rouge
+
+== Introduction
+
+This reference documents all AsciiDoc elements supported by the AsciiDoc to Word Converter. Each element is shown with its AsciiDoc syntax and the resulting Word output.
+
+== Document Structure
+
+=== Document Title
+
+[cols="1,2"]
+|===
+|AsciiDoc |Word Output
+
+a|
+[source,asciidoc]
+----
+= Document Title
+----
+|Document title in Title style
+
+a|
+[source,asciidoc]
+----
+= Main Title
+:author: John Doe
+:email: john@example.com
+----
+|Title with author metadata
+|===
+
+=== Sections
+
+[cols="1,2"]
+|===
+|AsciiDoc |Word Output
+
+a|
+[source,asciidoc]
+----
+== Level 1 Heading
+=== Level 2 Heading
+==== Level 3 Heading
+===== Level 4 Heading
+====== Level 5 Heading
+----
+|Hierarchical headings with appropriate styles
+|===
+
+== Block Elements
+
+=== Paragraphs
+
+==== Simple Paragraph
+
+[source,asciidoc]
+----
+This is a simple paragraph.
+It can span multiple lines.
+
+This is another paragraph.
+----
+
+*Word Output*: Standard paragraph with default spacing
+
+==== Paragraph with Title
+
+[source,asciidoc]
+----
+.Paragraph Title
+This is a paragraph with a title.
+----
+
+*Word Output*: Title in bold followed by paragraph content
+
+=== Lists
+
+==== Unordered Lists
+
+[source,asciidoc]
+----
+* First item
+* Second item
+** Nested item
+** Another nested item
+* Third item
+----
+
+*Word Output*: Bulleted list with proper indentation
+
+==== Ordered Lists
+
+[source,asciidoc]
+----
+. First step
+. Second step
+.. Nested step
+.. Another nested step
+. Third step
+----
+
+*Word Output*: Numbered list with proper indentation
+
+==== Definition Lists
+
+[source,asciidoc]
+----
+Term 1::
+Definition for term 1
+
+Term 2::
+Definition for term 2
+----
+
+*Word Output*: Term in bold followed by definition
+
+==== Mixed Lists
+
+[source,asciidoc]
+----
+* Bullet item
+. Numbered item
+.. Nested numbered
+* Another bullet
+----
+
+*Word Output*: Properly formatted mixed list types
+
+=== Tables
+
+==== Simple Table
+
+[source,asciidoc]
+----
+|===
+|Column 1 |Column 2 |Column 3
+
+|Cell 1.1
+|Cell 1.2
+|Cell 1.3
+
+|Cell 2.1
+|Cell 2.2
+|Cell 2.3
+|===
+----
+
+*Word Output*: Table with borders and default styling
+
+==== Table with Header
+
+[source,asciidoc]
+----
+[cols="1,2,1"]
+|===
+|Name |Description |Status
+
+|Item 1
+|First item description
+|Active
+
+|Item 2
+|Second item description
+|Pending
+|===
+----
+
+*Word Output*: Table with header row in bold
+
+==== Table with Title
+
+[source,asciidoc]
+----
+.Table Title
+|===
+|Column 1 |Column 2
+
+|Data 1
+|Data 2
+|===
+----
+
+*Word Output*: Table with caption above
+
+==== Complex Table
+
+[source,asciidoc]
+----
+[cols="1,2,1",options="header,footer"]
+|===
+|Column 1 |Column 2 |Column 3
+
+|Row 1, Col 1
+|Row 1, Col 2
+|Row 1, Col 3
+
+|Row 2, Col 1
+|Row 2, Col 2
+|Row 2, Col 3
+
+|Footer 1
+|Footer 2
+|Footer 3
+|===
+----
+
+*Word Output*: Table with header and footer rows
+
+=== Code Blocks
+
+==== Listing Block
+
+[source,asciidoc]
+----
+[source,java]
+----
+public class Example {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+    }
+}
+----
+----
+
+*Word Output*: Monospaced text block with code formatting
+
+==== Literal Block
+
+[source,asciidoc]
+----
+....
+Literal text block
+  Preserves spacing
+    and indentation
+....
+----
+
+*Word Output*: Monospaced text with preserved formatting
+
+==== Source Code with Syntax
+
+[source,asciidoc]
+----
+[source,python]
+----
+def hello():
+    print("Hello, World!")
+----
+----
+
+*Word Output*: Code block with language indicator
+
+=== Admonitions
+
+Admonitions are special blocks that draw attention to important information.
+
+==== Note
+
+[source,asciidoc]
+----
+NOTE: This is a note admonition.
+----
+
+*Word Output*: Note box with icon and highlighted background
+
+==== Tip
+
+[source,asciidoc]
+----
+TIP: This is a helpful tip.
+----
+
+*Word Output*: Tip box with icon and highlighted background
+
+==== Important
+
+[source,asciidoc]
+----
+IMPORTANT: This is important information.
+----
+
+*Word Output*: Important box with icon and highlighted background
+
+==== Warning
+
+[source,asciidoc]
+----
+WARNING: This is a warning.
+----
+
+*Word Output*: Warning box with icon and highlighted background
+
+==== Caution
+
+[source,asciidoc]
+----
+CAUTION: Proceed with caution.
+----
+
+*Word Output*: Caution box with icon and highlighted background
+
+==== Multi-line Admonitions
+
+[source,asciidoc]
+----
+[NOTE]
+====
+This is a multi-line note.
+
+It can contain multiple paragraphs,
+lists, and other content.
+====
+----
+
+*Word Output*: Admonition block containing multiple elements
+
+=== Examples
+
+[source,asciidoc]
+----
+.Example Title
+====
+This is an example block.
+It can contain any content.
+====
+----
+
+*Word Output*: Example box with title and bordered content
+
+=== Sidebars
+
+[source,asciidoc]
+----
+.Sidebar Title
+****
+This is sidebar content.
+It appears in a separate box.
+****
+----
+
+*Word Output*: Sidebar box with distinct styling
+
+=== Quotes
+
+==== Block Quote
+
+[source,asciidoc]
+----
+[quote, Author Name, Source]
+____
+This is a block quote.
+It can span multiple lines.
+____
+----
+
+*Word Output*: Indented quote with attribution
+
+==== Verse
+
+[source,asciidoc]
+----
+[verse, Poet Name, Poem Title]
+____
+Roses are red,
+Violets are blue,
+AsciiDoc is great,
+And so are you.
+____
+----
+
+*Word Output*: Verse block with preserved line breaks
+
+== Inline Elements
+
+=== Text Formatting
+
+==== Bold
+
+[source,asciidoc]
+----
+*bold text* or **bold text**
+----
+
+*Word Output*: **bold text**
+
+==== Italic
+
+[source,asciidoc]
+----
+_italic text_ or __italic text__
+----
+
+*Word Output*: _italic text_
+
+==== Monospace
+
+[source,asciidoc]
+----
+`monospace text` or ``monospace text``
+----
+
+*Word Output*: `monospace text`
+
+==== Combined Formatting
+
+[source,asciidoc]
+----
+*_bold and italic_*
+`*bold monospace*`
+----
+
+*Word Output*: Combined text styles
+
+==== Superscript
+
+[source,asciidoc]
+----
+E=mc^2^
+----
+
+*Word Output*: E=mc²
+
+==== Subscript
+
+[source,asciidoc]
+----
+H~2~O
+----
+
+*Word Output*: H₂O
+
+==== Highlight
+
+[source,asciidoc]
+----
+#highlighted text#
+----
+
+*Word Output*: Highlighted (marked) text
+
+==== Custom Styling
+
+[source,asciidoc]
+----
+[.custom-class]#styled text#
+----
+
+*Word Output*: Text with custom role/style applied
+
+=== Links
+
+==== External Links
+
+[source,asciidoc]
+----
+https://example.com
+https://example.com[Link Text]
+----
+
+*Word Output*: Clickable hyperlink
+
+==== Internal Cross-References
+
+[source,asciidoc]
+----
+[[section-id]]
+== Section Title
+
+See <<section-id>> for details.
+----
+
+*Word Output*: Internal document link
+
+==== Email Links
+
+[source,asciidoc]
+----
+mailto:user@example.com[Email Us]
+----
+
+*Word Output*: Email hyperlink
+
+=== Special Characters
+
+==== Symbols
+
+[source,asciidoc]
+----
+(C) Copyright
+(R) Registered
+(TM) Trademark
+----
+
+*Word Output*: © ® ™
+
+==== Arrows
+
+[source,asciidoc]
+----
+-> Right arrow
+<- Left arrow
+=> Double arrow
+----
+
+*Word Output*: → ← ⇒
+
+==== Ellipsis
+
+[source,asciidoc]
+----
+...
+----
+
+*Word Output*: …
+
+=== Line Breaks
+
+==== Hard Line Break
+
+[source,asciidoc]
+----
+Line 1 +
+Line 2
+----
+
+*Word Output*: Lines on separate lines without paragraph break
+
+==== Horizontal Rule
+
+[source,asciidoc]
+----
+'''
+----
+
+*Word Output*: Horizontal line separator
+
+== Advanced Elements
+
+=== Images
+
+[source,asciidoc]
+----
+image::path/to/image.png[Alt Text]
+
+.Image Caption
+image::diagram.png[Diagram,300,200]
+----
+
+*Word Output*: Embedded image with optional caption
+
+[NOTE]
+====
+Image support requires the image files to be accessible during conversion.
+====
+
+=== Includes
+
+[source,asciidoc]
+----
+include::chapter1.adoc[]
+----
+
+*Word Output*: Content from included file
+
+=== Comments
+
+[source,asciidoc]
+----
+// Single line comment
+
+////
+Multi-line comment
+Not visible in output
+////
+----
+
+*Word Output*: Comments are not included in output
+
+=== Page Breaks
+
+[source,asciidoc]
+----
+<<<
+----
+
+*Word Output*: Page break in Word document
+
+=== Table of Contents
+
+[source,asciidoc]
+----
+:toc:
+:toclevels: 3
+----
+
+*Word Output*: Automatic table of contents
+
+== Document Attributes
+
+=== Common Attributes
+
+[source,asciidoc]
+----
+:author: John Doe
+:email: john@example.com
+:revnumber: 1.0
+:revdate: 2024-01-01
+:toc: left
+:toclevels: 3
+:sectnums:
+:icons: font
+----
+
+These attributes control document metadata and formatting.
+
+=== Custom Attributes
+
+[source,asciidoc]
+----
+:company: ACME Corp
+:version: 2.0
+
+Document for {company} version {version}
+----
+
+*Word Output*: Attribute values substituted in text
+
+== Arabic Text Support
+
+The converter includes special support for Arabic text:
+
+[source,asciidoc]
+----
+This is English text. هذا نص عربي. Back to English.
+----
+
+*Word Output*: Properly rendered Arabic text with correct directionality
+
+[NOTE]
+====
+Arabic text is automatically detected and rendered with:
+
+* Right-to-left direction
+* Appropriate font selection
+* Correct character shaping
+====
+
+== Limitations and Known Issues
+
+=== Partially Supported Elements
+
+* **Footnotes**: Basic support, may not preserve all formatting
+* **Bibliography**: Limited support
+* **Index**: Not currently supported
+* **Mathematical formulas**: Not supported (use images instead)
+
+=== Workarounds
+
+==== Complex Tables
+
+For very complex tables with merged cells, consider:
+
+* Simplifying the table structure
+* Using multiple simpler tables
+* Creating the table in Word after conversion
+
+==== Custom Styling
+
+For advanced styling needs:
+
+* Use Word styles after conversion
+* Apply custom templates
+* Post-process the DOCX file
+
+== Examples by Use Case
+
+=== Technical Documentation
+
+[source,asciidoc]
+----
+= API Reference
+:toc:
+:sectnums:
+
+== Introduction
+
+This document describes the API.
+
+=== Authentication
+
+[source,java]
+----
+Authentication auth = new Authentication(apiKey);
+----
+
+IMPORTANT: Keep your API key secure.
+
+=== Endpoints
+
+[cols="1,2,1"]
+|===
+|Method |Endpoint |Description
+
+|GET
+|/api/users
+|List all users
+
+|POST
+|/api/users
+|Create new user
+|===
+----
+
+=== User Manual
+
+[source,asciidoc]
+----
+= User Guide
+:icons: font
+
+== Getting Started
+
+Follow these steps:
+
+. Install the software
+. Configure settings
+. Start using
+
+TIP: Check the FAQ for common questions.
+
+== Features
+
+* Feature 1
+* Feature 2
+* Feature 3
+----
+
+=== Report Template
+
+[source,asciidoc]
+----
+= Monthly Report
+:author: Jane Smith
+:date: 2024-01-31
+
+== Executive Summary
+
+.Key Metrics
+|===
+|Metric |Value |Change
+
+|Revenue
+|$100K
+|+10%
+
+|Users
+|1000
+|+5%
+|===
+
+== Detailed Analysis
+
+[NOTE]
+====
+All figures are preliminary and subject to revision.
+====
+----
+
+== See Also
+
+* link:index.adoc[Main Documentation]
+* link:cli-guide.adoc[CLI User Guide]
+* link:api-reference.adoc[API Reference]
+* https://docs.asciidoctor.org/asciidoc/latest/[AsciiDoc Language Documentation]

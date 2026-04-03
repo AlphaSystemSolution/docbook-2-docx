@@ -1,0 +1,668 @@
+= API Reference
+:toc: left
+:toclevels: 3
+:sectnums:
+:icons: font
+:source-highlighter: rouge
+
+== Introduction
+
+This guide covers programmatic usage of the AsciiDoc to Word Converter as a library in your Java applications.
+
+== Maven/Gradle Dependencies
+
+=== Gradle
+
+Add the following to your `build.gradle`:
+
+[source,groovy]
+----
+dependencies {
+    implementation 'io.github.sfali23:asciidoctor-adapter:0.5.5-SNAPSHOT'
+    implementation 'io.github.sfali23:docbook-2-docx:0.5.5-SNAPSHOT'
+}
+----
+
+For the complete CLI functionality:
+
+[source,groovy]
+----
+dependencies {
+    implementation 'io.github.sfali23:asciidoc-docx-cli:0.5.5-SNAPSHOT'
+}
+----
+
+=== Maven
+
+Add the following to your `pom.xml`:
+
+[source,xml]
+----
+<dependencies>
+    <dependency>
+        <groupId>io.github.sfali23</groupId>
+        <artifactId>asciidoctor-adapter</artifactId>
+        <version>0.5.5-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+        <groupId>io.github.sfali23</groupId>
+        <artifactId>docbook-2-docx</artifactId>
+        <version>0.5.5-SNAPSHOT</version>
+    </dependency>
+</dependencies>
+----
+
+== Core API Classes
+
+=== DocumentConverter
+
+The `DocumentConverter` class provides methods to convert AsciiDoc documents to DocBook XML.
+
+==== Package
+
+[source,java]
+----
+com.alphasystem.asciidoc.util.DocumentConverter
+----
+
+==== Methods
+
+===== convertDocument
+
+Loads and parses an AsciiDoc document without converting to DocBook.
+
+[source,java]
+----
+public static AsciiDocumentInfo convertDocument(Path srcPath)
+----
+
+*Parameters*:
+
+* `srcPath` - Path to the AsciiDoc source file
+
+*Returns*: `AsciiDocumentInfo` containing document metadata and attributes
+
+*Throws*: `NullPointerException` if the source file doesn't exist
+
+===== convertToDocBook
+
+Converts an AsciiDoc document to DocBook XML format.
+
+[source,java]
+----
+public static AsciiDocumentInfo convertToDocBook(Path srcPath) 
+    throws SystemException
+----
+
+*Parameters*:
+
+* `srcPath` - Path to the AsciiDoc source file
+
+*Returns*: `AsciiDocumentInfo` containing DocBook XML content
+
+*Throws*:
+
+* `SystemException` - If conversion fails
+* `NullPointerException` - If the source file doesn't exist
+
+==== Example Usage
+
+[source,java]
+----
+import com.alphasystem.asciidoc.util.DocumentConverter;
+import com.alphasystem.asciidoc.model.AsciiDocumentInfo;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+public class Example {
+    public static void main(String[] args) {
+        Path srcPath = Paths.get("document.adoc");
+        
+        try {
+            // Convert to DocBook
+            AsciiDocumentInfo docInfo = 
+                DocumentConverter.convertToDocBook(srcPath);
+            
+            // Get DocBook XML content
+            String docBookXml = docInfo.getContent();
+            System.out.println(docBookXml);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+----
+
+=== DocumentBuilder
+
+The `DocumentBuilder` class converts DocBook XML to DOCX format.
+
+==== Package
+
+[source,java]
+----
+com.alphasystem.docbook.DocumentBuilder
+----
+
+==== Methods
+
+===== buildDocument (with custom path)
+
+Builds a Word document from DocBook content with a specified output path.
+
+[source,java]
+----
+public static Path buildDocument(
+    DocumentInfo documentInfo, 
+    Path docxPath
+) throws SystemException
+----
+
+*Parameters*:
+
+* `documentInfo` - Document metadata and DocBook content
+* `docxPath` - Output path for the DOCX file
+
+*Returns*: Path to the created DOCX file
+
+*Throws*: `SystemException` - If document generation fails
+
+===== buildDocument (default path)
+
+Builds a Word document with an automatically determined output path.
+
+[source,java]
+----
+public static Path buildDocument(DocumentInfo documentInfo) 
+    throws SystemException
+----
+
+*Parameters*:
+
+* `documentInfo` - Document metadata and DocBook content
+
+*Returns*: Path to the created DOCX file (same directory as source, `.docx` extension)
+
+*Throws*: `SystemException` - If document generation fails
+
+==== Example Usage
+
+[source,java]
+----
+import com.alphasystem.docbook.DocumentBuilder;
+import com.alphasystem.asciidoc.model.DocumentInfo;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+public class Example {
+    public static void main(String[] args) {
+        try {
+            // Assuming you have DocumentInfo from DocumentConverter
+            DocumentInfo docInfo = getDocumentInfo();
+            
+            // Build with default path
+            Path outputPath = DocumentBuilder.buildDocument(docInfo);
+            System.out.println("Created: " + outputPath);
+            
+            // Or build with custom path
+            Path customPath = Paths.get("output/custom.docx");
+            Path result = DocumentBuilder.buildDocument(docInfo, customPath);
+            System.out.println("Created: " + result);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+----
+
+=== AsciiDocumentInfo
+
+Container for AsciiDoc document information and DocBook content.
+
+==== Package
+
+[source,java]
+----
+com.alphasystem.asciidoc.model.AsciiDocumentInfo
+----
+
+==== Key Methods
+
+[source,java]
+----
+// Get DocBook XML content
+String getContent()
+
+// Get document metadata
+DocumentInfo getDocumentInfo()
+
+// Get source file
+File getSrcFile()
+
+// Get backend type
+String getBackend()
+
+// Set DocBook content
+void setContent(String content)
+----
+
+==== Example
+
+[source,java]
+----
+AsciiDocumentInfo docInfo = DocumentConverter.convertToDocBook(srcPath);
+
+// Access properties
+String docBookXml = docInfo.getContent();
+File sourceFile = docInfo.getDocumentInfo().getSrcFile();
+String backend = docInfo.getBackend(); // "docbook"
+----
+
+== Complete Conversion Example
+
+=== Basic Conversion
+
+[source,java]
+----
+import com.alphasystem.asciidoc.util.DocumentConverter;
+import com.alphasystem.docbook.DocumentBuilder;
+import com.alphasystem.asciidoc.model.AsciiDocumentInfo;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+public class AsciiDocToWordConverter {
+    
+    public static void convertToWord(String inputPath, String outputPath) {
+        try {
+            // Step 1: Convert AsciiDoc to DocBook
+            Path srcPath = Paths.get(inputPath);
+            AsciiDocumentInfo docInfo = 
+                DocumentConverter.convertToDocBook(srcPath);
+            
+            // Step 2: Convert DocBook to Word
+            Path docxPath = Paths.get(outputPath);
+            Path result = DocumentBuilder.buildDocument(
+                docInfo.getDocumentInfo(), 
+                docxPath
+            );
+            
+            System.out.println("Successfully created: " + result);
+            
+        } catch (Exception e) {
+            System.err.println("Conversion failed: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    public static void main(String[] args) {
+        convertToWord("input.adoc", "output.docx");
+    }
+}
+----
+
+=== Conversion with Error Handling
+
+[source,java]
+----
+import com.alphasystem.asciidoc.util.DocumentConverter;
+import com.alphasystem.docbook.DocumentBuilder;
+import com.alphasystem.commons.SystemException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+public class RobustConverter {
+    
+    public static boolean convert(String input, String output) {
+        Path srcPath = Paths.get(input);
+        
+        // Validate input
+        if (!Files.exists(srcPath)) {
+            System.err.println("Input file not found: " + input);
+            return false;
+        }
+        
+        if (!Files.isRegularFile(srcPath)) {
+            System.err.println("Input is not a file: " + input);
+            return false;
+        }
+        
+        try {
+            // Convert to DocBook
+            var docInfo = DocumentConverter.convertToDocBook(srcPath);
+            
+            // Validate DocBook content
+            if (docInfo.getContent() == null || 
+                docInfo.getContent().isEmpty()) {
+                System.err.println("DocBook conversion produced no content");
+                return false;
+            }
+            
+            // Convert to Word
+            Path docxPath = Paths.get(output);
+            
+            // Ensure output directory exists
+            Path parentDir = docxPath.getParent();
+            if (parentDir != null && !Files.exists(parentDir)) {
+                Files.createDirectories(parentDir);
+            }
+            
+            Path result = DocumentBuilder.buildDocument(
+                docInfo.getDocumentInfo(), 
+                docxPath
+            );
+            
+            // Verify output
+            if (Files.exists(result) && Files.size(result) > 0) {
+                System.out.println("Success: " + result);
+                return true;
+            } else {
+                System.err.println("Output file was not created properly");
+                return false;
+            }
+            
+        } catch (SystemException e) {
+            System.err.println("Conversion error: " + e.getMessage());
+            return false;
+        } catch (Exception e) {
+            System.err.println("Unexpected error: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+}
+----
+
+=== Batch Conversion
+
+[source,java]
+----
+import java.io.IOException;
+import java.nio.file.*;
+import java.util.stream.Stream;
+
+public class BatchConverter {
+    
+    public static void convertDirectory(String inputDir, String outputDir) 
+            throws IOException {
+        Path inPath = Paths.get(inputDir);
+        Path outPath = Paths.get(outputDir);
+        
+        // Create output directory if needed
+        if (!Files.exists(outPath)) {
+            Files.createDirectories(outPath);
+        }
+        
+        // Find all .adoc files
+        try (Stream<Path> paths = Files.walk(inPath)) {
+            paths.filter(Files::isRegularFile)
+                 .filter(p -> p.toString().endsWith(".adoc"))
+                 .forEach(srcFile -> {
+                     try {
+                         // Determine output filename
+                         String filename = srcFile.getFileName()
+                                                  .toString()
+                                                  .replace(".adoc", ".docx");
+                         Path destFile = outPath.resolve(filename);
+                         
+                         // Convert
+                         System.out.println("Converting: " + srcFile);
+                         var docInfo = DocumentConverter
+                             .convertToDocBook(srcFile);
+                         DocumentBuilder.buildDocument(
+                             docInfo.getDocumentInfo(), 
+                             destFile
+                         );
+                         System.out.println("Created: " + destFile);
+                         
+                     } catch (Exception e) {
+                         System.err.println(
+                             "Failed to convert " + srcFile + ": " + 
+                             e.getMessage()
+                         );
+                     }
+                 });
+        }
+    }
+    
+    public static void main(String[] args) throws IOException {
+        convertDirectory("./docs", "./output");
+    }
+}
+----
+
+=== Saving Intermediate DocBook
+
+[source,java]
+----
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+public class DebugConverter {
+    
+    public static void convertWithDebug(
+            String input, 
+            String output, 
+            String debugDir
+    ) throws Exception {
+        Path srcPath = Paths.get(input);
+        
+        // Convert to DocBook
+        var docInfo = DocumentConverter.convertToDocBook(srcPath);
+        
+        // Save DocBook XML for debugging
+        if (debugDir != null) {
+            Path debugPath = Paths.get(debugDir);
+            if (!Files.exists(debugPath)) {
+                Files.createDirectories(debugPath);
+            }
+            
+            String xmlFilename = srcPath.getFileName()
+                                        .toString()
+                                        .replace(".adoc", ".xml");
+            Path xmlPath = debugPath.resolve(xmlFilename);
+            
+            Files.writeString(xmlPath, docInfo.getContent());
+            System.out.println("Saved DocBook XML: " + xmlPath);
+        }
+        
+        // Convert to Word
+        Path docxPath = Paths.get(output);
+        DocumentBuilder.buildDocument(
+            docInfo.getDocumentInfo(), 
+            docxPath
+        );
+        System.out.println("Created DOCX: " + docxPath);
+    }
+    
+    public static void main(String[] args) throws Exception {
+        convertWithDebug(
+            "document.adoc", 
+            "document.docx", 
+            "./debug"
+        );
+    }
+}
+----
+
+== Advanced Usage
+
+=== Custom Document Processing
+
+[source,java]
+----
+import com.alphasystem.asciidoc.util.DocumentConverter;
+import com.alphasystem.asciidoc.model.AsciiDocumentInfo;
+import java.nio.file.Path;
+
+public class CustomProcessor {
+    
+    public static void processDocument(Path srcPath) throws Exception {
+        // Load document
+        AsciiDocumentInfo docInfo = 
+            DocumentConverter.convertDocument(srcPath);
+        
+        // Access document attributes
+        var document = docInfo.getDocument();
+        if (document != null) {
+            // Process attributes
+            var attributes = document.getAttributes();
+            System.out.println("Title: " + attributes.get("doctitle"));
+            System.out.println("Author: " + attributes.get("author"));
+            
+            // Custom processing based on attributes
+            if (attributes.containsKey("custom-style")) {
+                // Apply custom styling
+            }
+        }
+        
+        // Convert to DocBook with custom options
+        AsciiDocumentInfo docBookInfo = 
+            DocumentConverter.convertToDocBook(srcPath);
+        
+        // Post-process DocBook content
+        String docBook = docBookInfo.getContent();
+        String modified = postProcessDocBook(docBook);
+        docBookInfo.setContent(modified);
+        
+        // Convert to Word
+        DocumentBuilder.buildDocument(docBookInfo.getDocumentInfo());
+    }
+    
+    private static String postProcessDocBook(String docBook) {
+        // Custom DocBook transformations
+        return docBook;
+    }
+}
+----
+
+=== Integration with Spring Boot
+
+[source,java]
+----
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+@Service
+public class ConversionService {
+    
+    public Path convertAsciiDocToWord(MultipartFile file) 
+            throws Exception {
+        // Save uploaded file
+        Path tempInput = Files.createTempFile("input", ".adoc");
+        file.transferTo(tempInput.toFile());
+        
+        try {
+            // Convert to DocBook
+            var docInfo = DocumentConverter.convertToDocBook(tempInput);
+            
+            // Create output file
+            Path tempOutput = Files.createTempFile("output", ".docx");
+            
+            // Convert to Word
+            return DocumentBuilder.buildDocument(
+                docInfo.getDocumentInfo(), 
+                tempOutput
+            );
+            
+        } finally {
+            // Cleanup
+            Files.deleteIfExists(tempInput);
+        }
+    }
+}
+----
+
+== Exception Handling
+
+=== SystemException
+
+The main exception thrown by the conversion API.
+
+[source,java]
+----
+try {
+    DocumentBuilder.buildDocument(docInfo);
+} catch (SystemException e) {
+    // Conversion failed
+    System.err.println("Error: " + e.getMessage());
+    Throwable cause = e.getCause();
+    if (cause != null) {
+        System.err.println("Caused by: " + cause.getMessage());
+    }
+}
+----
+
+=== Common Exceptions
+
+* `NullPointerException` - Source file doesn't exist
+* `SystemException` - Conversion error
+* `IOException` - File I/O error
+* `Docx4JException` - Word document generation error
+
+== Performance Considerations
+
+=== Memory Usage
+
+For large documents, consider:
+
+[source,java]
+----
+// Increase heap size when running
+// -Xmx2g or higher
+
+// Process in batches
+List<Path> files = getLargeFileList();
+for (Path file : files) {
+    convertFile(file);
+    // Allow garbage collection between files
+    System.gc();
+}
+----
+
+=== Parallel Processing
+
+[source,java]
+----
+import java.util.concurrent.*;
+
+public class ParallelConverter {
+    
+    public static void convertParallel(List<Path> files) {
+        ExecutorService executor = Executors.newFixedThreadPool(4);
+        
+        List<Future<Path>> futures = files.stream()
+            .map(file -> executor.submit(() -> {
+                var docInfo = DocumentConverter.convertToDocBook(file);
+                return DocumentBuilder.buildDocument(
+                    docInfo.getDocumentInfo()
+                );
+            }))
+            .toList();
+        
+        // Wait for completion
+        futures.forEach(future -> {
+            try {
+                Path result = future.get();
+                System.out.println("Completed: " + result);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        
+        executor.shutdown();
+    }
+}
+----
+
+== See Also
+
+* link:index.adoc[Main Documentation]
+* link:cli-guide.adoc[CLI User Guide]
+* link:developer-guide.adoc[Developer Guide]
+* link:elements-reference.adoc[Supported Elements]
