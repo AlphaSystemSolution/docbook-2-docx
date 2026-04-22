@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en">
+     <table colsep="1" rowsep="1" frame="all">
+        <title>Result: Rendered Color Codes</title>
+        <tgroup cols="5">
+            <colspec colwidth="20*" colname="col_1"/>
+            <colspec colwidth="20*" colname="col_2"/>
+            <colspec colwidth="20*" colname="col_3"/>
+            <colspec colwidth="20*" colname="col_4"/>
+            <colspec colwidth="20*" colname="col_5"/>
+            <tbody>
+                <row>
+                    <entry valign="top" align="left">
+                        <simpara><phrase role="aqua">Aqua</phrase></simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara><phrase role="black">Black</phrase></simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara><phrase role="blue">Blue</phrase></simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara><phrase role="cyan">Cyan</phrase></simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara><phrase role="fuchsia">Fuchsia</phrase></simpara>
+                    </entry>
+                </row>
+                <row>
+                    <entry valign="top" align="left">
+                        <simpara><phrase role="gray">Gray</phrase></simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara><phrase role="green">Green</phrase></simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara><phrase role="lime">Lime</phrase></simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara><phrase role="maroon">Maroon</phrase></simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara><phrase role="navy">Navy</phrase></simpara>
+                    </entry>
+                </row>
+                <row>
+                    <entry valign="top" align="left">
+                        <simpara><phrase role="olive">Olive</phrase></simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara><phrase role="purple">Purple</phrase></simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara><phrase role="red">Red</phrase></simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara><phrase role="silver">Silver</phrase></simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara><phrase role="teal">Teal</phrase></simpara>
+                    </entry>
+                </row>
+                <row>
+                    <entry valign="top" align="left">
+                        <simpara><phrase role="white">White</phrase></simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara><phrase role="yellow">Yellow</phrase></simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara>&#160;</simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara>&#160;</simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara>&#160;</simpara>
+                    </entry>
+                </row>
+            </tbody>
+        </tgroup>
+     </table>
+</article>

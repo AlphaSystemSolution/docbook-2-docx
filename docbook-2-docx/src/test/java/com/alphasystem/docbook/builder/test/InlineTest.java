@@ -280,4 +280,12 @@ public class InlineTest extends AbstractTest {
         assertText(content.get(content.size() - 1), "Zayd ate chocolate at home yesterday happily because he was hungry.");
         addHorizontalLine();
     }
+
+    @Test(dependsOnMethods = "testSingleSpace")
+    public void testColorCode() {
+        addTestTitle("Color code test");
+        processContent(readXml("color-code"));
+        assertSize( 2);
+        addHorizontalLine();
+    }
 }
