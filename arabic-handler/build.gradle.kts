@@ -1,0 +1,3 @@
+dependencies {
+    api(project(":docbook-2-docx"))
+}

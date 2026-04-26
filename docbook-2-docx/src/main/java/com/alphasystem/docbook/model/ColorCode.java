@@ -10,24 +10,24 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
  */
 public enum ColorCode {
 
-    AQUA("aqua", "00FFFF"),
-    BLACK("black", "000000"),
-    BLUE("blue", "0000FF"),
+    AQUA("aqua", "#00FFFF"),
+    BLACK("black", "#000000"),
+    BLUE("blue", "#0000FF"),
     CYAN("cyan", "#00FFFF"),
-    FUCHSIA("fuchsia", "FF0080"),
-    GRAY("gray", "808080"),
-    GREY("grey", "808080"),
-    GREEN("green", "00FF00"),
-    LIME("lime", "32CD32"),
-    MAROON("maroon", "800000"),
-    NAVY("navy", "000080"),
-    OLIVE("olive", "808000"),
-    PURPLE("purple", "800080"),
-    RED("red", "FF0000"),
-    SILVER("silver", "C0C0C0"),
-    TEAL("teal", "008080"),
-    WHITE("white", "FFFFFF"),
-    YELLOW("yellow", "FFFF00");
+    FUCHSIA("fuchsia", "#FF0080"),
+    GRAY("gray", "#808080"),
+    GREY("grey", "#808080"),
+    GREEN("green", "#00FF00"),
+    LIME("lime", "#32CD32"),
+    MAROON("maroon", "#800000"),
+    NAVY("navy", "#000080"),
+    OLIVE("olive", "#808000"),
+    PURPLE("purple", "#800080"),
+    RED("red", "#FF0000"),
+    SILVER("silver", "#C0C0C0"),
+    TEAL("teal", "#008080"),
+    WHITE("white", "#FFFFFF"),
+    YELLOW("yellow", "#FFFF00");
 
     private static final Map<String, ColorCode> codeMap = new LinkedHashMap<>();
     private static final Map<String, ColorCode> nameMap = new LinkedHashMap<>();

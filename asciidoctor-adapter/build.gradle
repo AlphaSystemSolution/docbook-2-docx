@@ -1,5 +1,0 @@
-dependencies {
-    api project(":docbook-2-docx-common")
-    api "org.asciidoctor:asciidoctorj:${asciidoctorjVersion}"
-    api "org.asciidoctor:asciidoctorj-api:${asciidoctorjVersion}"
-}
