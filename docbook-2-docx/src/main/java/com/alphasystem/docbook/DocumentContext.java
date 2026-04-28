@@ -33,6 +33,7 @@ public final class DocumentContext {
     private WmlPackageBuilder wmlPackageBuilder;
     private WordprocessingMLPackage wordprocessingMLPackage;
     private MainDocumentPart mainDocumentPart;
+    private int tableWidth = 0;
     private final NumberingHelper numberingHelper = NumberingHelper.getInstance();
 
     public DocumentContext(final DocumentInfo documentInfo) {
@@ -134,6 +135,22 @@ public final class DocumentContext {
             label = "here";
         }
         return label;
+    }
+
+    public void setTableWidth(String width) {
+        final var input = "table-width=\"";
+        final var inputLength = input.length();
+        final var startIndex = width.indexOf(input);
+        final var endIndex = width.indexOf("\"", inputLength + startIndex);
+        this.tableWidth = Integer.parseInt(width.substring(startIndex + inputLength, endIndex).replaceAll("%", ""));
+    }
+
+    public void restTableWidth() {
+        this.tableWidth = 0;
+    }
+
+    public int getTableWidth() {
+        return tableWidth;
     }
 
     private void updateDocumentCompatibility() {

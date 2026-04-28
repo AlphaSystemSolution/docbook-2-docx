@@ -3,7 +3,7 @@ dependencies {
     api(project(":docbook-2-docx-common"))
     api("org.glassfish.jaxb:jaxb-runtime:${property("jaxbRuntimeVersion")}")
     api("jakarta.xml.bind:jakarta.xml.bind-api:${property("bindApiVersion")}")
-    api("io.github.sfali23:open-xml-builder:${property("openxmlBuilderVersion")}")
+    api("io.github.sfali23:docx4j-builder:${property("openxmlBuilderVersion")}")
     api("io.vavr:vavr:${property("vavrVersion")}")
     api("org.graalvm.js:js:${property("graalvmJsVersion")}")
     api("com.typesafe:config:${property("typesafeConfigVersion")}")

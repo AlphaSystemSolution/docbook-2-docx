@@ -240,6 +240,12 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
             case "asciidoc-pagebreak" ->
                     ApplicationController.getContext().getMainDocumentPart().addObject(WmlAdapter.getPageBreak());
             case "asciidoc-br", "linebreak" -> currentText += System.lineSeparator();
+            case "dbhtml" -> {
+                 if (data.contains("table-width")) {
+                    documentContext.setTableWidth(data);
+                }
+            }
+            case "dbfo", "dblatex" -> { } // ignore
             default -> logger.warn("Unhandled processing instruction: target = {}", target);
         }
     }
