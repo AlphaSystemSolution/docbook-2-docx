@@ -36,14 +36,17 @@
                     <entry valign="top" align="left">
                         <simpara><phrase role="lime">Lime</phrase></simpara>
                     </entry>
+                     <entry valign="top" align="left">
+                        <simpara><phrase role="magenta">Magenta</phrase></simpara>
+                    </entry>
                     <entry valign="top" align="left">
                         <simpara><phrase role="maroon">Maroon</phrase></simpara>
                     </entry>
+                </row>
+                <row>
                     <entry valign="top" align="left">
                         <simpara><phrase role="navy">Navy</phrase></simpara>
                     </entry>
-                </row>
-                <row>
                     <entry valign="top" align="left">
                         <simpara><phrase role="olive">Olive</phrase></simpara>
                     </entry>
@@ -56,22 +59,16 @@
                     <entry valign="top" align="left">
                         <simpara><phrase role="silver">Silver</phrase></simpara>
                     </entry>
+                </row>
+                <row>
                     <entry valign="top" align="left">
                         <simpara><phrase role="teal">Teal</phrase></simpara>
                     </entry>
-                </row>
-                <row>
                     <entry valign="top" align="left">
                         <simpara><phrase role="white">White</phrase></simpara>
                     </entry>
                     <entry valign="top" align="left">
                         <simpara><phrase role="yellow">Yellow</phrase></simpara>
-                    </entry>
-                    <entry valign="top" align="left">
-                        <simpara>&#160;</simpara>
-                    </entry>
-                    <entry valign="top" align="left">
-                        <simpara>&#160;</simpara>
                     </entry>
                     <entry valign="top" align="left">
                         <simpara>&#160;</simpara>

@@ -19,6 +19,7 @@ public enum ColorCode {
     GREY("grey", "#808080"),
     GREEN("green", "#00FF00"),
     LIME("lime", "#32CD32"),
+    MAGENTA("magenta", "#FF00FF"),
     MAROON("maroon", "#800000"),
     NAVY("navy", "#000080"),
     OLIVE("olive", "#808000"),

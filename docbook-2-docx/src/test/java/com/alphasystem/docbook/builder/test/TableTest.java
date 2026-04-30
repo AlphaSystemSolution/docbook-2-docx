@@ -179,6 +179,16 @@ public class TableTest extends AbstractTest {
     }
 
     @Test(dependsOnMethods = "testTableWithStyle")
+    public void testTableWithWidth() {
+        addTestTitle("Table with table width");
+        processContent(readXml("table-with-table-width"));
+        assertSize(1);
+        final var content = mainDocumentPart.getContent();
+        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 49);
+        addHorizontalLine();
+    }
+
+     @Test(dependsOnMethods = "testTableWithWidth")
     public void testCustomCaption() {
         addTestTitle("Table with custom styles");
         processContent(readXml("table-with-custom-caption"));

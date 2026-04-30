@@ -55,9 +55,17 @@ public class DocBookTableAdapter {
 
     public String getTableStyle() {
         if (informalTable != null) {
-            return informalTable.getTableStyle();
+            var style = informalTable.getTableStyle();
+            if (style == null) {
+                style = informalTable.getRole();
+            }
+            return style;
         } else if (table != null) {
-            return table.getTableStyle();
+            var style = table.getTableStyle();
+            if (style == null) {
+                style = table.getRole();
+            }
+            return style;
         }
         return null;
     }

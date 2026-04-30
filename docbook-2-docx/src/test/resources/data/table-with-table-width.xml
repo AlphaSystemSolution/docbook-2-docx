@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<article xmlns="http://docbook.org/ns/docbook">
+    <informaltable role="CenteredTable" frame="all" rowsep="1" colsep="1">
+        <?dbhtml table-width="60%"?>
+        <?dbfo table-width="60%"?>
+        <?dblatex table-width="60%"?>
+        <tgroup cols="5">
+            <colspec colname="col_1" colwidth="44.9998*"/>
+            <colspec colname="col_2" colwidth="44.9998*"/>
+            <colspec colname="col_3" colwidth="44.9998*"/>
+            <colspec colname="col_4" colwidth="59.9999*"/>
+            <colspec colname="col_5" colwidth="60.0004*"/>
+            <tbody>
+                <row>
+                    <entry align="center" valign="middle">
+                        <simpara>
+                            <phrase role="arabicTableCaption">جمع</phrase>
+                        </simpara>
+                    </entry>
+                    <entry align="center" valign="middle">
+                        <simpara>
+                            <phrase role="arabicTableCaption">مثّنى</phrase>
+                        </simpara>
+                    </entry>
+                    <entry align="center" valign="middle">
+                        <simpara>
+                            <phrase role="arabicTableCaption">مفرد</phrase>
+                        </simpara>
+                    </entry>
+                    <entry align="center" valign="middle" namest="col_4" nameend="col_5">
+                        <simpara>&#160;</simpara>
+                    </entry>
+                </row>
+                <row>
+                    <entry align="center" valign="middle">
+                        <simpara>
+                            <phrase role="arabicNormal">فَتَحُوا</phrase>&#160;<phrase role="arabicSmall"><phrase role="grey">هُم</phrase></phrase>
+                        </simpara>
+                    </entry>
+                    <entry align="center" valign="middle">
+                        <simpara>
+                            <phrase role="arabicNormal">فَتَحَا</phrase>&#160;<phrase role="arabicSmall"><phrase role="grey">هُمَا</phrase></phrase>
+                        </simpara>
+                    </entry>
+                    <entry align="center" valign="middle">
+                        <simpara>
+                            <phrase role="arabicNormal">فَتَحَ</phrase>&#160;<phrase role="arabicSmall"><phrase role="grey">هُو</phrase></phrase>
+                        </simpara>
+                    </entry>
+                    <entry align="center" valign="middle">
+                         <simpara>
+                            <phrase role="arabicTableCaption">مذكر</phrase>
+                        </simpara>
+                    </entry>
+                    <entry align="center" valign="middle" morerows="1">
+                        <simpara>
+                            <phrase role="arabicTableCaption">غائب</phrase>
+                        </simpara>
+                    </entry>
+                </row>
+                <row>
+                    <entry align="center" valign="middle">
+                        <simpara>
+                            <phrase role="arabicNormal">فَتَحْنَ</phrase>&#160;<phrase role="arabicSmall"><phrase role="grey">هُنَّ</phrase></phrase>
+                        </simpara>
+                    </entry>
+                    <entry align="center" valign="middle">
+                        <simpara>
+                            <phrase role="arabicNormal">فَتَحَا</phrase>&#160;<phrase role="arabicSmall"><phrase role="grey">هُمَا</phrase></phrase>
+                        </simpara>
+                    </entry>
+                    <entry align="center" valign="middle">
+                        <simpara>
+                            <phrase role="arabicNormal">فَتَحَتْ</phrase>&#160;<phrase role="arabicSmall"><phrase role="grey">هي</phrase></phrase>
+                        </simpara>
+                    </entry>
+                    <entry align="center" valign="middle">
+                         <simpara>
+                            <phrase role="arabicTableCaption">مؤنّث</phrase>
+                        </simpara>
+                    </entry>
+                </row>
+            </tbody>
+        </tgroup>
+    </informaltable>
+</article>

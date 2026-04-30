@@ -1,5 +1,6 @@
 package com.alphasystem.docbook.builder.impl.block;
 
+import com.alphasystem.docbook.ApplicationController;
 import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.builder.impl.BlockBuilder;
 import com.alphasystem.docbook.model.DocBookTableAdapter;
@@ -16,7 +17,10 @@ import org.docx4j.wml.CTBorder;
 import org.docx4j.wml.Tbl;
 import org.docx4j.wml.TblBorders;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -111,12 +115,14 @@ public abstract class AbstractTableBuilder<S> extends BlockBuilder<S> {
         final var tableAdapter = new TableAdapter()
                 .withTableType(tableType)
                 .withTableStyle(tableStyle)
+                .withTableWidth(ApplicationController.getContext().getTableWidth())
                 .withIndentLevel(level)
                 .withTableProperties(tblPrBuilder.getObject())
                 .withColumnInputs(buildColumns(colSpec))
                 .startTable();
         columnInfoList = tableAdapter.getColumns();
         table = tableAdapter.getTable();
+        ApplicationController.getContext().restTableWidth();
     }
 
     private String getTableStyle(TableGroup tableGroup, String styleName) {
@@ -193,6 +199,21 @@ public abstract class AbstractTableBuilder<S> extends BlockBuilder<S> {
                 columnWidth = columnWidth.substring(0, columnWidth.length() - 1);
             }
             columnInputs[i] = new ColumnInput(columnSpec.getColumnName(), Double.parseDouble(columnWidth));
+        }
+
+        var totalWidth = Arrays.stream(columnInputs).mapToDouble(ColumnInput::getColumnWidth).sum();
+        var totalWidthBigDecimal = BigDecimal.valueOf(totalWidth);
+        totalWidthBigDecimal = totalWidthBigDecimal.setScale(0, RoundingMode.HALF_UP);
+        totalWidth = totalWidthBigDecimal.doubleValue();
+
+        // total width should not exceed 100%
+        if (totalWidth > 100) {
+            for (int i = 0; i < numOfColumns; i++) {
+                final var columnInput = columnInputs[i];
+                var columnWidth = columnInput.getColumnWidth();
+                columnWidth = BigDecimal.valueOf(columnWidth).multiply(TableAdapter.PERCENT).divide(BigDecimal.valueOf(totalWidth), 4, RoundingMode.HALF_UP).doubleValue();
+                columnInputs[i] = new ColumnInput(columnInput.getColumnName(), columnWidth);
+            }
         }
         return columnInputs;
     }
