@@ -4,10 +4,10 @@ import com.alphasystem.docbook.ApplicationController;
 import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.builder.impl.BlockBuilder;
 import com.alphasystem.docbook.model.DocBookTableAdapter;
-import com.alphasystem.docx4j.builder.wml.WmlBuilderFactory;
 import com.alphasystem.docx4j.builder.wml.table.ColumnInfo;
 import com.alphasystem.docx4j.builder.wml.table.ColumnInput;
 import com.alphasystem.docx4j.builder.wml.table.TableAdapter;
+import com.alphasystem.docx4j.builder.wml.table.TableFormat;
 import com.alphasystem.docx4j.builder.wml.table.TableType;
 import org.docbook.model.Choice;
 import org.docbook.model.ColumnSpec;
@@ -27,6 +27,9 @@ import java.util.Objects;
 
 import static com.alphasystem.docx4j.builder.wml.WmlAdapter.getDefaultBorder;
 import static com.alphasystem.docx4j.builder.wml.WmlAdapter.getNilBorder;
+import static com.alphasystem.docx4j.builder.wml.WmlAdapter.getNilTblBorders;
+import static com.alphasystem.docx4j.builder.wml.WmlBuilderFactory.getTblBordersBuilder;
+import static com.alphasystem.docx4j.builder.wml.WmlBuilderFactory.getTblPrBuilder;
 import static java.lang.String.format;
 import static org.docbook.model.Choice.ONE;
 
@@ -34,10 +37,12 @@ public abstract class AbstractTableBuilder<S> extends BlockBuilder<S> {
 
     private static final int HEADER = 1;
     private static final int FOOTER = 2;
+    private static final String CONJUGATION_TABLE_STYLE = "TwoColumnConjugationTable";
 
     private int level = -1;
     private List<ColumnInfo> columnInfoList;
     protected TableType tableType;
+    protected TableFormat tableFormat = TableFormat.NORMAL;
     private Tbl table;
     private TableGroup tableGroup;
     protected DocBookTableAdapter docBookTableAdapter;
@@ -48,6 +53,10 @@ public abstract class AbstractTableBuilder<S> extends BlockBuilder<S> {
 
     public TableType getTableType() {
         return tableType;
+    }
+
+    public TableFormat getTableFormat() {
+        return tableFormat;
     }
 
     public List<ColumnInfo> getColumnInfoList() {
@@ -84,7 +93,7 @@ public abstract class AbstractTableBuilder<S> extends BlockBuilder<S> {
             this.level = (int) listParent.getListInfo().getLevel();
         }
         final var tableGroups = docBookTableAdapter.getTableGroup();
-        tableGroup = ((tableGroups != null) && !tableGroups.isEmpty()) ? tableGroups.get(0) : null;
+        tableGroup = ((tableGroups != null) && !tableGroups.isEmpty()) ? tableGroups.getFirst() : null;
         if (tableGroup == null) {
             throw new IllegalArgumentException("tableGroup is null.");
         }
@@ -107,14 +116,29 @@ public abstract class AbstractTableBuilder<S> extends BlockBuilder<S> {
             throw new RuntimeException("Neither numOfColumns nor colSpec defined.");
         }
 
+        final var parentTableBuilder = getParent(AbstractTableBuilder.class);
+        if (parentTableBuilder != null && TableFormat.OUTER_NESTED == parentTableBuilder.getTableFormat()) {
+            // we are creating an inner nested table
+            tableFormat = TableFormat.INNER_NESTED;
+        }
+
         tableType = level <= -1 ? TableType.PCT : TableType.AUTO;
         var tableStyle = getTableStyle(tableGroup, styleName);
+        if (CONJUGATION_TABLE_STYLE.equals(styleName)) {
+            tableStyle = null; // reset
+            tableFormat = TableFormat.OUTER_NESTED;
+        }
 
-        var tblPrBuilder = WmlBuilderFactory.getTblPrBuilder().withTblBorders(createFrame(frame, rowSep, colSep));
+        var tblBorders = createFrame(frame, rowSep, colSep);
+        if (TableFormat.OUTER_NESTED == tableFormat) {
+            tblBorders = getNilTblBorders();
+        }
+        final var tblPrBuilder = getTblPrBuilder().withTblBorders(tblBorders);
 
         final var tableAdapter = new TableAdapter()
                 .withTableType(tableType)
                 .withTableStyle(tableStyle)
+                .withTableFormat(tableFormat)
                 .withTableWidth(ApplicationController.getContext().getTableWidth())
                 .withIndentLevel(level)
                 .withTableProperties(tblPrBuilder.getObject())
@@ -181,7 +205,7 @@ public abstract class AbstractTableBuilder<S> extends BlockBuilder<S> {
         if (ONE.equals(colSep)) {
             insideV = getDefaultBorder();
         }
-        return WmlBuilderFactory.getTblBordersBuilder().withTop(top).withLeft(left).withBottom(bottom)
+        return getTblBordersBuilder().withTop(top).withLeft(left).withBottom(bottom)
                 .withRight(right).withInsideH(insideH).withInsideV(insideV).getObject();
     }
 
@@ -246,7 +270,7 @@ public abstract class AbstractTableBuilder<S> extends BlockBuilder<S> {
         if (columnInfos.isEmpty()) {
             return null;
         } else {
-            return columnInfos.get(0);
+            return columnInfos.getFirst();
         }
     }
 }

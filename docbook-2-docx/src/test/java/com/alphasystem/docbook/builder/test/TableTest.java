@@ -20,7 +20,7 @@ public class TableTest extends AbstractTest {
         processContent(readXml("informal-table"));
         assertSize(1);
         final var content = mainDocumentPart.getContent();
-        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 9);
+        assertEquals(getTableContentSize((Tbl) content.getLast()), 9);
         addHorizontalLine();
     }
 
@@ -30,7 +30,7 @@ public class TableTest extends AbstractTest {
         processContent(readXml("table"));
         assertSize(2);
         final var content = mainDocumentPart.getContent();
-        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 6);
+        assertEquals(getTableContentSize((Tbl) content.getLast()), 6);
         addHorizontalLine();
     }
 
@@ -40,7 +40,7 @@ public class TableTest extends AbstractTest {
         processContent(readXml("table-center-left-align"));
         assertSize(1);
         final var content = mainDocumentPart.getContent();
-        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 4);
+        assertEquals(getTableContentSize((Tbl) content.getLast()), 4);
         addHorizontalLine();
     }
 
@@ -50,7 +50,7 @@ public class TableTest extends AbstractTest {
         processContent(readXml("table-bottom-left-align"));
         assertSize(1);
         final var content = mainDocumentPart.getContent();
-        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 4);
+        assertEquals(getTableContentSize((Tbl) content.getLast()), 4);
         addHorizontalLine();
     }
 
@@ -60,7 +60,7 @@ public class TableTest extends AbstractTest {
         processContent(readXml("table-center-center-align"));
         assertSize(1);
         final var content = mainDocumentPart.getContent();
-        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 4);
+        assertEquals(getTableContentSize((Tbl) content.getLast()), 4);
         addHorizontalLine();
     }
 
@@ -70,7 +70,7 @@ public class TableTest extends AbstractTest {
         processContent(readXml("table-column-span"));
         assertSize(1);
         final var content = mainDocumentPart.getContent();
-        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 18);
+        assertEquals(getTableContentSize((Tbl) content.getLast()), 18);
         addHorizontalLine();
     }
 
@@ -80,7 +80,7 @@ public class TableTest extends AbstractTest {
         processContent(readXml("table-row-span"));
         assertSize(1);
         final var content = mainDocumentPart.getContent();
-        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 8);
+        assertEquals(getTableContentSize((Tbl) content.getLast()), 8);
         addHorizontalLine();
     }
 
@@ -90,7 +90,7 @@ public class TableTest extends AbstractTest {
         processContent(readXml("table-row-column-span"));
         assertSize(1);
         final var content = mainDocumentPart.getContent();
-        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 6);
+        assertEquals(getTableContentSize((Tbl) content.getLast()), 6);
         addHorizontalLine();
     }
 
@@ -100,7 +100,7 @@ public class TableTest extends AbstractTest {
         processContent(readXml("table-complex-row-column-span"));
         assertSize(1);
         final var content = mainDocumentPart.getContent();
-        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 31);
+        assertEquals(getTableContentSize((Tbl) content.getLast()), 31);
         addHorizontalLine();
     }
 
@@ -110,7 +110,7 @@ public class TableTest extends AbstractTest {
         processContent(readXml("table-without-border"));
         assertSize(1);
         final var content = mainDocumentPart.getContent();
-        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 12);
+        assertEquals(getTableContentSize((Tbl) content.getLast()), 12);
         addHorizontalLine();
     }
 
@@ -144,7 +144,7 @@ public class TableTest extends AbstractTest {
         processContent(readXml("table-with-header"));
         assertSize(2);
         final var content = mainDocumentPart.getContent();
-        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 8);
+        assertEquals(getTableContentSize((Tbl) content.getLast()), 8);
         addHorizontalLine();
     }
 
@@ -154,7 +154,7 @@ public class TableTest extends AbstractTest {
         processContent(readXml("table-with-footer"));
         assertSize(2);
         final var content = mainDocumentPart.getContent();
-        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 8);
+        assertEquals(getTableContentSize((Tbl) content.getLast()), 8);
         addHorizontalLine();
     }
 
@@ -164,7 +164,7 @@ public class TableTest extends AbstractTest {
         processContent(readXml("table-with-header-footer"));
         assertSize(2);
         final var content = mainDocumentPart.getContent();
-        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 12);
+        assertEquals(getTableContentSize((Tbl) content.getLast()), 12);
         addHorizontalLine();
     }
 
@@ -174,7 +174,7 @@ public class TableTest extends AbstractTest {
         processContent(readXml("informal-table-with-style"));
         assertSize(1);
         final var content = mainDocumentPart.getContent();
-        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 13);
+        assertEquals(getTableContentSize((Tbl) content.getLast()), 13);
         addHorizontalLine();
     }
 
@@ -184,7 +184,7 @@ public class TableTest extends AbstractTest {
         processContent(readXml("table-with-table-width"));
         assertSize(1);
         final var content = mainDocumentPart.getContent();
-        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 49);
+        assertEquals(getTableContentSize((Tbl) content.getLast()), 49);
         addHorizontalLine();
     }
 
@@ -194,7 +194,17 @@ public class TableTest extends AbstractTest {
         processContent(readXml("table-with-custom-caption"));
         assertSize(1);
         final var content = mainDocumentPart.getContent();
-        assertEquals(getTableContentSize((Tbl) content.get(content.size() - 1)), 12);
+        assertEquals(getTableContentSize((Tbl) content.getLast()), 12);
+        addHorizontalLine();
+    }
+
+    @Test(dependsOnMethods = "testCustomCaption")
+    public void testNestedTable() {
+        addTestTitle("Nested Tables");
+        processContent(readXml("nested-tables"));
+        assertSize(1);
+        final var content = mainDocumentPart.getContent();
+        assertEquals(getTableContentSize((Tbl) content.getLast()), 0);
         addHorizontalLine();
     }
 }

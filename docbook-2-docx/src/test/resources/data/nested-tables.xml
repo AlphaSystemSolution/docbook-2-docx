@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<article
+	xmlns="http://docbook.org/ns/docbook">
+	<informaltable role="TwoColumnConjugationTable" frame="none" rowsep="0" colsep="0">
+		<tgroup cols="2">
+			<colspec colname="col_1" colwidth="50*"/>
+			<colspec colname="col_2" colwidth="50*"/>
+			<tbody>
+				<row>
+					<entry align="center" valign="middle">
+						<informaltable frame="all" rowsep="1" colsep="1">
+							<tgroup cols="3">
+								<colspec colname="col_1" colwidth="33.3333*"/>
+								<colspec colname="col_2" colwidth="33.3333*"/>
+								<colspec colname="col_3" colwidth="33.3334*"/>
+								<tbody>
+									<row>
+										<entry align="center" valign="middle">
+											<simpara>T1R1C1</simpara>
+										</entry>
+										<entry align="center" valign="middle">
+											<simpara>T1R1C2</simpara>
+										</entry>
+										<entry align="center" valign="middle">
+											<simpara>T1R1C3</simpara>
+										</entry>
+									</row>
+									<row>
+										<entry align="center" valign="middle">
+											<simpara>T1R2C1</simpara>
+										</entry>
+										<entry align="center" valign="middle">
+											<simpara>T1R2C2</simpara>
+										</entry>
+										<entry align="center" valign="middle">
+											<simpara>T1R2C3</simpara>
+										</entry>
+									</row>
+									<row>
+										<entry align="center" valign="middle">
+											<simpara>T1R3C1</simpara>
+										</entry>
+										<entry align="center" valign="middle">
+											<simpara>T1R3C2</simpara>
+										</entry>
+										<entry align="center" valign="middle">
+											<simpara>T1R3C3</simpara>
+										</entry>
+									</row>
+									<row>
+										<entry align="center" valign="middle">
+											<simpara>T1R4C1</simpara>
+										</entry>
+										<entry align="center" valign="middle">
+											<simpara>T1R4C2</simpara>
+										</entry>
+										<entry align="center" valign="middle">
+											<simpara>T1R4C3</simpara>
+										</entry>
+									</row>
+									<row>
+										<entry align="center" valign="middle">
+											<simpara>T1R5C1</simpara>
+										</entry>
+										<entry align="center" valign="middle">
+											<simpara>T1R5C2</simpara>
+										</entry>
+										<entry align="center" valign="middle">
+											<simpara>T1R5C3</simpara>
+										</entry>
+									</row>
+								</tbody>
+							</tgroup>
+						</informaltable>
+					</entry>
+					<entry align="center" valign="middle">
+						<informaltable frame="all" rowsep="1" colsep="1">
+							<tgroup cols="3">
+								<colspec colname="col_1" colwidth="33.3333*"/>
+								<colspec colname="col_2" colwidth="33.3333*"/>
+								<colspec colname="col_3" colwidth="33.3334*"/>
+								<tbody>
+									<row>
+										<entry align="center" valign="middle">
+											<simpara>T2R1C1</simpara>
+										</entry>
+										<entry align="center" valign="middle">
+											<simpara>T2R1C2</simpara>
+										</entry>
+										<entry align="center" valign="middle">
+											<simpara>T2R1C3</simpara>
+										</entry>
+									</row>
+									<row>
+										<entry align="center" valign="middle">
+											<simpara>T2R2C1</simpara>
+										</entry>
+										<entry align="center" valign="middle">
+											<simpara>T2R2C2</simpara>
+										</entry>
+										<entry align="center" valign="middle">
+											<simpara>T2R2C3</simpara>
+										</entry>
+									</row>
+									<row>
+										<entry align="center" valign="middle">
+											<simpara>T2R3C1</simpara>
+										</entry>
+										<entry align="center" valign="middle">
+											<simpara>T2R3C2</simpara>
+										</entry>
+										<entry align="center" valign="middle">
+											<simpara>T2R3C3</simpara>
+										</entry>
+									</row>
+									<row>
+										<entry align="center" valign="middle">
+											<simpara>T2R4C1</simpara>
+										</entry>
+										<entry align="center" valign="middle">
+											<simpara>T2R4C2</simpara>
+										</entry>
+										<entry align="center" valign="middle">
+											<simpara>T2R4C3</simpara>
+										</entry>
+									</row>
+									<row>
+										<entry align="center" valign="middle">
+											<simpara>T2R5C1</simpara>
+										</entry>
+										<entry align="center" valign="middle">
+											<simpara>T2R5C1</simpara>
+										</entry>
+										<entry align="center" valign="middle">
+											<simpara>T2R5C1</simpara>
+										</entry>
+									</row>
+								</tbody>
+							</tgroup>
+						</informaltable>
+					</entry>
+				</row>
+			</tbody>
+		</tgroup>
+	</informaltable>
+</article>

@@ -62,7 +62,7 @@ public class EntryBuilder extends AbstractBuilder<Entry> {
             return childContent.stream().map(content -> {
                 final var processedContent = builderFactory.process(content, this);
                 if (UnmarshallerConstants.isParaTypes(content)) {
-                    var p = (P) (processedContent.get(0));
+                    var p = (P) (processedContent.getFirst());
                     final var ppr = new PPrBuilder(WmlBuilderFactory.getPPrBuilder().withJc(align).getObject(), p.getPPr()).getObject();
                     p.setPPr(ppr);
                     return Collections.singletonList(p);
@@ -84,7 +84,8 @@ public class EntryBuilder extends AbstractBuilder<Entry> {
 
         var columnData = new ColumnData(columnIndex).withColumnProperties(tcPr).withGridSpanValue(gridSpan)
                 .withVerticalMergeType(vMergeType).withContent(processedChildContent.toArray());
-        final var tc = TableAdapter.createColumn(tableBuilder.getTableType(), columnData, tableBuilder.getColumnInfoList());
+        final var tc = TableAdapter.createColumn(tableBuilder.getTableType(), tableBuilder.getTableFormat(), columnData,
+                tableBuilder.getColumnInfoList());
         return Collections.singletonList(tc);
     }
 
