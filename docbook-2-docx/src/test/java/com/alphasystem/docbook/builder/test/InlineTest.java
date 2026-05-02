@@ -48,7 +48,7 @@ public class InlineTest extends AbstractTest {
 
         // validate
         assertSize( 1);
-        assertText(content.get(content.size() - 1), "This paragraph contains some bold text, some italic text, " +
+        assertText(content.getLast(), "This paragraph contains some bold text, some italic text, " +
                 "and default highlighted text, and few highlighted texts with custom colors: Red, Cyan, Magenta, Green.");
         addHorizontalLine();
     }
@@ -72,7 +72,7 @@ public class InlineTest extends AbstractTest {
 
         // validate
         assertSize( 1);
-        assertText(content.get(content.size() - 1), "Chemical formula for water is H2O.");
+        assertText(content.getLast(), "Chemical formula for water is H2O.");
         addHorizontalLine();
     }
 
@@ -84,7 +84,7 @@ public class InlineTest extends AbstractTest {
 
         // validate
         assertSize( 1);
-        assertText(content.get(content.size() - 1), "A paragraph with xreflabel (Text to display).");
+        assertText(content.getLast(), "A paragraph with xreflabel (Text to display).");
         addHorizontalLine();
     }
 
@@ -107,7 +107,7 @@ public class InlineTest extends AbstractTest {
 
         // validate
         assertSize( 1);
-        assertText(content.get(content.size() - 1), "Einstein's theory of relativity is E = mc2.");
+        assertText(content.getLast(), "Einstein's theory of relativity is E = mc2.");
         addHorizontalLine();
     }
 
@@ -126,7 +126,7 @@ public class InlineTest extends AbstractTest {
         processContent(article);
         final var content = mainDocumentPart.getContent();
         assertSize( 1);
-        assertText(content.get(content.size() - 1), "This paragraph contains mixed of English and Arabic text (سلم).");
+        assertText(content.getLast(), "This paragraph contains mixed of English and Arabic text (سلم).");
         addHorizontalLine();
     }
 
@@ -142,7 +142,7 @@ public class InlineTest extends AbstractTest {
         processContent(article);
         final var content = mainDocumentPart.getContent();
         assertSize( 1);
-        assertText(content.get(content.size() - 1), "This text has multiple roles. (literal, line-through, and green).");
+        assertText(content.getLast(), "This text has multiple roles. (literal, line-through, and green).");
         addHorizontalLine();
     }
 
@@ -156,7 +156,7 @@ public class InlineTest extends AbstractTest {
         processContent(article);
         final var content = mainDocumentPart.getContent();
         assertSize( 1);
-        assertText(content.get(content.size() - 1), "Paragraph with custom style.");
+        assertText(content.getLast(), "Paragraph with custom style.");
         addHorizontalLine();
     }
 
@@ -170,7 +170,7 @@ public class InlineTest extends AbstractTest {
         processContent(article);
         final var content = mainDocumentPart.getContent();
         assertSize( 1);
-        assertText(content.get(content.size() - 1), "Link to Text to display.");
+        assertText(content.getLast(), "Link to Text to display.");
         addHorizontalLine();
     }
 
@@ -185,7 +185,7 @@ public class InlineTest extends AbstractTest {
         processContent(article);
         assertSize( 1);
         final var content = mainDocumentPart.getContent();
-        assertText(content.get(content.size() - 1), "Link to Text to display.");
+        assertText(content.getLast(), "Link to Text to display.");
         addHorizontalLine();
     }
 
@@ -195,7 +195,7 @@ public class InlineTest extends AbstractTest {
         processContent(readXml("external-link-no-content"));
         assertSize( 1);
         final var content = mainDocumentPart.getContent();
-        assertText(content.get(content.size() - 1), "Link to https://tdg.docbook.org/.");
+        assertText(content.getLast(), "Link to https://tdg.docbook.org/.");
         addHorizontalLine();
     }
 
@@ -205,7 +205,7 @@ public class InlineTest extends AbstractTest {
         processContent(readXml("external-link-with-content"));
         assertSize( 1);
         final var content = mainDocumentPart.getContent();
-        assertText(content.get(content.size() - 1), "Link to TDG.");
+        assertText(content.getLast(), "Link to TDG.");
         addHorizontalLine();
     }
 
@@ -215,7 +215,7 @@ public class InlineTest extends AbstractTest {
         processContent(readXml("internal-link-no-content"));
         assertSize( 1);
         final var content = mainDocumentPart.getContent();
-        assertText(content.get(content.size() - 1), "Link to Text to display.");
+        assertText(content.getLast(), "Link to Text to display.");
         addHorizontalLine();
     }
 
@@ -225,7 +225,7 @@ public class InlineTest extends AbstractTest {
         processContent(readXml("internal-link-with-content"));
         assertSize( 1);
         final var content = mainDocumentPart.getContent();
-        assertText(content.get(content.size() - 1), "Link to internal section.");
+        assertText(content.getLast(), "Link to internal section.");
         addHorizontalLine();
     }
 
@@ -240,7 +240,7 @@ public class InlineTest extends AbstractTest {
         processContent(article);
         final var content = mainDocumentPart.getContent();
         assertSize( 1);
-        assertText(content.get(content.size() - 1), "Paragraph with custom style.");
+        assertText(content.getLast(), "Paragraph with custom style.");
         addHorizontalLine();
     }
 
@@ -267,17 +267,17 @@ public class InlineTest extends AbstractTest {
     public void lineBreakWithAsciidocBr() {
         addTestTitle("Line break test");
         processContent(readXml("linebreak"));
-        assertSize( 2);
+        assertSize( 4);
         addHorizontalLine();
     }
 
     @Test(dependsOnMethods = "lineBreakWithAsciidocBr")
     public void testSingleSpace() {
-        addTestTitle("Line break test");
+        addTestTitle("Space between two elements");
         processContent(readXml("space-between-two-elements"));
         assertSize( 1);
         final var content = mainDocumentPart.getContent();
-        assertText(content.get(content.size() - 1), "Zayd ate chocolate at home yesterday happily because he was hungry.");
+        assertText(content.getLast(), "Zayd ate chocolate at home yesterday happily because he was hungry.");
         addHorizontalLine();
     }
 
