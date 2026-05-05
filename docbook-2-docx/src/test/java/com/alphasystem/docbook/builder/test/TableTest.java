@@ -66,7 +66,7 @@ public class TableTest extends AbstractTest {
 
     @Test(dependsOnMethods = "testTableVAlignCenter")
     public void testTableColumnSpan() {
-        addTestTitle("Table with column span");
+        addTestTitle("Table with column span with dbfo with keep-together=always");
         processContent(readXml("table-column-span"));
         assertSize(1);
         final var content = mainDocumentPart.getContent();

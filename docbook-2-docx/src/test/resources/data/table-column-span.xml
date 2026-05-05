@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <article xmlns="http://docbook.org/ns/docbook">
     <informaltable colsep="1" rowsep="1" frame="all">
+        <!-- keep-together="always" will prevent table from splitting across pages  -->
+        <?dbfo keep-together="always"?>
         <tgroup cols="4">
             <colspec colwidth="25*" colname="col_1"/>
             <colspec colwidth="20*" colname="col_2"/>

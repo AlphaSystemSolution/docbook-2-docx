@@ -243,11 +243,13 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
             case "asciidoc-pagebreak" -> ApplicationController.getContext().getMainDocumentPart().addObject(WmlAdapter.getPageBreak());
             case "asciidoc-br", "linebreak" -> currentText += System.lineSeparator();
             case "dbhtml" -> {
-                if (data.contains("table-width")) {
-                    documentContext.setTableWidth(data);
+                final var tableWidth = parseProcessingInstruction(data, "table-width");
+                if (tableWidth != null) {
+                    documentContext.setTableWidth(tableWidth);
                 }
             }
-            case "dbfo", "dblatex" -> {
+            case "dbfo" -> documentContext.setKeepTogether(parseProcessingInstruction(data, "keep-together"));
+            case "dblatex" -> {
             } // ignore, same as dbhtml
             default -> logger.warn("Unhandled processing instruction: target = {}", target);
         }
@@ -1171,5 +1173,16 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
 
     private static String getAttributeValue(String attributeName, Attributes attributes) {
         return attributes.getValue(attributeName);
+    }
+
+    private static String parseProcessingInstruction(String data, String target) {
+        final var input = target + "=\"";
+        final var inputLength = input.length();
+        final var startIndex = data.indexOf(input);
+        if (startIndex == -1) {
+            return null;
+        }
+        final var endIndex = data.indexOf("\"", inputLength + startIndex);
+        return data.substring(startIndex + inputLength, endIndex).replace("%", "");
     }
 }

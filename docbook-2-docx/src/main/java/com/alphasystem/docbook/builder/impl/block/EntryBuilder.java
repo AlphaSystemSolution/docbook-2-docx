@@ -82,10 +82,10 @@ public class EntryBuilder extends AbstractBuilder<Entry> {
         final var gridSpan = Integer.parseInt(source.getNameEnd());
         final var vMergeType = VerticalMergeType.valueOf(source.getMoreRows());
 
-        var columnData = new ColumnData(columnIndex).withColumnProperties(tcPr).withGridSpanValue(gridSpan)
+        final var columnData = new ColumnData(columnIndex).withColumnProperties(tcPr).withGridSpanValue(gridSpan)
                 .withVerticalMergeType(vMergeType).withContent(processedChildContent.toArray());
-        final var tc = TableAdapter.createColumn(tableBuilder.getTableType(), tableBuilder.getTableFormat(), columnData,
-                tableBuilder.getColumnInfoList());
+        final var tc = TableAdapter.createColumn(tableBuilder.getTableType(), tableBuilder.getTableFormat(),
+                tableBuilder.isKeepTableTogether(), columnData, tableBuilder.getColumnInfoList());
         return Collections.singletonList(tc);
     }
 
