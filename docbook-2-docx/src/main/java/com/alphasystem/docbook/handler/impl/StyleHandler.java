@@ -11,14 +11,15 @@ import com.alphasystem.docx4j.builder.wml.WmlBuilderFactory;
  */
 public class StyleHandler implements InlineStyleHandler {
 
-    protected final String styleName;
+  protected final String styleName;
 
-    public StyleHandler(String styleName) {
-        this.styleName = styleName;
-    }
+  public StyleHandler(String styleName) {
+    this.styleName = styleName;
+  }
 
-    @Override
-    public RPrBuilder applyStyle(RPrBuilder rprBuilder) {
-        return rprBuilder.withRStyle(WmlBuilderFactory.getRStyleBuilder().withVal(styleName).getObject());
-    }
+  @Override
+  public RPrBuilder applyStyle(RPrBuilder rprBuilder) {
+    return rprBuilder.withRStyle(
+        WmlBuilderFactory.getRStyleBuilder().withVal(styleName).getObject());
+  }
 }

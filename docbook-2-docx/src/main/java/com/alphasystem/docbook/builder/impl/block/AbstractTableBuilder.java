@@ -1,5 +1,13 @@
 package com.alphasystem.docbook.builder.impl.block;
 
+import static com.alphasystem.docx4j.builder.wml.WmlAdapter.getDefaultBorder;
+import static com.alphasystem.docx4j.builder.wml.WmlAdapter.getNilBorder;
+import static com.alphasystem.docx4j.builder.wml.WmlAdapter.getNilTblBorders;
+import static com.alphasystem.docx4j.builder.wml.WmlBuilderFactory.getTblBordersBuilder;
+import static com.alphasystem.docx4j.builder.wml.WmlBuilderFactory.getTblPrBuilder;
+import static java.lang.String.format;
+import static org.docbook.model.Choice.ONE;
+
 import com.alphasystem.docbook.ApplicationController;
 import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.builder.impl.BlockBuilder;
@@ -9,6 +17,13 @@ import com.alphasystem.docx4j.builder.wml.table.ColumnInput;
 import com.alphasystem.docx4j.builder.wml.table.TableAdapter;
 import com.alphasystem.docx4j.builder.wml.table.TableFormat;
 import com.alphasystem.docx4j.builder.wml.table.TableType;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import org.docbook.model.Choice;
 import org.docbook.model.ColumnSpec;
 import org.docbook.model.Frame;
@@ -17,269 +32,275 @@ import org.docx4j.wml.CTBorder;
 import org.docx4j.wml.Tbl;
 import org.docx4j.wml.TblBorders;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-
-import static com.alphasystem.docx4j.builder.wml.WmlAdapter.getDefaultBorder;
-import static com.alphasystem.docx4j.builder.wml.WmlAdapter.getNilBorder;
-import static com.alphasystem.docx4j.builder.wml.WmlAdapter.getNilTblBorders;
-import static com.alphasystem.docx4j.builder.wml.WmlBuilderFactory.getTblBordersBuilder;
-import static com.alphasystem.docx4j.builder.wml.WmlBuilderFactory.getTblPrBuilder;
-import static java.lang.String.format;
-import static org.docbook.model.Choice.ONE;
-
 public abstract class AbstractTableBuilder<S> extends BlockBuilder<S> {
 
-    private static final int HEADER = 1;
-    private static final int FOOTER = 2;
-    private static final String CONJUGATION_TABLE_STYLE = "TwoColumnConjugationTable";
+  private static final int HEADER = 1;
+  private static final int FOOTER = 2;
+  private static final String CONJUGATION_TABLE_STYLE = "TwoColumnConjugationTable";
 
-    private int level = -1;
-    private List<ColumnInfo> columnInfoList;
-    protected TableType tableType;
-    protected TableFormat tableFormat = TableFormat.NORMAL;
-    private boolean keepTableTogether;
-    private Tbl table;
-    private TableGroup tableGroup;
-    protected DocBookTableAdapter docBookTableAdapter;
+  private int level = -1;
+  private List<ColumnInfo> columnInfoList;
+  protected TableType tableType;
+  protected TableFormat tableFormat = TableFormat.NORMAL;
+  private boolean keepTableTogether;
+  private Tbl table;
+  private TableGroup tableGroup;
+  protected DocBookTableAdapter docBookTableAdapter;
 
-    protected AbstractTableBuilder(S source, Builder<?> parent) {
-        super(null, source, parent);
+  protected AbstractTableBuilder(S source, Builder<?> parent) {
+    super(null, source, parent);
+  }
+
+  public TableType getTableType() {
+    return tableType;
+  }
+
+  public TableFormat getTableFormat() {
+    return tableFormat;
+  }
+
+  public boolean isKeepTableTogether() {
+    return keepTableTogether;
+  }
+
+  public List<ColumnInfo> getColumnInfoList() {
+    return columnInfoList;
+  }
+
+  @Override
+  protected List<Object> getChildContent() {
+    final var childContent = new ArrayList<>();
+
+    final var header = tableGroup.getTableHeader();
+    if (!Objects.isNull(header)) {
+      childContent.add(header);
     }
 
-    public TableType getTableType() {
-        return tableType;
+    final var body = tableGroup.getTableBody();
+    if (!Objects.isNull(body)) {
+      childContent.add(body);
     }
 
-    public TableFormat getTableFormat() {
-        return tableFormat;
+    final var footer = tableGroup.getTableFooter();
+    if (!Objects.isNull(footer)) {
+      childContent.add(footer);
+    }
+    return childContent;
+  }
+
+  @Override
+  protected void preProcess() {
+    super.preProcess();
+    this.level = -1;
+    final var listParent = getParent(ListBuilder.class);
+    if (listParent != null) {
+      this.level = (int) listParent.getListInfo().getLevel();
+    }
+    final var tableGroups = docBookTableAdapter.getTableGroup();
+    tableGroup = ((tableGroups != null) && !tableGroups.isEmpty()) ? tableGroups.getFirst() : null;
+    if (tableGroup == null) {
+      throw new IllegalArgumentException("tableGroup is null.");
+    }
+    initializeTable(
+        tableGroup,
+        docBookTableAdapter.getFrame(),
+        docBookTableAdapter.getRowSep(),
+        docBookTableAdapter.getColSep(),
+        docBookTableAdapter.getTableStyle());
+  }
+
+  @Override
+  protected List<Object> doProcess(List<Object> processedChildContent) {
+    table.getContent().addAll(processedChildContent);
+    return Collections.singletonList(table);
+  }
+
+  private void initializeTable(
+      TableGroup tableGroup, Frame frame, Choice rowSep, Choice colSep, String styleName) {
+    int numOfColumns = Integer.parseInt(tableGroup.getCols());
+    final List<ColumnSpec> colSpec = tableGroup.getColSpec();
+    final boolean noColSpec = (colSpec == null) || colSpec.isEmpty();
+    numOfColumns = noColSpec ? numOfColumns : colSpec.size();
+    if (numOfColumns <= 0) {
+      throw new RuntimeException("Neither numOfColumns nor colSpec defined.");
     }
 
-    public boolean isKeepTableTogether() {
-        return keepTableTogether;
+    final var parentTableBuilder = getParent(AbstractTableBuilder.class);
+    if (parentTableBuilder != null
+        && TableFormat.OUTER_NESTED == parentTableBuilder.getTableFormat()) {
+      // we are creating an inner nested table
+      tableFormat = TableFormat.INNER_NESTED;
     }
 
-    public List<ColumnInfo> getColumnInfoList() {
-        return columnInfoList;
+    tableType = level <= -1 ? TableType.PCT : TableType.AUTO;
+    var tableStyle = getTableStyle(tableGroup, styleName);
+    if (CONJUGATION_TABLE_STYLE.equals(styleName)) {
+      tableStyle = null; // reset
+      tableFormat = TableFormat.OUTER_NESTED;
     }
 
-    @Override
-    protected List<Object> getChildContent() {
-        final var childContent = new ArrayList<>();
+    var tblBorders = createFrame(frame, rowSep, colSep);
+    if (TableFormat.OUTER_NESTED == tableFormat) {
+      tblBorders = getNilTblBorders();
+    }
+    final var tblPrBuilder = getTblPrBuilder().withTblBorders(tblBorders);
 
-        final var header = tableGroup.getTableHeader();
-        if (!Objects.isNull(header)) {
-            childContent.add(header);
-        }
+    final var context = ApplicationController.getContext();
+    this.keepTableTogether = context.getKeepTogether();
+    final var tableAdapter =
+        new TableAdapter()
+            .withTableType(tableType)
+            .withTableStyle(tableStyle)
+            .withTableFormat(tableFormat)
+            .withTableWidth(context.getTableWidth())
+            .withIndentLevel(level)
+            .withKeepTableTogether(keepTableTogether)
+            .withTableProperties(tblPrBuilder.getObject())
+            .withColumnInputs(buildColumns(colSpec))
+            .startTable();
+    columnInfoList = tableAdapter.getColumns();
+    table = tableAdapter.getTable();
+    context.restTableWidth();
+    context.resetKeepTogether();
+  }
 
-        final var body = tableGroup.getTableBody();
-        if (!Objects.isNull(body)) {
-            childContent.add(body);
-        }
-
-        final var footer = tableGroup.getTableFooter();
-        if (!Objects.isNull(footer)) {
-            childContent.add(footer);
-        }
-        return childContent;
+  private String getTableStyle(TableGroup tableGroup, String styleName) {
+    var tableStyle = configurationUtils.getTableStyle(styleName);
+    if ((styleName != null) && (tableStyle == null)) {
+      tableStyle = styleName;
+    }
+    if (Objects.isNull(tableStyle)) {
+      int header = (tableGroup.getTableHeader() == null) ? 0 : HEADER;
+      int footer = (tableGroup.getTableFooter() == null) ? 0 : FOOTER;
+      int value = header | footer;
+      if (value != 0) {
+        tableStyle = format("TableGrid%s", value);
+      }
     }
 
-    @Override
-    protected void preProcess() {
-        super.preProcess();
-        this.level = -1;
-        final var listParent = getParent(ListBuilder.class);
-        if (listParent != null) {
-            this.level = (int) listParent.getListInfo().getLevel();
-        }
-        final var tableGroups = docBookTableAdapter.getTableGroup();
-        tableGroup = ((tableGroups != null) && !tableGroups.isEmpty()) ? tableGroups.getFirst() : null;
-        if (tableGroup == null) {
-            throw new IllegalArgumentException("tableGroup is null.");
-        }
-        initializeTable(tableGroup, docBookTableAdapter.getFrame(), docBookTableAdapter.getRowSep(),
-                docBookTableAdapter.getColSep(), docBookTableAdapter.getTableStyle());
+    return tableStyle;
+  }
+
+  private TblBorders createFrame(Frame frame, Choice rowSep, Choice colSep) {
+    frame = (frame == null) ? Frame.NONE : frame;
+    CTBorder top = getNilBorder();
+    CTBorder left = getNilBorder();
+    CTBorder bottom = getNilBorder();
+    CTBorder right = getNilBorder();
+    CTBorder insideH = getNilBorder();
+    CTBorder insideV = getNilBorder();
+
+    switch (frame) {
+      case ABOVE, TOP -> top = getDefaultBorder();
+      case BELOW, BOTTOM -> bottom = getDefaultBorder();
+      case TOP_AND_BOTTOM -> {
+        top = getDefaultBorder();
+        bottom = getDefaultBorder();
+      }
+      case LEFT_HAND_SIDE -> left = getDefaultBorder();
+      case RIGHT_HAND_SIDE -> right = getDefaultBorder();
+      case SIDES -> {
+        left = getDefaultBorder();
+        right = getDefaultBorder();
+      }
+      case HORIZONTAL_SIDES -> insideH = getDefaultBorder();
+      case VERTICAL_SIDES -> insideV = getDefaultBorder();
+      case BOX, BORDER, ALL -> {
+        top = getDefaultBorder();
+        left = getDefaultBorder();
+        bottom = getDefaultBorder();
+        right = getDefaultBorder();
+      }
+      case NONE -> {}
+    }
+    if (ONE.equals(rowSep)) {
+      insideH = getDefaultBorder();
+    }
+    if (ONE.equals(colSep)) {
+      insideV = getDefaultBorder();
+    }
+    return getTblBordersBuilder()
+        .withTop(top)
+        .withLeft(left)
+        .withBottom(bottom)
+        .withRight(right)
+        .withInsideH(insideH)
+        .withInsideV(insideV)
+        .getObject();
+  }
+
+  private static ColumnInput[] buildColumns(List<ColumnSpec> columnSpecs) {
+    if (columnSpecs == null || columnSpecs.isEmpty()) {
+      throw new IllegalArgumentException("Invalid column spec");
+    }
+    final var numOfColumns = columnSpecs.size();
+
+    var columnInputs = new ColumnInput[numOfColumns];
+    for (int i = 0; i < numOfColumns; i++) {
+      final var columnSpec = columnSpecs.get(i);
+      var columnWidth = columnSpec.getColumnWidth();
+      if (columnWidth.endsWith("*")) {
+        columnWidth = columnWidth.substring(0, columnWidth.length() - 1);
+      }
+      columnInputs[i] =
+          new ColumnInput(columnSpec.getColumnName(), Double.parseDouble(columnWidth));
     }
 
-    @Override
-    protected List<Object> doProcess(List<Object> processedChildContent) {
-        table.getContent().addAll(processedChildContent);
-        return Collections.singletonList(table);
+    var totalWidth = Arrays.stream(columnInputs).mapToDouble(ColumnInput::getColumnWidth).sum();
+    var totalWidthBigDecimal = BigDecimal.valueOf(totalWidth);
+    totalWidthBigDecimal = totalWidthBigDecimal.setScale(0, RoundingMode.HALF_UP);
+    totalWidth = totalWidthBigDecimal.doubleValue();
+
+    // total width should not exceed 100%
+    if (totalWidth > 100) {
+      for (int i = 0; i < numOfColumns; i++) {
+        final var columnInput = columnInputs[i];
+        var columnWidth = columnInput.getColumnWidth();
+        columnWidth =
+            BigDecimal.valueOf(columnWidth)
+                .multiply(TableAdapter.PERCENT)
+                .divide(BigDecimal.valueOf(totalWidth), 4, RoundingMode.HALF_UP)
+                .doubleValue();
+        columnInputs[i] = new ColumnInput(columnInput.getColumnName(), columnWidth);
+      }
     }
+    return columnInputs;
+  }
 
-    private void initializeTable(TableGroup tableGroup, Frame frame, Choice rowSep, Choice colSep, String styleName) {
-        int numOfColumns = Integer.parseInt(tableGroup.getCols());
-        final List<ColumnSpec> colSpec = tableGroup.getColSpec();
-        final boolean noColSpec = (colSpec == null) || colSpec.isEmpty();
-        numOfColumns = noColSpec ? numOfColumns : colSpec.size();
-        if (numOfColumns <= 0) {
-            throw new RuntimeException("Neither numOfColumns nor colSpec defined.");
-        }
-
-        final var parentTableBuilder = getParent(AbstractTableBuilder.class);
-        if (parentTableBuilder != null && TableFormat.OUTER_NESTED == parentTableBuilder.getTableFormat()) {
-            // we are creating an inner nested table
-            tableFormat = TableFormat.INNER_NESTED;
-        }
-
-        tableType = level <= -1 ? TableType.PCT : TableType.AUTO;
-        var tableStyle = getTableStyle(tableGroup, styleName);
-        if (CONJUGATION_TABLE_STYLE.equals(styleName)) {
-            tableStyle = null; // reset
-            tableFormat = TableFormat.OUTER_NESTED;
-        }
-
-        var tblBorders = createFrame(frame, rowSep, colSep);
-        if (TableFormat.OUTER_NESTED == tableFormat) {
-            tblBorders = getNilTblBorders();
-        }
-        final var tblPrBuilder = getTblPrBuilder().withTblBorders(tblBorders);
-
-        final var context = ApplicationController.getContext();
-        this.keepTableTogether = context.getKeepTogether();
-        final var tableAdapter = new TableAdapter()
-                .withTableType(tableType)
-                .withTableStyle(tableStyle)
-                .withTableFormat(tableFormat)
-                .withTableWidth(context.getTableWidth())
-                .withIndentLevel(level)
-                .withKeepTableTogether(keepTableTogether)
-                .withTableProperties(tblPrBuilder.getObject())
-                .withColumnInputs(buildColumns(colSpec))
-                .startTable();
-        columnInfoList = tableAdapter.getColumns();
-        table = tableAdapter.getTable();
-        context.restTableWidth();
-        context.resetKeepTogether();
+  public int getGridSpan(String startColumnName, String endColumnName) {
+    int gridSpan = 1;
+    if (startColumnName != null && endColumnName != null) {
+      final ColumnInfo startColumn = getColumnInfo(startColumnName);
+      if (startColumn == null) {
+        throw new RuntimeException(
+            format("No column info found with name \"%s\".", startColumnName));
+      }
+      final ColumnInfo endColumn = getColumnInfo(endColumnName);
+      if (endColumn == null) {
+        throw new RuntimeException(format("No column info found with name \"%s\".", endColumnName));
+      }
+      final int startColumnColumnNumber = startColumn.getColumnNumber();
+      final int endColumnColumnNumber = endColumn.getColumnNumber();
+      gridSpan = endColumnColumnNumber - startColumnColumnNumber + 1;
+      if (gridSpan < 1) {
+        throw new RuntimeException(
+            format(
+                "Invalid start (%s) and end (%s) column indices for columns \"%s\" and \"%s\" respectively.",
+                startColumnColumnNumber, endColumnColumnNumber, startColumnName, endColumnName));
+      }
     }
+    return gridSpan;
+  }
 
-    private String getTableStyle(TableGroup tableGroup, String styleName) {
-        var tableStyle = configurationUtils.getTableStyle(styleName);
-        if ((styleName != null) && (tableStyle == null)) {
-            tableStyle = styleName;
-        }
-        if (Objects.isNull(tableStyle)) {
-            int header = (tableGroup.getTableHeader() == null) ? 0 : HEADER;
-            int footer = (tableGroup.getTableFooter() == null) ? 0 : FOOTER;
-            int value = header | footer;
-            if (value != 0) {
-                tableStyle = format("TableGrid%s", value);
-            }
-        }
-
-        return tableStyle;
+  private ColumnInfo getColumnInfo(String name) {
+    var columnInfos =
+        columnInfoList.stream()
+            .filter(columnInfo -> columnInfo.getColumnName().equals(name))
+            .toList();
+    if (columnInfos.isEmpty()) {
+      return null;
+    } else {
+      return columnInfos.getFirst();
     }
-
-    private TblBorders createFrame(Frame frame, Choice rowSep, Choice colSep) {
-        frame = (frame == null) ? Frame.NONE : frame;
-        CTBorder top = getNilBorder();
-        CTBorder left = getNilBorder();
-        CTBorder bottom = getNilBorder();
-        CTBorder right = getNilBorder();
-        CTBorder insideH = getNilBorder();
-        CTBorder insideV = getNilBorder();
-
-        switch (frame) {
-            case ABOVE, TOP -> top = getDefaultBorder();
-            case BELOW, BOTTOM -> bottom = getDefaultBorder();
-            case TOP_AND_BOTTOM -> {
-                top = getDefaultBorder();
-                bottom = getDefaultBorder();
-            }
-            case LEFT_HAND_SIDE -> left = getDefaultBorder();
-            case RIGHT_HAND_SIDE -> right = getDefaultBorder();
-            case SIDES -> {
-                left = getDefaultBorder();
-                right = getDefaultBorder();
-            }
-            case HORIZONTAL_SIDES -> insideH = getDefaultBorder();
-            case VERTICAL_SIDES -> insideV = getDefaultBorder();
-            case BOX, BORDER, ALL -> {
-                top = getDefaultBorder();
-                left = getDefaultBorder();
-                bottom = getDefaultBorder();
-                right = getDefaultBorder();
-            }
-            case NONE -> {
-            }
-        }
-        if (ONE.equals(rowSep)) {
-            insideH = getDefaultBorder();
-        }
-        if (ONE.equals(colSep)) {
-            insideV = getDefaultBorder();
-        }
-        return getTblBordersBuilder().withTop(top).withLeft(left).withBottom(bottom)
-                .withRight(right).withInsideH(insideH).withInsideV(insideV).getObject();
-    }
-
-    private static ColumnInput[] buildColumns(List<ColumnSpec> columnSpecs) {
-        if (columnSpecs == null || columnSpecs.isEmpty()) {
-            throw new IllegalArgumentException("Invalid column spec");
-        }
-        final var numOfColumns = columnSpecs.size();
-
-        var columnInputs = new ColumnInput[numOfColumns];
-        for (int i = 0; i < numOfColumns; i++) {
-            final var columnSpec = columnSpecs.get(i);
-            var columnWidth = columnSpec.getColumnWidth();
-            if (columnWidth.endsWith("*")) {
-                columnWidth = columnWidth.substring(0, columnWidth.length() - 1);
-            }
-            columnInputs[i] = new ColumnInput(columnSpec.getColumnName(), Double.parseDouble(columnWidth));
-        }
-
-        var totalWidth = Arrays.stream(columnInputs).mapToDouble(ColumnInput::getColumnWidth).sum();
-        var totalWidthBigDecimal = BigDecimal.valueOf(totalWidth);
-        totalWidthBigDecimal = totalWidthBigDecimal.setScale(0, RoundingMode.HALF_UP);
-        totalWidth = totalWidthBigDecimal.doubleValue();
-
-        // total width should not exceed 100%
-        if (totalWidth > 100) {
-            for (int i = 0; i < numOfColumns; i++) {
-                final var columnInput = columnInputs[i];
-                var columnWidth = columnInput.getColumnWidth();
-                columnWidth = BigDecimal.valueOf(columnWidth).multiply(TableAdapter.PERCENT).divide(BigDecimal.valueOf(totalWidth), 4, RoundingMode.HALF_UP).doubleValue();
-                columnInputs[i] = new ColumnInput(columnInput.getColumnName(), columnWidth);
-            }
-        }
-        return columnInputs;
-    }
-
-    public int getGridSpan(String startColumnName, String endColumnName) {
-        int gridSpan = 1;
-        if (startColumnName != null && endColumnName != null) {
-            final ColumnInfo startColumn = getColumnInfo(startColumnName);
-            if (startColumn == null) {
-                throw new RuntimeException(format("No column info found with name \"%s\".", startColumnName));
-            }
-            final ColumnInfo endColumn = getColumnInfo(endColumnName);
-            if (endColumn == null) {
-                throw new RuntimeException(format("No column info found with name \"%s\".", endColumnName));
-            }
-            final int startColumnColumnNumber = startColumn.getColumnNumber();
-            final int endColumnColumnNumber = endColumn.getColumnNumber();
-            gridSpan = endColumnColumnNumber - startColumnColumnNumber + 1;
-            if (gridSpan < 1) {
-                throw new RuntimeException(format("Invalid start (%s) and end (%s) column indices for columns \"%s\" and \"%s\" respectively.",
-                        startColumnColumnNumber, endColumnColumnNumber, startColumnName, endColumnName));
-            }
-        }
-        return gridSpan;
-    }
-
-    private ColumnInfo getColumnInfo(String name) {
-        var columnInfos = columnInfoList.stream().filter(columnInfo -> columnInfo.getColumnName().equals(name))
-                .toList();
-        if (columnInfos.isEmpty()) {
-            return null;
-        } else {
-            return columnInfos.getFirst();
-        }
-    }
+  }
 }

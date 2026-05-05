@@ -9,6 +9,9 @@ clean:
 test:
 	$(GRADLE) test
 
+spotless:
+	$(GRADLE) spotlessApply
+
 all: clean build test
 
 cli:

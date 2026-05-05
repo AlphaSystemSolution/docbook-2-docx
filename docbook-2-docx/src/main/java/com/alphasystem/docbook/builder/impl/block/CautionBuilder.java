@@ -6,7 +6,7 @@ import org.docbook.model.Caution;
 
 public class CautionBuilder extends AdmonitionBuilder<Caution> {
 
-    public CautionBuilder(Caution source, Builder<?> parent) {
-        super(Admonition.CAUTION, source, parent);
-    }
+  public CautionBuilder(Caution source, Builder<?> parent) {
+    super(Admonition.CAUTION, source, parent);
+  }
 }

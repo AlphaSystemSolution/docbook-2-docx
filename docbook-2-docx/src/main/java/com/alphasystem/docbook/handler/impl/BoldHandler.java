@@ -10,8 +10,8 @@ import com.alphasystem.docx4j.builder.wml.RPrBuilder;
  */
 public class BoldHandler implements InlineStyleHandler {
 
-    @Override
-    public RPrBuilder applyStyle(RPrBuilder rprBuilder) {
-        return rprBuilder.withB(true).withBCs(true);
-    }
+  @Override
+  public RPrBuilder applyStyle(RPrBuilder rprBuilder) {
+    return rprBuilder.withB(true).withBCs(true);
+  }
 }

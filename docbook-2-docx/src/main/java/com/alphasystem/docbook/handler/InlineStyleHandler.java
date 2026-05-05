@@ -9,11 +9,11 @@ import com.alphasystem.docx4j.builder.wml.RPrBuilder;
  */
 public interface InlineStyleHandler {
 
-    /**
-     * Apply the style on the current run.
-     *
-     * @param rprBuilder current running {@link RPrBuilder}
-     * @return modified {@link RPrBuilder} after applying this style
-     */
-    RPrBuilder applyStyle(RPrBuilder rprBuilder);
+  /**
+   * Apply the style on the current run.
+   *
+   * @param rprBuilder current running {@link RPrBuilder}
+   * @return modified {@link RPrBuilder} after applying this style
+   */
+  RPrBuilder applyStyle(RPrBuilder rprBuilder);
 }

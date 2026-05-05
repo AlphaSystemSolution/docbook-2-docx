@@ -10,8 +10,8 @@ import com.alphasystem.docx4j.builder.wml.RPrBuilder;
  */
 public class StrikeThroughHandler implements InlineStyleHandler {
 
-    @Override
-    public RPrBuilder applyStyle(RPrBuilder rprBuilder) {
-        return rprBuilder.withStrike(true);
-    }
+  @Override
+  public RPrBuilder applyStyle(RPrBuilder rprBuilder) {
+    return rprBuilder.withStrike(true);
+  }
 }

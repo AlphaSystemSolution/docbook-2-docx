@@ -10,8 +10,8 @@ import com.alphasystem.docx4j.builder.wml.RPrBuilder;
  */
 public class ItalicHandler implements InlineStyleHandler {
 
-    @Override
-    public RPrBuilder applyStyle(RPrBuilder rprBuilder) {
-        return rprBuilder.withI(true).withICs(true);
-    }
+  @Override
+  public RPrBuilder applyStyle(RPrBuilder rprBuilder) {
+    return rprBuilder.withI(true).withICs(true);
+  }
 }

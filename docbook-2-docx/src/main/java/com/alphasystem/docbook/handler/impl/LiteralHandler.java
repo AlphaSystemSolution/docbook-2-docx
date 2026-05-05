@@ -11,11 +11,15 @@ import com.alphasystem.docx4j.builder.wml.WmlBuilderFactory;
  */
 public class LiteralHandler implements InlineStyleHandler {
 
-    private static final String COURIER_NEW = "Courier New";
+  private static final String COURIER_NEW = "Courier New";
 
-    @Override
-    public RPrBuilder applyStyle(RPrBuilder rprBuilder) {
-        return rprBuilder.withRFonts(WmlBuilderFactory.getRFontsBuilder().withAscii(COURIER_NEW).withHAnsi(COURIER_NEW)
-                .withCs(COURIER_NEW).getObject());
-    }
+  @Override
+  public RPrBuilder applyStyle(RPrBuilder rprBuilder) {
+    return rprBuilder.withRFonts(
+        WmlBuilderFactory.getRFontsBuilder()
+            .withAscii(COURIER_NEW)
+            .withHAnsi(COURIER_NEW)
+            .withCs(COURIER_NEW)
+            .getObject());
+  }
 }
