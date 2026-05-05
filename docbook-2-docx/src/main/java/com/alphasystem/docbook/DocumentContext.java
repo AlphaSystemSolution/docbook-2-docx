@@ -34,6 +34,7 @@ public final class DocumentContext {
     private WordprocessingMLPackage wordprocessingMLPackage;
     private MainDocumentPart mainDocumentPart;
     private int tableWidth = 0;
+    private boolean keepTogether = false;
     private final NumberingHelper numberingHelper = NumberingHelper.getInstance();
 
     public DocumentContext(final DocumentInfo documentInfo) {
@@ -138,11 +139,12 @@ public final class DocumentContext {
     }
 
     public void setTableWidth(String width) {
-        final var input = "table-width=\"";
-        final var inputLength = input.length();
-        final var startIndex = width.indexOf(input);
-        final var endIndex = width.indexOf("\"", inputLength + startIndex);
-        this.tableWidth = Integer.parseInt(width.substring(startIndex + inputLength, endIndex).replaceAll("%", ""));
+        try {
+            this.tableWidth = Integer.parseInt(width);
+        } catch (NumberFormatException e) {
+            // ignore
+            this.tableWidth = 0;
+        }
     }
 
     public void restTableWidth() {
@@ -151,6 +153,18 @@ public final class DocumentContext {
 
     public int getTableWidth() {
         return tableWidth;
+    }
+
+    public void setKeepTogether(String keepTogether) {
+        this.keepTogether = StringUtils.isNotBlank(keepTogether) && "always".equals(keepTogether);
+    }
+
+    public void resetKeepTogether() {
+        this.keepTogether = false;
+    }
+
+    public boolean getKeepTogether() {
+        return keepTogether;
     }
 
     private void updateDocumentCompatibility() {

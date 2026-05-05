@@ -43,6 +43,7 @@ public abstract class AbstractTableBuilder<S> extends BlockBuilder<S> {
     private List<ColumnInfo> columnInfoList;
     protected TableType tableType;
     protected TableFormat tableFormat = TableFormat.NORMAL;
+    private boolean keepTableTogether;
     private Tbl table;
     private TableGroup tableGroup;
     protected DocBookTableAdapter docBookTableAdapter;
@@ -57,6 +58,10 @@ public abstract class AbstractTableBuilder<S> extends BlockBuilder<S> {
 
     public TableFormat getTableFormat() {
         return tableFormat;
+    }
+
+    public boolean isKeepTableTogether() {
+        return keepTableTogether;
     }
 
     public List<ColumnInfo> getColumnInfoList() {
@@ -135,18 +140,22 @@ public abstract class AbstractTableBuilder<S> extends BlockBuilder<S> {
         }
         final var tblPrBuilder = getTblPrBuilder().withTblBorders(tblBorders);
 
+        final var context = ApplicationController.getContext();
+        this.keepTableTogether = context.getKeepTogether();
         final var tableAdapter = new TableAdapter()
                 .withTableType(tableType)
                 .withTableStyle(tableStyle)
                 .withTableFormat(tableFormat)
-                .withTableWidth(ApplicationController.getContext().getTableWidth())
+                .withTableWidth(context.getTableWidth())
                 .withIndentLevel(level)
+                .withKeepTableTogether(keepTableTogether)
                 .withTableProperties(tblPrBuilder.getObject())
                 .withColumnInputs(buildColumns(colSpec))
                 .startTable();
         columnInfoList = tableAdapter.getColumns();
         table = tableAdapter.getTable();
-        ApplicationController.getContext().restTableWidth();
+        context.restTableWidth();
+        context.resetKeepTogether();
     }
 
     private String getTableStyle(TableGroup tableGroup, String styleName) {
