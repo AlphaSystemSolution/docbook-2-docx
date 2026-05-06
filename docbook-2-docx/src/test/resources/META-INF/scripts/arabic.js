@@ -21,6 +21,11 @@ function arabicSmall(rPrBuilder) {
     return arabicHandler(rPrBuilder, "arabic.small", true);
 }
 
+function arabicSmallGray(rPrBuilder) {
+    var color = WmlBuilderFactory.getColorBuilder().withVal("gray").getObject();
+    return arabicHandler(rPrBuilder.withColor(color), "arabic.small", true);
+}
+
 function translation(rPrBuilder) {
     return arabicHandler(rPrBuilder, "arabic.translation", false);
 }

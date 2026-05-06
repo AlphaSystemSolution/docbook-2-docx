@@ -184,7 +184,7 @@ public class TableTest extends AbstractTest {
     processContent(readXml("table-with-table-width"));
     assertSize(1);
     final var content = mainDocumentPart.getContent();
-    assertEquals(getTableContentSize((Tbl) content.getLast()), 49);
+    assertEquals(getTableContentSize((Tbl) content.getLast()), 43);
     addHorizontalLine();
   }
 
