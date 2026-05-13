@@ -35,7 +35,7 @@ public class AdmonitionTest extends AbstractTest {
     addHorizontalLine();
   }
 
-  @Test(dependsOnMethods = {"testImportant"})
+  @Test(dependsOnMethods = {"testWarning"})
   public void testNote() {
     addTestTitle("Note Admonition");
     processContent(readXml("note"));
@@ -45,7 +45,7 @@ public class AdmonitionTest extends AbstractTest {
     addHorizontalLine();
   }
 
-  @Test(dependsOnMethods = {"testNote"})
+  @Test(dependsOnMethods = {"testImportant"})
   public void testTip() {
     addTestTitle("Tip Admonition");
     processContent(readXml("tip"));
@@ -65,7 +65,7 @@ public class AdmonitionTest extends AbstractTest {
     addHorizontalLine();
   }
 
-  @Test(dependsOnMethods = {"testWarning"})
+  @Test(dependsOnMethods = {"testNote"})
   public void testSideBar() {
     addTestTitle("SideBar test");
     processContent(readXml("side-bar"));

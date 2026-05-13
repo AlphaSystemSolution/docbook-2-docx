@@ -17,7 +17,6 @@ public abstract class AdmonitionBuilder<S> extends JavaScriptBasedBuilder<S, Tbl
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   protected FunctionInput<Tbl> initFunctionInputs(List<Object> processedChildContent) {
     final var parent = getParent(ListBuilder.class);
     var level = -1;
