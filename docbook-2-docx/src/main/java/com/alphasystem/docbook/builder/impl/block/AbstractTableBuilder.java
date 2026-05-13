@@ -36,7 +36,7 @@ public abstract class AbstractTableBuilder<S> extends BlockBuilder<S> {
 
   private static final int HEADER = 1;
   private static final int FOOTER = 2;
-  private static final String CONJUGATION_TABLE_STYLE = "TwoColumnConjugationTable";
+  private static final String MULTI_COLUMN_NESTED_TABLE = "MultiColumnNestedTable";
 
   private int level = -1;
   private List<ColumnInfo> columnInfoList;
@@ -134,7 +134,7 @@ public abstract class AbstractTableBuilder<S> extends BlockBuilder<S> {
 
     tableType = level <= -1 ? TableType.PCT : TableType.AUTO;
     var tableStyle = getTableStyle(tableGroup, styleName);
-    if (CONJUGATION_TABLE_STYLE.equals(styleName)) {
+    if (MULTI_COLUMN_NESTED_TABLE.equals(styleName)) {
       tableStyle = null; // reset
       tableFormat = TableFormat.OUTER_NESTED;
     }

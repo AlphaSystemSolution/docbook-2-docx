@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <article
 	xmlns="http://docbook.org/ns/docbook">
-	<informaltable role="TwoColumnConjugationTable" frame="none" rowsep="0" colsep="0">
+	<informaltable role="MultiColumnNestedTable" frame="none" rowsep="0" colsep="0">
 		<tgroup cols="2">
 			<colspec colname="col_1" colwidth="50*"/>
 			<colspec colname="col_2" colwidth="50*"/>
