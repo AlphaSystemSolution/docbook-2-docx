@@ -5,7 +5,7 @@ import org.docbook.model.CrossReference;
 
 public class CrossReferenceBuilder extends LinkSupportBuilder<CrossReference> {
 
-    public CrossReferenceBuilder(CrossReference source, Builder<?> parent) {
-        super(null, source, parent);
-    }
+  public CrossReferenceBuilder(CrossReference source, Builder<?> parent) {
+    super(null, source, parent);
+  }
 }

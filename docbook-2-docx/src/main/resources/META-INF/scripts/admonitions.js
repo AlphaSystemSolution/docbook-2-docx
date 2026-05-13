@@ -73,6 +73,7 @@ function admonitionTable(admonitionType, captionText, colorValue, indentLevel, c
     var row2Column0 = new ColumnData(0).withColumnProperties(getContentColumnProperties())
                 .withGridSpanValue(2).withContent(content);
     return new TableAdapter()
+                .withKeepTableTogether(true)
                 .withTableType(TableType.AUTO)
                 .withWidths(30.0, 70.0)
                 .withIndentLevel(indentLevel)

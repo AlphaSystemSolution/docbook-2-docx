@@ -10,8 +10,8 @@ import com.alphasystem.docx4j.builder.wml.RPrBuilder;
  */
 public class NullHandler implements InlineStyleHandler {
 
-    @Override
-    public RPrBuilder applyStyle(RPrBuilder rprBuilder) {
-        return rprBuilder;
-    }
+  @Override
+  public RPrBuilder applyStyle(RPrBuilder rprBuilder) {
+    return rprBuilder;
+  }
 }

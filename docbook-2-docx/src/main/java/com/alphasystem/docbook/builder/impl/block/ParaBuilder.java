@@ -5,7 +5,7 @@ import org.docbook.model.Para;
 
 public class ParaBuilder extends AbstractParaBuilder<Para> {
 
-    public ParaBuilder(Para source, Builder<?> parent) {
-        super(source, parent);
-    }
+  public ParaBuilder(Para source, Builder<?> parent) {
+    super(source, parent);
+  }
 }

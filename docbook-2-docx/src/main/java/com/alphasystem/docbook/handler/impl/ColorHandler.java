@@ -12,14 +12,14 @@ import com.alphasystem.docx4j.builder.wml.WmlAdapter;
  */
 public class ColorHandler implements InlineStyleHandler {
 
-    private final ColorCode colorCode;
+  private final ColorCode colorCode;
 
-    public ColorHandler(ColorCode colorCode) {
-        this.colorCode = colorCode;
-    }
+  public ColorHandler(ColorCode colorCode) {
+    this.colorCode = colorCode;
+  }
 
-    @Override
-    public RPrBuilder applyStyle(RPrBuilder rprBuilder) {
-        return rprBuilder.withColor(WmlAdapter.getColor(colorCode.getCode()));
-    }
+  @Override
+  public RPrBuilder applyStyle(RPrBuilder rprBuilder) {
+    return rprBuilder.withColor(WmlAdapter.getColor(colorCode.getCode()));
+  }
 }

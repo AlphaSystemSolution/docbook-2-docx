@@ -2,4 +2,6 @@
 <article xmlns="http://docbook.org/ns/docbook">
     <simpara>This line breaks into<?asciidoc-br?>two lines using <literal>asciidoc-br</literal>&#160;<emphasis>processing instruction</emphasis>.</simpara>
     <simpara>This line breaks into<?linebreak?>two lines using <literal>linebreak</literal>&#160;<emphasis>processing instruction</emphasis>.</simpara>
+    <?asciidoc-pagebreak?>
+    <simpara>After page break</simpara>
 </article>

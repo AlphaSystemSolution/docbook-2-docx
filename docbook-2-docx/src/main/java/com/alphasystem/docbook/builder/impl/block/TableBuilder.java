@@ -6,8 +6,8 @@ import org.docbook.model.Table;
 
 public class TableBuilder extends AbstractTableBuilder<Table> {
 
-    public TableBuilder(Table source, Builder<?> parent) {
-        super(source, parent);
-        this.docBookTableAdapter = DocBookTableAdapter.fromTable(source);
-    }
+  public TableBuilder(Table source, Builder<?> parent) {
+    super(source, parent);
+    this.docBookTableAdapter = DocBookTableAdapter.fromTable(source);
+  }
 }

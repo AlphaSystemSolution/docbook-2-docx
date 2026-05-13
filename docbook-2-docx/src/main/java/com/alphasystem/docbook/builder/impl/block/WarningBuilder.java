@@ -6,7 +6,7 @@ import org.docbook.model.Warning;
 
 public class WarningBuilder extends AdmonitionBuilder<Warning> {
 
-    public WarningBuilder(Warning source, Builder<?> parent) {
-        super(Admonition.WARNING, source, parent);
-    }
+  public WarningBuilder(Warning source, Builder<?> parent) {
+    super(Admonition.WARNING, source, parent);
+  }
 }

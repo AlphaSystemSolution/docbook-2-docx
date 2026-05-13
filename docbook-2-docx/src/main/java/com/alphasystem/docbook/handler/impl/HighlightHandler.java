@@ -10,25 +10,23 @@ import com.alphasystem.docx4j.builder.wml.RPrBuilder;
  */
 public class HighlightHandler implements InlineStyleHandler {
 
-    private final String highlightColor;
+  private final String highlightColor;
 
-    public HighlightHandler() {
-        this("yellow");
-    }
+  public HighlightHandler() {
+    this("yellow");
+  }
 
-    public HighlightHandler(String highlightColor) {
-        this.highlightColor = highlightColor;
-    }
+  public HighlightHandler(String highlightColor) {
+    this.highlightColor = highlightColor;
+  }
 
-    @Override
-    public RPrBuilder applyStyle(RPrBuilder rprBuilder) {
-        return rprBuilder.withHighlight(highlightColor);
-    }
+  @Override
+  public RPrBuilder applyStyle(RPrBuilder rprBuilder) {
+    return rprBuilder.withHighlight(highlightColor);
+  }
 
-    @Override
-    public String toString() {
-        return "HighlightHandler{" +
-                "highlightColor='" + highlightColor + '\'' +
-                '}';
-    }
+  @Override
+  public String toString() {
+    return "HighlightHandler{" + "highlightColor='" + highlightColor + '\'' + '}';
+  }
 }

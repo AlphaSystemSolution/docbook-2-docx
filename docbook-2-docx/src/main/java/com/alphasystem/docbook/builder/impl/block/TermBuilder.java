@@ -5,7 +5,7 @@ import org.docbook.model.Term;
 
 public class TermBuilder extends AbstractParaBuilder<Term> {
 
-    public TermBuilder(Term source, Builder<?> parent) {
-        super(source, parent);
-    }
+  public TermBuilder(Term source, Builder<?> parent) {
+    super(source, parent);
+  }
 }

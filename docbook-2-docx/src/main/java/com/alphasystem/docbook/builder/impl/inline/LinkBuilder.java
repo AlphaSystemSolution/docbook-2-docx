@@ -5,7 +5,7 @@ import org.docbook.model.Link;
 
 public class LinkBuilder extends LinkSupportBuilder<Link> {
 
-    public LinkBuilder(Link source, Builder<?> parent) {
-        super("getContent", source, parent);
-    }
+  public LinkBuilder(Link source, Builder<?> parent) {
+    super("getContent", source, parent);
+  }
 }
