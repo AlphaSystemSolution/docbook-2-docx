@@ -9,10 +9,12 @@ import com.alphasystem.docx4j.builder.wml.WmlBuilderFactory;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import org.docx4j.wml.JcEnumeration;
 import org.docx4j.wml.PPr;
 
 public abstract class AbstractParaBuilder<S> extends BlockBuilder<S> {
 
+  private static final String JUSTIFICATION_STYLE_PREFIX = "text-";
   protected PPr paraProperties;
   private final VariableListType variableListType = new VariableListType();
 
@@ -28,7 +30,16 @@ public abstract class AbstractParaBuilder<S> extends BlockBuilder<S> {
   protected void preProcess() {
     super.preProcess();
 
+    final var jc = getJc(role);
+    if (Objects.nonNull(jc)) {
+      role = null;
+    }
+
     paraProperties = WmlBuilderFactory.getPPrBuilder().withPStyle(role).getObject();
+    if (Objects.nonNull(jc)) {
+      paraProperties.setJc(WmlBuilderFactory.getJcBuilder().withVal(jc).getObject());
+    }
+
     if (AppUtil.isInstanceOf(TermBuilder.class, this)) {
       role = configurationUtils.getVarTermStyle();
       final var pPrBuilder = WmlBuilderFactory.getPPrBuilder().withPStyle(role);
@@ -87,5 +98,18 @@ public abstract class AbstractParaBuilder<S> extends BlockBuilder<S> {
   @Override
   protected List<Object> doProcess(List<Object> processedChildContent) {
     return createPara(processedChildContent);
+  }
+
+  private static JcEnumeration getJc(String role) {
+    if (role != null && role.startsWith(JUSTIFICATION_STYLE_PREFIX)) {
+      var justificationType = role.substring(JUSTIFICATION_STYLE_PREFIX.length());
+      return switch (justificationType) {
+        case "center" -> JcEnumeration.CENTER;
+        case "right" -> JcEnumeration.RIGHT;
+        case "justify" -> JcEnumeration.BOTH;
+        default -> JcEnumeration.LEFT;
+      };
+    }
+    return null;
   }
 }

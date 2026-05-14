@@ -3,6 +3,7 @@ package com.alphasystem.docbook.builder.test;
 import static com.alphasystem.docbook.builder.test.DataFactory.*;
 
 import com.alphasystem.commons.util.IdGenerator;
+import java.util.ArrayList;
 import org.docbook.model.SimplePara;
 import org.testng.annotations.Test;
 
@@ -281,6 +282,53 @@ public class InlineTest extends AbstractTest {
     addTestTitle("Color code test");
     processContent(readXml("color-code"));
     assertSize(2);
+    addHorizontalLine();
+  }
+
+  @Test(dependsOnMethods = "testColorCode")
+  public void testTextAlignment() {
+    addTestTitle("Text alignment test");
+
+    var contents = new ArrayList<Object>();
+
+    var simplePara = createSimplePara(IdGenerator.nextId(), createBold("Default alignment"));
+    contents.add(simplePara);
+
+    simplePara = createSimplePara(IdGenerator.nextId(), "Normal text");
+    contents.add(simplePara);
+
+    simplePara = createSimplePara(IdGenerator.nextId(), createBold("Justified alignment"));
+    contents.add(simplePara);
+
+    simplePara =
+        createSimplePara(
+            IdGenerator.nextId(),
+            createBold("Lorem Ipsum "),
+            "is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever "
+                + "since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. "
+                + "It has survived not only five centuries, but also the leap into electronic typesetting, "
+                + "remaining essentially unchanged. It was popularized in the 1960s with the release of Letraset sheets containing "
+                + "Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions "
+                + "of Lorem Ipsum.");
+    simplePara.setRole("text-justify");
+    contents.add(simplePara);
+
+    simplePara = createSimplePara(IdGenerator.nextId(), createBold("Right alignment"));
+    contents.add(simplePara);
+
+    simplePara = createSimplePara(IdGenerator.nextId(), createPhrase("arabicNormal", "فعل"));
+    simplePara.setRole("text-right");
+    contents.add(simplePara);
+
+    simplePara = createSimplePara(IdGenerator.nextId(), "Center alignment");
+    contents.add(simplePara);
+
+    simplePara = createSimplePara(IdGenerator.nextId(), createBold("Centered text"));
+    simplePara.setRole("text-center");
+    contents.add(simplePara);
+
+    processContent(createArticle(contents.toArray()));
+    assertSize(8);
     addHorizontalLine();
   }
 }
