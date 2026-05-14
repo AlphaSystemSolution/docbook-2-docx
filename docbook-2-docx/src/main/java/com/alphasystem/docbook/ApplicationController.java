@@ -78,7 +78,7 @@ public final class ApplicationController {
     final var consumer =
         (Function<Path, Void>)
             path -> {
-              logger.info("Loading script: {}", path);
+              logger.debug("Loading script: {}", path);
               context.eval(loadSource(path.toFile()));
               return null;
             };

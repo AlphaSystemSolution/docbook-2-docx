@@ -59,7 +59,7 @@ public class BuilderFactory {
             entry -> {
               final var key = entry.getKey();
               final var builderClassName = entry.getValue().unwrapped().toString();
-              logger.info("Loading builder \"{}\" for \"{}\".", builderClassName, key);
+              logger.debug("Loading builder \"{}\" for \"{}\".", builderClassName, key);
               try {
                 buildersClassMap.put(key, Class.forName(builderClassName));
               } catch (ClassNotFoundException e) {

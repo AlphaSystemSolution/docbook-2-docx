@@ -24,7 +24,7 @@ public abstract class HandlerFactory<H> {
     // handler(s)
     final H h = handlers.get(key);
     if (h == null) {
-      logger.info("Loading handler: \"{}={}\"", key, handler.getClass().getName());
+      logger.debug("Loading handler: \"{}={}\"", key, handler.getClass().getName());
       handlers.put(key, handler);
     }
   }
