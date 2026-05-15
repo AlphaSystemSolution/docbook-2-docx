@@ -2,9 +2,10 @@ package com.alphasystem.docbook.builder.test;
 
 import com.alphasystem.commons.util.IdGenerator;
 import com.alphasystem.docbook.util.JAXBTool;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
+
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.lang3.StringUtils;
 import org.docbook.model.*;
 

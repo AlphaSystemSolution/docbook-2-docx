@@ -1,18 +1,18 @@
 plugins {
-    id("com.github.bjornvester.xjc") version "1.3"
+    id("com.github.bjornvester.xjc") version "1.9.0"
 }
 
 dependencies {
-    api("com.sun.xml.bind:jaxb-core:${property("jaxbCoreVersion")}")
-    api("com.sun.xml.bind:jaxb-impl:${property("jaxbImplVersion")}")
-    api("javax.xml.bind:jaxb-api:${property("jaxbApiVersion")}")
-    "xjcPlugins"("com.github.jaxb-xew-plugin:jaxb-xew-plugin:1.8")
-    "xjcPlugins"("org.apache.cxf.xjcplugins:cxf-xjc-dv:3.0.5")
-    "xjcPlugins"("org.jvnet.jaxb2_commons:jaxb2-basics:1.11.1")
-    "xjcPlugins"("net.java.dev.jaxb2-commons:jaxb-fluent-api:2.1.8")
-    "xjcPlugins"("org.jvnet.jaxb2_commons:jaxb2-default-value:1.1")
-    "xjcPlugins"("org.jvnet.jaxb2_commons:jaxb2-basics-annotate:1.0.2")
-    "xjcPlugins"("net.java.dev.vcc.thirdparty:collection-setter-injector:0.5.0-1")
+    api("org.glassfish.jaxb:jaxb-core:${libs.versions.jaxbRuntime.get()}")
+    api("com.sun.xml.bind:jaxb-impl:${libs.versions.jaxbImpl.get()}")
+    api("org.glassfish.jaxb:jaxb-runtime:${libs.versions.jaxbRuntime.get()}")
+    api("jakarta.xml.bind:jakarta.xml.bind-api:${libs.versions.bindApi.get()}")
+    xjc("org.apache.cxf.xjcplugins:cxf-xjc-dv:${libs.versions.cfxXjcPlugin.get()}")
+    xjc("com.github.jaxb-xew-plugin:jaxb-xew-plugin:${libs.versions.jaxbXewPlugin.get()}")
+    xjc("org.jvnet.jaxb2_commons:jaxb2-fluent-api:${libs.versions.jaxb2FluentApi.get()}")
+    xjc("org.jvnet.jaxb2_commons:jaxb2-default-value:${libs.versions.jaxb2DefaultValue.get()}")
+    xjc("org.jvnet.jaxb2_commons:jaxb2-basics-annotate:${libs.versions.jaxb2BasicsAnnotate.get()}")
+    xjc("net.java.dev.vcc.thirdparty:collection-setter-injector:${libs.versions.collectionSetterInjector.get()}")
 }
 
 configure<com.github.bjornvester.xjc.XjcExtension> {

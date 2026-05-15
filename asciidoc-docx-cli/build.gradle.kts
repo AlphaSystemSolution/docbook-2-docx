@@ -9,7 +9,7 @@ dependencies {
     api(project(":asciidoctor-adapter"))
     api(project(":docbook-2-docx"))
     api(project(":arabic-handler"))
-    api("commons-cli:commons-cli:${property("commonsCliVersion")}")
+    api("commons-cli:commons-cli:${libs.versions.commonsCli.get()}")
 }
 
 // Task to merge reference.conf files manually
