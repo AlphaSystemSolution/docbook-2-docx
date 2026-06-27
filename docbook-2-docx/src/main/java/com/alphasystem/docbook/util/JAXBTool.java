@@ -1,14 +1,15 @@
 /** */
 package com.alphasystem.docbook.util;
 
+import static jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT;
+import static javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI;
+
 import com.alphasystem.commons.util.AppUtil;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
-import org.xml.sax.SAXException;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,9 +31,7 @@ import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-
-import static jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT;
-import static javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI;
+import org.xml.sax.SAXException;
 
 /**
  * @author sali
@@ -101,16 +100,16 @@ public final class JAXBTool {
   public <T> String marshall(String contextPath, JAXBElement<T> jaxbElement)
       throws JAXBException, XMLStreamException {
     String result = null;
-      try (StringWriter writer = new StringWriter()) {
-          try {
-              marshall(writer, contextPath, jaxbElement);
-              result = writer.toString();
-          } catch (JAXBException | XMLStreamException e) {
-              throw e;
-          }
-      } catch (IOException e) {
-          //
+    try (StringWriter writer = new StringWriter()) {
+      try {
+        marshall(writer, contextPath, jaxbElement);
+        result = writer.toString();
+      } catch (JAXBException | XMLStreamException e) {
+        throw e;
       }
+    } catch (IOException e) {
+      //
+    }
     return result;
   }
 
