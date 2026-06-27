@@ -1,18 +1,18 @@
 plugins {
-    id("com.github.bjornvester.xjc") version "1.3"
+    alias(libs.plugins.xjc)
 }
 
 dependencies {
-    api("com.sun.xml.bind:jaxb-core:${property("jaxbCoreVersion")}")
-    api("com.sun.xml.bind:jaxb-impl:${property("jaxbImplVersion")}")
-    api("javax.xml.bind:jaxb-api:${property("jaxbApiVersion")}")
-    "xjcPlugins"("com.github.jaxb-xew-plugin:jaxb-xew-plugin:1.8")
-    "xjcPlugins"("org.apache.cxf.xjcplugins:cxf-xjc-dv:3.0.5")
-    "xjcPlugins"("org.jvnet.jaxb2_commons:jaxb2-basics:1.11.1")
-    "xjcPlugins"("net.java.dev.jaxb2-commons:jaxb-fluent-api:2.1.8")
-    "xjcPlugins"("org.jvnet.jaxb2_commons:jaxb2-default-value:1.1")
-    "xjcPlugins"("org.jvnet.jaxb2_commons:jaxb2-basics-annotate:1.0.2")
-    "xjcPlugins"("net.java.dev.vcc.thirdparty:collection-setter-injector:0.5.0-1")
+    api(libs.jaxbCore)
+    api(libs.jaxbRuntime)
+    api(libs.jaxbImpl)
+    api(libs.xmlBindApi)
+    xjc(libs.cxfXjcDv)
+    xjc(libs.jaxbXewPlugin)
+    xjc(libs.jaxb2FluentApi)
+    xjc(libs.jaxb2DefaultValue)
+    xjc(libs.jaxb2BasicsAnnotate)
+    xjc(libs.collectionSetterInjector)
 }
 
 configure<com.github.bjornvester.xjc.XjcExtension> {

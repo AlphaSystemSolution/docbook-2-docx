@@ -1,7 +1,7 @@
 plugins {
     id("net.researchgate.release") version "3.1.0"
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
-    id("com.diffplug.spotless") version "8.4.0"
+    alias(libs.plugins.spotless)
 }
 
 allprojects {

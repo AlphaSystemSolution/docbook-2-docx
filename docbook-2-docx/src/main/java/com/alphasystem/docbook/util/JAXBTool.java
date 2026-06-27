@@ -1,11 +1,21 @@
 /** */
 package com.alphasystem.docbook.util;
 
+import static jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT;
 import static javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI;
-import static javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT;
 
 import com.alphasystem.commons.util.AppUtil;
-import java.io.*;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -13,7 +23,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import javax.xml.bind.*;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -33,8 +42,8 @@ public final class JAXBTool {
   private Marshaller.Listener marshallerListener;
   private Unmarshaller.Listener unMarshallerListener;
   private Schema schema;
-  private NamespaceContext noNamespaceContext;
-  private Map<String, Object> marshallerProperties = new HashMap<String, Object>();
+  private final NamespaceContext noNamespaceContext;
+  private final Map<String, Object> marshallerProperties = new HashMap<String, Object>();
 
   public JAXBTool() {
     noNamespaceContext = new NoNamespaceContext();
@@ -91,18 +100,15 @@ public final class JAXBTool {
   public <T> String marshall(String contextPath, JAXBElement<T> jaxbElement)
       throws JAXBException, XMLStreamException {
     String result = null;
-    StringWriter writer = new StringWriter();
-    try {
-      marshall(writer, contextPath, jaxbElement);
-      result = writer.toString();
-    } catch (JAXBException | XMLStreamException e) {
-      throw e;
-    } finally {
+    try (StringWriter writer = new StringWriter()) {
       try {
-        writer.close();
-      } catch (IOException e) {
-        //
+        marshall(writer, contextPath, jaxbElement);
+        result = writer.toString();
+      } catch (JAXBException | XMLStreamException e) {
+        throw e;
       }
+    } catch (IOException e) {
+      //
     }
     return result;
   }
@@ -157,7 +163,7 @@ public final class JAXBTool {
   }
 
   public <T> T unmarshal(Class<T> klass, Reader source) throws JAXBException {
-    T result = null;
+    T result;
     JAXBContext jaxbContext = JAXBContext.newInstance(klass.getPackage().getName());
     Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
     if (unMarshallerListener != null) {

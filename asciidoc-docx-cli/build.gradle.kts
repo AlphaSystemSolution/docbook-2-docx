@@ -1,7 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
-    id("com.gradleup.shadow") version "9.4.1"
+    alias(libs.plugins.shadow)
     java
 }
 
@@ -9,7 +9,7 @@ dependencies {
     api(project(":asciidoctor-adapter"))
     api(project(":docbook-2-docx"))
     api(project(":arabic-handler"))
-    api("commons-cli:commons-cli:${property("commonsCliVersion")}")
+    api(libs.commonsCli)
 }
 
 // Task to merge reference.conf files manually

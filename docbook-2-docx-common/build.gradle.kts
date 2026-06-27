@@ -1,3 +1,6 @@
 dependencies {
-    api("io.github.sfali23:commons:${property("commonsVersion")}")
+    api(libs.asCommons)
+
+    // to fix transitive dependency venerability
+    api(libs.commonsLang3)
 }

@@ -1,0 +1,60 @@
+[versions]
+asciidoctorj = "3.0.1"
+bindApi = "4.0.5"
+commonsCli = "1.6.0"
+commons = "0.3.2"
+commonsLang3 = "3.20.0"
+graalvmJs = "25.0.3"
+guava = "33.6.0-jre"
+guice = "7.0.0"
+jaxbImpl = "4.0.8"
+jaxbRuntime =  "4.0.8"
+logbackClassic =  "1.5.32"
+docx4jBuilder =  "0.6.0"
+reportng = "1.1.4"
+slf4jApi = "2.0.18"
+testng = "7.9.0"
+typesafeConfig = "1.4.3"
+vavr = "1.0.1"
+cfxXjcPlugin = "4.2.0"
+jaxbXewPlugin = "2.1"
+jaxb2FluentApi = "3.0"
+jaxb2DefaultValue = "1.1"
+jaxb2BasicsAnnotate = "1.1.0"
+collectionSetterInjector = "0.5.0-1"
+spotless = "8.4.0"
+shadow = "9.4.1"
+xjc = "1.9.0"
+
+[libraries]
+commonsCli = { module = "commons-cli:commons-cli", version.ref = "commonsCli" }
+asciidoctorj = { module = "org.asciidoctor:asciidoctorj", version.ref = "asciidoctorj" }
+asciidoctorjApi = { module = "org.asciidoctor:asciidoctorj-api", version.ref = "asciidoctorj" }
+docx4jBuilder = { module = "io.github.sfali23:docx4j-builder", version.ref = "docx4jBuilder" }
+vavr = { module = "io.vavr:vavr", version.ref = "vavr" }
+graalvmJs = { module = "org.graalvm.js:js", version.ref = "graalvmJs" }
+polyglot = { module = "org.graalvm.polyglot:polyglot", version.ref = "graalvmJs" }
+typesafeConfig = { module = "com.typesafe:config", version.ref = "typesafeConfig" }
+slf4jApi = { module = "org.slf4j:slf4j-api", version.ref = "slf4jApi" }
+logbackClassic = { module = "ch.qos.logback:logback-classic", version.ref = "logbackClassic" }
+testng = { module = "org.testng:testng", version.ref = "testng" }
+guice = { module = "com.google.inject:guice", version.ref = "guice" }
+guava = { module = "com.google.guava:guava", version.ref = "guava" }
+reportng = { module = "org.uncommons:reportng", version.ref = "reportng" }
+asCommons = { module = "io.github.sfali23:commons", version.ref = "commons" }
+commonsLang3 = { module = "org.apache.commons:commons-lang3", version.ref = "commonsLang3" }
+jaxbCore = { module = "org.glassfish.jaxb:jaxb-core", version.ref = "jaxbRuntime" }
+jaxbRuntime = { module = "org.glassfish.jaxb:jaxb-runtime", version.ref = "jaxbRuntime" }
+jaxbImpl = { module = "com.sun.xml.bind:jaxb-impl", version.ref = "jaxbImpl" }
+xmlBindApi = { module = "jakarta.xml.bind:jakarta.xml.bind-api", version.ref = "bindApi" }
+cxfXjcDv = { module = "org.apache.cxf.xjcplugins:cxf-xjc-dv", version.ref = "cfxXjcPlugin" }
+jaxbXewPlugin = { module = "com.github.jaxb-xew-plugin:jaxb-xew-plugin", version.ref = "jaxbXewPlugin" }
+jaxb2FluentApi = { module = "org.jvnet.jaxb2_commons:jaxb2-fluent-api", version.ref = "jaxb2FluentApi" }
+jaxb2DefaultValue = { module = "org.jvnet.jaxb2_commons:jaxb2-default-value", version.ref = "jaxb2DefaultValue" }
+jaxb2BasicsAnnotate = { module = "org.jvnet.jaxb2_commons:jaxb2-basics-annotate", version.ref = "jaxb2BasicsAnnotate" }
+collectionSetterInjector = { module = "net.java.dev.vcc.thirdparty:collection-setter-injector", version.ref = "collectionSetterInjector" }
+
+[plugins]
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
+xjc = { id = "com.github.bjornvester.xjc", version.ref = "xjc" }
