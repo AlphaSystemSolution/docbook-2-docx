@@ -1,17 +1,17 @@
 dependencies {
     api(project(":docbook-model"))
     api(project(":docbook-2-docx-common"))
-    api("io.github.sfali23:docx4j-builder:${libs.versions.docx4jBuilder.get()}")
-    api("io.vavr:vavr:${libs.versions.vavr.get()}")
-    api("org.graalvm.js:js:${libs.versions.graalvmJs.get()}")
-    api("org.graalvm.polyglot:polyglot:${libs.versions.graalvmJs.get()}")
-    api("com.typesafe:config:${libs.versions.typesafeConfig.get()}")
-    api("org.slf4j:slf4j-api:${libs.versions.slf4jApi.get()}")
-    api("ch.qos.logback:logback-classic:${libs.versions.logbackClassic.get()}")
-    testImplementation("org.testng:testng:${libs.versions.testng.get()}")
-    testImplementation("com.google.inject:guice:${libs.versions.guice.get()}")
-    testImplementation("com.google.guava:guava:${libs.versions.guava.get()}")
-    testImplementation("org.uncommons:reportng:${libs.versions.reportng.get()}")
+    api(libs.docx4jBuilder)
+    api(libs.vavr)
+    api(libs.graalvmJs)
+    api(libs.polyglot)
+    api(libs.typesafeConfig)
+    api(libs.slf4jApi)
+    api(libs.logbackClassic)
+    testImplementation(libs.testng)
+    testImplementation(libs.guice)
+    testImplementation(libs.guava)
+    testImplementation(libs.reportng)
 }
 
 tasks.withType<Test>().configureEach {

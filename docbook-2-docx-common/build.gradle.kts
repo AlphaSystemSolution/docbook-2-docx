@@ -1,6 +1,6 @@
 dependencies {
-    api("io.github.sfali23:commons:${libs.versions.commons.get()}")
+    api(libs.asCommons)
 
     // to fix transitive dependency venerability
-    api("org.apache.commons:commons-lang3:${libs.versions.commonsLang3.get()}")
+    api(libs.commonsLang3)
 }
