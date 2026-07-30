@@ -1,35 +1,62 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<article xmlns="http://docbook.org/ns/docbook">
-    <informaltable colsep="1" rowsep="1" frame="all">
-        <tgroup cols="4">
-            <colspec colwidth="25*" colname="col_1"/>
-            <colspec colwidth="25*" colname="col_2"/>
-            <colspec colwidth="25*" colname="col_3"/>
-            <colspec colwidth="25*" colname="col_4"/>
-            <tbody>
-                <row>
-                    <entry valign="middle" align="center">
-                        <simpara>Row 4, Column 1</simpara>
-                    </entry>
-                    <entry valign="middle" align="center">
-                        <simpara>Row 4, Column 2</simpara>
-                    </entry>
-                    <entry valign="middle" align="center">
-                        <simpara>Row 4, Column 3</simpara>
-                    </entry>
-                    <entry valign="middle" align="center">
-                        <simpara>Row 4, Column 4</simpara>
-                    </entry>
-                </row>
-                <row>
-                    <entry valign="middle" morerows="2" namest="col_1" nameend="col_2" align="center">
-                        <simpara>Row span 3, Column 1 &amp; 2</simpara>
-                    </entry>
-                    <entry valign="middle" morerows="2" namest="col_2" nameend="col_3" align="center">
-                        <simpara>Row span 3, Column 3 &amp; 4</simpara>
-                    </entry>
-                </row>
-            </tbody>
-        </tgroup>
-    </informaltable>
+<article
+	xmlns="http://docbook.org/ns/docbook">
+	<informaltable frame="all" rowsep="1" colsep="1">
+		<tgroup cols="5">
+			<colspec colname="col_1" colwidth="52*"/>
+			<colspec colname="col_2" colwidth="12*"/>
+			<colspec colname="col_3" colwidth="12*"/>
+			<colspec colname="col_4" colwidth="12*"/>
+			<colspec colname="col_5" colwidth="12*"/>
+			<tbody>
+				<row>
+					<entry align="center" valign="middle">
+						<simpara>Be yourself; everyone else is already taken.</simpara>
+					</entry>
+					<entry align="center" valign="middle">
+						<simpara>Oscar Wilde</simpara>
+					</entry>
+					<entry align="center" valign="middle" namest="col_3" nameend="col_4" morerows="1">
+						<simpara>Column span 2, Row span 2</simpara>
+					</entry>
+					<entry align="center" valign="middle" morerows="4"><simpara>Row span 5</simpara></entry>
+				</row>
+				<row>
+					<entry align="center" valign="middle">
+						<simpara>The only way to do great work is to love what you do.</simpara>
+					</entry>
+					<entry align="center" valign="middle">
+						<simpara>Steve Jobs</simpara>
+					</entry>
+				</row>
+				<row>
+					<entry align="center" valign="middle">
+						<simpara>Strive not to be a success, but rather to be of value.</simpara>
+					</entry>
+					<entry align="center" valign="middle">
+						<simpara>Albert Einstein</simpara>
+					</entry>
+					<entry align="center" valign="middle" namest="col_3" nameend="col_4" morerows="2">
+						<simpara>Column span 2, Row span 3</simpara>
+					</entry>
+				</row>
+				<row>
+					<entry align="center" valign="middle">
+						<simpara>You miss 100% of the shots you don't take.</simpara>
+					</entry>
+					<entry align="center" valign="middle">
+						<simpara>Wayne Gretzky</simpara>
+					</entry>
+				</row>
+				<row>
+					<entry align="center" valign="middle">
+						<simpara>The most difficult thing is the decision to act, the rest is merely tenacity.</simpara>
+					</entry>
+					<entry align="center" valign="middle">
+						<simpara>Amelia Earhart</simpara>
+					</entry>
+				</row>
+			</tbody>
+		</tgroup>
+	</informaltable>
 </article>

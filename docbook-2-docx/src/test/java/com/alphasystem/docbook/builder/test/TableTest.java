@@ -90,7 +90,7 @@ public class TableTest extends AbstractTest {
     processContent(readXml("table-row-column-span"));
     assertSize(1);
     final var content = mainDocumentPart.getContent();
-    assertEquals(getTableContentSize((Tbl) content.getLast()), 6);
+    assertEquals(getTableContentSize((Tbl) content.getLast()), 13);
     addHorizontalLine();
   }
 
