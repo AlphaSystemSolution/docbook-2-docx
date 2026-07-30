@@ -1,6 +1,8 @@
 plugins {
     id("net.researchgate.release") version "3.1.0"
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
+    alias(libs.plugins.publish)
+    alias(libs.plugins.semverRelease)
     alias(libs.plugins.spotless)
 }
 
@@ -51,9 +53,16 @@ subprojects {
     }
 
     configure<JavaPluginExtension> {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(25))
+        }
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
         withJavadocJar()
         withSourcesJar()
     }
+}
+
+semverrelease {
+    addUnReleasedCommitsToTagComment.set(true)
 }

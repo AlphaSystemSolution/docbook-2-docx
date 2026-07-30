@@ -25,6 +25,8 @@ collectionSetterInjector = "0.5.0-1"
 spotless = "8.4.0"
 shadow = "9.4.1"
 xjc = "1.9.0"
+publish = "0.36.0"
+semver-release-plugin = "0.3.0"
 
 [libraries]
 commonsCli = { module = "commons-cli:commons-cli", version.ref = "commonsCli" }
@@ -58,3 +60,5 @@ collectionSetterInjector = { module = "net.java.dev.vcc.thirdparty:collection-se
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 xjc = { id = "com.github.bjornvester.xjc", version.ref = "xjc" }
+publish = { id = "com.vanniktech.maven.publish", version.ref = "publish" }
+semverRelease = { id = "io.github.sfali23.gradle-semantic-versioning-release", version.ref = "semver-release-plugin" }
