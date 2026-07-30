@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
 import org.docbook.model.Entry;
 import org.docbook.model.ObjectFactory;
 import org.docbook.model.Row;
@@ -91,11 +90,6 @@ public abstract class TableContentBuilder<S> extends AbstractBuilder<S> {
                       .withNameStart(String.valueOf(columnIndex))
                       .withNameEnd(String.valueOf(gridSpan));
               entries[rowIndex + i][columnIndex] = nextEntry;
-              // if there is column span then no need to continue
-              if (StringUtils.isNotBlank(startColumnName)
-                  && StringUtils.isNotBlank(endColumnName)) {
-                break;
-              }
             }
           }
           columnIndex += gridSpan;
