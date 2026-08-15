@@ -37,7 +37,7 @@ public class ConfigurationUtils {
   private String exampleCaption;
   private String varTermStyle;
 
-  /** Do not let any one instantiate this class. */
+  /** Do not let anyone instantiate this class. */
   private ConfigurationUtils() {
     mainConfig = ConfigFactory.load();
     appConfig = mainConfig.getConfig("docbook-docx");
@@ -78,6 +78,10 @@ public class ConfigurationUtils {
               final var value = entry.getValue().unwrapped().toString();
               functionNames.put(key, value);
             });
+  }
+
+  public Config getAppConfig() {
+    return appConfig;
   }
 
   public String getTitleStyle(String titleKey) {
@@ -160,6 +164,10 @@ public class ConfigurationUtils {
     var _styles = getString("styles");
     _styles = StringUtils.isBlank(_styles) ? defaultStyles : defaultStyles + "," + _styles;
     return _styles.split(",");
+  }
+
+  public List<String> getCustomStyles() {
+    return appConfig.getStringList("style-scripts");
   }
 
   public Config getConfig(String path) {

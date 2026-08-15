@@ -10,7 +10,9 @@ import com.alphasystem.docbook.util.ConfigurationUtils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.function.Function;
+
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Source;
 import org.slf4j.Logger;
@@ -84,6 +86,12 @@ public final class ApplicationController {
             };
     try {
       AppUtil.processResourceDirectory("META-INF/scripts", consumer);
+      final var customScriptsPath = System.getProperty("docbook-docx.customDirPath");
+      if (customScriptsPath != null) {
+        final var scripts = String.format("%s%s%s", customScriptsPath, File.separator, "scripts");
+        logger.info("Loading custom scripts: {}", scripts);
+        AppUtil.processDirectory(Paths.get(scripts), consumer);
+      }
     } catch (SystemException e) {
       throw new RuntimeException(e);
     }
