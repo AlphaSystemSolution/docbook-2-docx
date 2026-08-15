@@ -15,7 +15,6 @@ dependencies {
 }
 
 tasks.withType<Test>().configureEach {
-    systemProperty("docbook-docx.styles", "META-INF/custom-styles.xml")
     systemProperty("config.file", "${rootDir}/custom-scripts/docbook-docx.conf")
     systemProperty("docbook-docx.customDirPath", "${rootDir}/custom-scripts")
     systemProperty("target.path", "build/docs")
