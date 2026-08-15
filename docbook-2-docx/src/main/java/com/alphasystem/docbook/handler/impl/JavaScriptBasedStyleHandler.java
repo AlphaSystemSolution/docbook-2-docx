@@ -1,30 +1,28 @@
 package com.alphasystem.docbook.handler.impl;
 
-import com.alphasystem.docbook.ScriptHandler;
 import com.alphasystem.docbook.handler.InlineStyleHandler;
-import com.alphasystem.docbook.model.FunctionInput;
 import com.alphasystem.docx4j.builder.wml.RPrBuilder;
+import org.docx4j.wml.RPr;
 
 /**
- * Javascript based inline style handler. The handler would take styleName (role), which would be
+ * JavaScript-based inline style handler. The handler would take styleName (role), which would be
  * the name of the function as well.
  */
-public class JavaScriptBasedStyleHandler implements InlineStyleHandler, ScriptHandler<RPrBuilder> {
+public class JavaScriptBasedStyleHandler implements InlineStyleHandler {
 
-  private final String styleName;
+  private final RPr runProperties;
 
   /**
-   * Initialize handler with the given style name / role / function name.
+   * Initialize the handler with the given style name / role / function name.
    *
-   * @param styleName Name of the style or role, this would be the name of JavaScriptFunction as
-   *     well.
+   * @param runProperties Run properties to be applied to the current run.
    */
-  public JavaScriptBasedStyleHandler(String styleName) {
-    this.styleName = styleName;
+  public JavaScriptBasedStyleHandler(RPr runProperties) {
+    this.runProperties = runProperties;
   }
 
   @Override
   public RPrBuilder applyStyle(RPrBuilder rprBuilder) {
-    return execute(new FunctionInput<>(styleName, RPrBuilder.class, new Object[] {rprBuilder}));
+    return new RPrBuilder(rprBuilder.getObject(), runProperties);
   }
 }

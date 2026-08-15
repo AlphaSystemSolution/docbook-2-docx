@@ -5,7 +5,7 @@ import com.alphasystem.commons.SystemException;
 import com.alphasystem.docbook.model.DocumentCaption;
 import com.alphasystem.docbook.util.ConfigurationUtils;
 import com.alphasystem.docx4j.builder.wml.NumberingHelper;
-import com.alphasystem.docx4j.builder.wml.WmlBuilderFactory;
+import com.alphasystem.docx4j.builder.wml.StylesBuilder;
 import com.alphasystem.docx4j.builder.wml.WmlPackageBuilder;
 
 import java.util.*;
@@ -17,8 +17,6 @@ import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.openpackaging.parts.WordprocessingML.DocumentSettingsPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
 import org.docx4j.wml.CTCompat;
-import org.docx4j.wml.Style;
-import org.docx4j.wml.Styles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +55,13 @@ public final class DocumentContext {
                     "Loading template \"{}\" and styles: \"{}\".", template, Arrays.toString(styleFiles));
 
             final var inputs = new WmlPackageBuilder.WmlPackageInputs().withTemplatePath(template);
-            wmlPackageBuilder = new WmlPackageBuilder(inputs).styles(styleFiles).styles(loadCustomStyles());
+
+            wmlPackageBuilder = new WmlPackageBuilder(inputs).styles(styleFiles);
+            final Object customStyles = applicationController.getFunction("styles");
+            if (customStyles != null) {
+                wmlPackageBuilder = wmlPackageBuilder.styles(((StylesBuilder) customStyles).getObject());
+            }
+
             wordprocessingMLPackage = wmlPackageBuilder.getPackage();
             mainDocumentPart = wordprocessingMLPackage.getMainDocumentPart();
 
@@ -80,16 +84,6 @@ public final class DocumentContext {
         } catch (Docx4JException | SystemException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private Styles loadCustomStyles() {
-        final var scriptEngine = applicationController.getScriptEngine();
-        final var styles = configurationUtils.getCustomStyles()
-                .stream()
-                .map(functionName -> scriptEngine.getBindings("js").getMember(functionName).execute().as(Style.class))
-                .toList()
-                .toArray(new Style[0]);
-        return WmlBuilderFactory.getStylesBuilder().addStyle(styles).getObject();
     }
 
     public DocumentInfo getDocumentInfo() {

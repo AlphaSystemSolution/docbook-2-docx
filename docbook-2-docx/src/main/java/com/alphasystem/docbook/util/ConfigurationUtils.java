@@ -166,10 +166,6 @@ public class ConfigurationUtils {
     return _styles.split(",");
   }
 
-  public List<String> getCustomStyles() {
-    return appConfig.getStringList("style-scripts");
-  }
-
   public Config getConfig(String path) {
     return mainConfig.getConfig(path);
   }
