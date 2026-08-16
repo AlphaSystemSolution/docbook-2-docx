@@ -145,18 +145,12 @@ public class InlineTest extends AbstractTest {
 
   @Test(dependsOnMethods = "multipleRolesTest")
   public void customParaStyleTest() {
-    final var article =
-        createArticle(
-            createSimplePara(IdGenerator.nextId(), "Paragraph with custom style.")
-                .withRole("Style1"),
-            createSimplePara(IdGenerator.nextId(), "نَصَرَ يَنْصُرُ نَصْرًا فهو نَاصِرٌ")
-                        .withRole("ArabicParagraph"));
-
     addTestTitle("Custom para style Test");
-    processContent(article);
+    processContent(readXml("custom-para"));
     final var content = mainDocumentPart.getContent();
-    assertSize(2);
-    assertText(content.get(content.size() - 2), "Paragraph with custom style.");
+    assertSize(3);
+    assertText(content.get(content.size() - 3), "Paragraph with custom style.");
+    assertText(content.get(content.size() - 2), "نَصَرَ يَنْصُرُ نَصْرًا فهو نَاصِرٌ");
     assertText(content.getLast(), "نَصَرَ يَنْصُرُ نَصْرًا فهو نَاصِرٌ");
     addHorizontalLine();
   }

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en">
+    <simpara role="Style1">Paragraph with custom style.</simpara>
+    <simpara>
+        <phrase role="arabicNormal">&#1606;&#1614;&#1589;&#1614;&#1585;&#1614;&#0032;&#1610;&#1614;&#1606;&#1618;&#1589;&#1615;&#1585;&#1615;&#0032;&#1606;&#1614;&#1589;&#1618;&#1585;&#1611;&#1575; <phrase role="arabicSmallGray">&#1601;&#1607;&#1608;</phrase> &#1606;&#1614;&#1575;&#1589;&#1616;&#1585;&#1612;</phrase>
+    </simpara>
+    <simpara role="ArabicParagraph">&#1606;&#1614;&#1589;&#1614;&#1585;&#1614;&#0032;&#1610;&#1614;&#1606;&#1618;&#1589;&#1615;&#1585;&#1615;&#0032;&#1606;&#1614;&#1589;&#1618;&#1585;&#1611;&#1575;&#0032;<phrase role="arabicSmallGray">&#1601;&#1607;&#1608;</phrase>&#0032;&#1606;&#1614;&#1575;&#1589;&#1616;&#1585;&#1612;</simpara>
+</article>

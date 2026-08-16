@@ -23,6 +23,6 @@ public class JavaScriptBasedStyleHandler implements InlineStyleHandler {
 
   @Override
   public RPrBuilder applyStyle(RPrBuilder rprBuilder) {
-    return new RPrBuilder(rprBuilder.getObject(), runProperties);
+    return new RPrBuilder(runProperties, rprBuilder.getObject());
   }
 }

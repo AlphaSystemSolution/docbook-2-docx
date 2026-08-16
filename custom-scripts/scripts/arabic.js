@@ -1,15 +1,13 @@
-var ConfigurationUtils = Java.type("com.alphasystem.docbook.util.ConfigurationUtils")
-var WmlAdapter = Java.type("com.alphasystem.docx4j.builder.wml.WmlAdapter");
-var WmlBuilderFactory = Java.type("com.alphasystem.docx4j.builder.wml.WmlBuilderFactory");
-var RPrBuilder = Java.type("com.alphasystem.docx4j.builder.wml.RPrBuilder")
-var STThemeColor = Java.type("org.docx4j.wml.STThemeColor")
+const ConfigurationUtils = Java.type("com.alphasystem.docbook.util.ConfigurationUtils");
+// const WmlAdapter = Java.type("com.alphasystem.docx4j.builder.wml.WmlAdapter");
+// const WmlBuilderFactory = Java.type("com.alphasystem.docx4j.builder.wml.WmlBuilderFactory");
+// const STThemeColor = Java.type("org.docx4j.wml.STThemeColor");
 
 function arabicHandler(rPrBuilder, configPath, rtl) {
     const config = ConfigurationUtils.getInstance().getAppConfig().getConfig(configPath);
     const fontName = config.getString("font-name");
     const fontSize = config.getInt("font-size");
-    const rFonts = WmlBuilderFactory.getRFontsBuilder().withAscii(fontName).withHAnsi(fontName)
-        .withCs(fontName).getObject();
+    const rFonts = WmlBuilderFactory.getRFontsBuilder().withAscii(fontName).withHAnsi(fontName).withCs(fontName).getObject();
     return rPrBuilder.withRFonts(rFonts).withSz(fontSize).withSzCs(fontSize).withRtl(rtl);
 }
 
@@ -48,13 +46,13 @@ function translation() {
 }
 
 function arabicParagraph() {
-    var styleId = "ArabicParagraph";
-    var appConfig = ConfigurationUtils.getInstance().getAppConfig();
-    var fontName = appConfig.getString("arabic.normal.font-name");
-    var fontSize = appConfig.getLong("arabic.normal.font-size");
-    var pPr = WmlBuilderFactory.getPPrBuilder().withBidi(true).getObject();
-    var rFonts = WmlBuilderFactory.getRFontsBuilder().withAscii(fontName).withHAnsi(fontName).getObject();
-    var rPr = WmlBuilderFactory.getRPrBuilder().withRFonts(rFonts).withSz(fontSize).getObject();
+    const styleId = "ArabicParagraph";
+    const appConfig = ConfigurationUtils.getInstance().getAppConfig();
+    const fontName = appConfig.getString("arabic.normal.font-name");
+    const fontSize = appConfig.getLong("arabic.normal.font-size");
+    const pPr = WmlBuilderFactory.getPPrBuilder().withBidi(true).getObject();
+    const rFonts = WmlBuilderFactory.getRFontsBuilder().withAscii(fontName).withHAnsi(fontName).getObject();
+    const rPr = WmlBuilderFactory.getRPrBuilder().withRFonts(rFonts).withSz(fontSize).getObject();
     return WmlBuilderFactory.getStyleBuilder().withType("paragraph").withCustomStyle(true).withBasedOn("Normal").withStyleId(styleId)
         .withName(styleId).withRsid("00A401CB").withPPr(pPr).withRPr(rPr).getObject();
 }
