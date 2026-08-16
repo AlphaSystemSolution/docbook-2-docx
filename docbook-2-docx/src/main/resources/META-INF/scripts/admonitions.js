@@ -13,7 +13,7 @@ var FILL_COLOR = "F2F2F2";
 
 function getAdmonitionStyleId(admonitionType) {
     return admonitionType + STYLE_SUFFIX;
-};
+}
 
 function getTableBorders(colorValue) {
     return WmlBuilderFactory.getTblBordersBuilder()
@@ -24,7 +24,7 @@ function getTableBorders(colorValue) {
                     .withInsideH(WmlAdapter.getBorder(STBorder.SINGLE, BORDER_SIZE, 0, colorValue))
                     .withInsideV(WmlAdapter.getBorder(STBorder.SINGLE, BORDER_SIZE, 0, colorValue))
                     .getObject();
-};
+}
 
 function getCaptionColumnProperties(colorValue) {
     return WmlBuilderFactory.getTcPrBuilder()
@@ -36,7 +36,7 @@ function getCaptionColumnProperties(colorValue) {
                             .withFill(FILL_COLOR).withThemeFill(STThemeColor.BACKGROUND_1)
                             .withThemeFillShade("F2").getObject())
                     .getObject();
-};
+}
 
 function getEmptyColumnProperties(colorValue) {
     return WmlBuilderFactory.getTcPrBuilder()
@@ -47,7 +47,7 @@ function getEmptyColumnProperties(colorValue) {
                         .withRight(WmlAdapter.getNilBorder())
                         .getObject())
                 .getObject();
-};
+}
 
 function getContentColumnProperties() {
     return WmlBuilderFactory.getTcPrBuilder()
@@ -58,20 +58,20 @@ function getContentColumnProperties() {
                             .withFill(FILL_COLOR).withThemeFill(STThemeColor.BACKGROUND_1)
                             .withThemeFillShade("F2").getObject())
                     .getObject();
-};
+}
 
 function getAdmonitionCaption(admonitionType, captionText) {
      return WmlAdapter.getParagraphWithStyle(getAdmonitionStyleId(admonitionType), captionText);
-};
+}
 
 function admonitionTable(admonitionType, captionText, colorValue, indentLevel, content) {
-    var tblPr = WmlBuilderFactory.getTblPrBuilder().withTblBorders(getTableBorders(colorValue)).getObject();
-    var row1Column0 = new ColumnData(0).withColumnProperties(getCaptionColumnProperties(colorValue))
-                .withContent(getAdmonitionCaption(admonitionType, captionText));
-    var row1Column1 = new ColumnData(1).withColumnProperties(getEmptyColumnProperties(colorValue))
-                .withContent(WmlAdapter.getEmptyParaNoSpacing());
-    var row2Column0 = new ColumnData(0).withColumnProperties(getContentColumnProperties())
-                .withGridSpanValue(2).withContent(content);
+    const tblPr = WmlBuilderFactory.getTblPrBuilder().withTblBorders(getTableBorders(colorValue)).getObject();
+    const row1Column0 = new ColumnData(0).withColumnProperties(getCaptionColumnProperties(colorValue))
+        .withContent(getAdmonitionCaption(admonitionType, captionText));
+    const row1Column1 = new ColumnData(1).withColumnProperties(getEmptyColumnProperties(colorValue))
+        .withContent(WmlAdapter.getEmptyParaNoSpacing());
+    const row2Column0 = new ColumnData(0).withColumnProperties(getContentColumnProperties())
+        .withGridSpanValue(2).withContent(content);
     return new TableAdapter()
                 .withKeepTableTogether(true)
                 .withTableType(TableType.AUTO)
@@ -87,4 +87,4 @@ function admonitionTable(admonitionType, captionText, colorValue, indentLevel, c
                 .addColumn(row2Column0)
                 .endRow()
                 .getTable();
-};
+}

@@ -8,15 +8,13 @@ plugins {
 dependencies {
     api(project(":asciidoctor-adapter"))
     api(project(":docbook-2-docx"))
-    api(project(":arabic-handler"))
     api(libs.commonsCli)
 }
 
 // Task to merge reference.conf files manually
 tasks.register("mergeReferenceConf") {
     dependsOn(":docbook-2-docx:jar")
-    dependsOn(":arabic-handler:jar")
-    
+
     doLast {
         val mergedFile = file("${layout.buildDirectory.get()}/resources/main/reference.conf")
         mergedFile.parentFile.mkdirs()
@@ -50,7 +48,6 @@ tasks.named<Jar>("jar") {
     dependsOn(":docbook-model:jar")
     dependsOn(":asciidoctor-adapter:jar")
     dependsOn(":docbook-2-docx:jar")
-    dependsOn(":arabic-handler:jar")
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
     manifest {
         attributes("Main-Class" to "com.alphasystem.docx.cli.Main")
