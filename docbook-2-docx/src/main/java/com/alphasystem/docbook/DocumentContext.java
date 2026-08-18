@@ -33,6 +33,7 @@ public final class DocumentContext {
     private final List<String> documentStyles;
     private final DocumentInfo documentInfo;
     private final boolean article;
+    private boolean previousElementTable = false;
     private WmlPackageBuilder wmlPackageBuilder;
     private WordprocessingMLPackage wordprocessingMLPackage;
     private MainDocumentPart mainDocumentPart;
@@ -84,6 +85,14 @@ public final class DocumentContext {
         } catch (Docx4JException | SystemException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public boolean isPreviousElementTable() {
+        return previousElementTable;
+    }
+
+    public void setPreviousElementTable(boolean previousElementTable) {
+        this.previousElementTable = previousElementTable;
     }
 
     public DocumentInfo getDocumentInfo() {
