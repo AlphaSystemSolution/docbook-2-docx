@@ -207,4 +207,12 @@ public class TableTest extends AbstractTest {
     assertEquals(getTableContentSize((Tbl) content.getLast()), 0);
     addHorizontalLine();
   }
+
+  @Test(dependsOnMethods = "testNestedTable")
+  public void testMultipleConsecutiveTables() {
+    addTestTitle("Multiple consecutive tables");
+    processContent(readXml("multiple-consecutive-tables"));
+    assertSize(6);
+    addHorizontalLine();
+  }
 }

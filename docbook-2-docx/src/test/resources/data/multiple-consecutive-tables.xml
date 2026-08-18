@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<article xmlns="http://docbook.org/ns/docbook">
+    <informaltable colsep="1" rowsep="1" frame="all">
+        <tgroup cols="3">
+            <colspec colwidth="33*" colname="col_1"/>
+            <colspec colwidth="33*" colname="col_2"/>
+            <colspec colwidth="34*" colname="col_3"/>
+            <tbody>
+                <row>
+                    <entry valign="top" align="left">
+                        <simpara>Table 1, Row 1, Column 1</simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara>Table 1, Row 1, Column 2</simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara>Table 1, Row 1, Column 3</simpara>
+                    </entry>
+                </row>
+            </tbody>
+        </tgroup>
+    </informaltable>
+    <informaltable colsep="1" rowsep="1" frame="all">
+        <tgroup cols="3">
+            <colspec colwidth="33*" colname="col_1"/>
+            <colspec colwidth="33*" colname="col_2"/>
+            <colspec colwidth="34*" colname="col_3"/>
+            <tbody>
+                <row>
+                    <entry valign="top" align="left">
+                        <simpara>Table 2, Row 1, Column 1</simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara>Table 2, Row 1, Column 2</simpara>
+                    </entry>
+                    <entry valign="top" align="left">
+                        <simpara>Table 2, Row 1, Column 3</simpara>
+                    </entry>
+                </row>
+            </tbody>
+        </tgroup>
+    </informaltable>
+    <note>
+        <simpara>An admonition, also known as a notice, helps draw attention to content with a special label or icon.</simpara>
+        <itemizedlist mark="diamond">
+            <listitem>
+                <simpara>NOTE</simpara>
+            </listitem>
+            <listitem>
+                <simpara>TIP</simpara>
+            </listitem>
+            <listitem>
+                <simpara>IMPORTANT</simpara>
+            </listitem>
+            <listitem>
+                <simpara>CAUTION</simpara>
+            </listitem>
+            <listitem>
+                <simpara>WARNING</simpara>
+            </listitem>
+        </itemizedlist>
+    </note>
+    <simpara>This is a simple paragraph.</simpara>
+</article>

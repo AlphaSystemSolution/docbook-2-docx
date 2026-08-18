@@ -41,6 +41,7 @@ import static com.alphasystem.xml.UnmarshallerConstants.isVariableListEntryType;
 import static com.alphasystem.xml.UnmarshallerConstants.isVariableListType;
 import static com.alphasystem.xml.UnmarshallerConstants.isWarningType;
 
+import com.alphasystem.commons.util.AppUtil;
 import com.alphasystem.commons.util.IdGenerator;
 import com.alphasystem.docbook.ApplicationController;
 import com.alphasystem.docbook.DocumentContext;
@@ -94,6 +95,7 @@ import org.docbook.model.Title;
 import org.docbook.model.VariableList;
 import org.docbook.model.VariableListEntry;
 import org.docbook.model.Warning;
+import org.docx4j.wml.Tbl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -1255,9 +1257,25 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     logger.debug("Processing content: {}", content.getClass().getName());
     final var processedContent = builderFactory.process(content, null);
     if (processedContent != null) {
+      final var context = ApplicationController.getContext();
       processedContent.forEach(
-          obj -> ApplicationController.getContext().getMainDocumentPart().addObject(obj));
+          obj -> {
+            final var lastElementTable = isTable(obj);
+            if (lastElementTable && context.isPreviousElementTable()) {
+              // if this object is a table, and the previous element was a table, then add an empty para to separate two tables
+              // MS Word seems to merge two tables
+              context.getMainDocumentPart().addObject(WmlAdapter.getEmptyParaNoSpacing());
+            }
+            context.getMainDocumentPart().addObject(obj);
+            context.setPreviousElementTable(lastElementTable);
+            logger.debug("Processed content: {}", obj.getClass().getName());
+          });
+
     }
+  }
+
+  private boolean isTable(Object obj) {
+    return AppUtil.isInstanceOf(Tbl.class, obj);
   }
 
   private boolean canProcessText() {
