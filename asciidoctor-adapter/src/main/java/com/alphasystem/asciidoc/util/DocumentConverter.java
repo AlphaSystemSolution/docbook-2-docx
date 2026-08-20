@@ -1,9 +1,9 @@
 package com.alphasystem.asciidoc.util;
 
-import static com.alphasystem.asciidoc.model.Backend.DOC_BOOK;
 import static java.nio.file.Files.exists;
 
 import com.alphasystem.asciidoc.model.AsciiDocumentInfo;
+import com.alphasystem.asciidoc.model.Backend;
 import com.alphasystem.commons.SystemException;
 import java.io.File;
 import java.io.IOException;
@@ -36,22 +36,34 @@ public class DocumentConverter {
   }
 
   public static AsciiDocumentInfo convertToDocBook(final Path srcPath) throws SystemException {
-    String docBookContent;
-    final var docBook = new AsciiDocumentInfo(convertDocument(srcPath));
-    docBook.setBackend(DOC_BOOK.getValue());
-    OptionsBuilder optionsBuilder = docBook.getOptionsBuilder().standalone(true);
+    return convert(Backend.DOC_BOOK, srcPath);
+  }
+
+  public static AsciiDocumentInfo convertToXhtml(final Path srcPath) throws SystemException {
+    return convert(Backend.XHTML, srcPath);
+  }
+
+  public static AsciiDocumentInfo convertToHtml(final Path srcPath) throws SystemException {
+    return convert(Backend.HTML, srcPath);
+  }
+
+  private static AsciiDocumentInfo convert(final Backend backend, final Path srcPath) throws SystemException {
+    String content;
+    final var documentInfo = new AsciiDocumentInfo(convertDocument(srcPath));
+    documentInfo.setBackend(backend.getValue());
+    OptionsBuilder optionsBuilder = documentInfo.getOptionsBuilder().standalone(true);
     try {
       try (Reader reader =
-              Files.newBufferedReader(docBook.getDocumentInfo().getSrcFile().toPath());
-          StringWriter writer = new StringWriter()) {
+                   Files.newBufferedReader(documentInfo.getDocumentInfo().getSrcFile().toPath());
+           StringWriter writer = new StringWriter()) {
         asciiDoctor.convert(reader, writer, optionsBuilder.build());
-        docBookContent = writer.toString();
+        content = writer.toString();
       }
     } catch (IOException e) {
       throw new SystemException(e.getMessage(), e);
     }
-    docBook.setContent(docBookContent);
-    docBook.setDocument(null);
-    return docBook;
+    documentInfo.setContent(content);
+    documentInfo.setDocument(null);
+    return documentInfo;
   }
 }
