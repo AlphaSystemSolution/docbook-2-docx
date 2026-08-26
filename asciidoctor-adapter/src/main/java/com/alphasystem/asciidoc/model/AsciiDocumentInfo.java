@@ -6,6 +6,8 @@ import static org.asciidoctor.SafeMode.UNSAFE;
 
 import java.io.File;
 import java.util.Map;
+
+import com.alphasystem.commons.util.AppUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.asciidoctor.Attributes;
 import org.asciidoctor.Options;
@@ -348,7 +350,11 @@ public class AsciiDocumentInfo {
   public void setSrcFile(File srcFile) {
     final var value = (srcFile == null) ? USER_HOME_DIR : srcFile;
     documentInfo.setSrcFile(value);
-    optionsBuilder.baseDir(value.getParentFile());
+    var parentFile = value.getParentFile();
+    if (parentFile == null) {
+        parentFile = AppUtil.CURRENT_USER_DIR;
+    }
+    optionsBuilder.baseDir(parentFile);
   }
 
   public void populateAttributes(final Document document) {

@@ -99,8 +99,8 @@ public class Main {
 
             Path srcPath = null;
             if (cmd.hasOption(srcOption)) {
-                srcPath = toPath(cmd.getOptionValue(srcOption));
-                if (srcPath == null || !Files.exists(srcPath)) {
+                srcPath = toPath(cmd.getOptionValue(srcOption)).toAbsolutePath();
+                if (!Files.exists(srcPath)) {
                     printHelp("Source path does not exists", helper, options);
                 }
             }
@@ -144,7 +144,7 @@ public class Main {
 
         if (StringUtils.isNotBlank(docBookContentPath)) {
             try {
-                saveDocBookContent(docBookContentPath, docxPath, documentInfo.getContent());
+                saveDocBookContent(docBookContentPath, srcPath, documentInfo.getContent());
             } catch (IOException ex) {
                 System.out.printf("Unable save DocBook content.%n");
             }
@@ -200,11 +200,11 @@ public class Main {
         ZipUtil.extractZipFile(dir.toFile(), docxPath.toString());
     }
 
-    private static void saveDocBookContent(String value, Path docxPath, String content)
+    private static void saveDocBookContent(String value, Path srcPath, String content)
             throws IOException {
         final var parentDir = toPath(value);
         if (Files.isDirectory(parentDir)) {
-            final var fileName = FileUtil.getDocBookFile(docxPath).getFileName().toString();
+            final var fileName = FileUtil.getDocBookFile(srcPath).getFileName().toString();
             final var dockBookFile = Paths.get(value, fileName);
             Files.writeString(dockBookFile, content);
         } else {
