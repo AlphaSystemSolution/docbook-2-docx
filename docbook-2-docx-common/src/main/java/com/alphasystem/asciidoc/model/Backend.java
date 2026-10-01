@@ -5,8 +5,9 @@ package com.alphasystem.asciidoc.model;
  */
 public enum Backend {
   HTML("html", "html"),
+  XHTML("xhtml", "xhtml"),
   DOC_BOOK("docbook", "xml"),
-  WORD("docbook", "xml");
+  WORD("word", "xml");
 
   private final String value;
   private final String extension;

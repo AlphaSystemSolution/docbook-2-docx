@@ -12,6 +12,9 @@ test:
 spotless:
 	$(GRADLE) spotlessApply
 
+publishLocal:
+	$(GRADLE) publishToMavenLocal
+
 all: clean build test
 
 cli:
