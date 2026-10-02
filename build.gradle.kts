@@ -79,12 +79,6 @@ subprojects {
         }
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
-        withJavadocJar()
-        withSourcesJar()
-    }
-
-    tasks.withType<org.gradle.api.publish.tasks.GenerateModuleMetadata>().configureEach {
-        dependsOn(tasks.named("plainJavadocJar"))
     }
 }
 

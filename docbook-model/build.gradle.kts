@@ -29,6 +29,6 @@ sourceSets {
     }
 }
 
-tasks.named<Jar>("sourcesJar") {
+tasks.named<Jar>("plainSourcesJar") {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
