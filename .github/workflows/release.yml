@@ -1,10 +1,6 @@
-name: Run Tests
+name: Release
 
-on:
-  pull_request:
-    branches:
-      - main
-      - v*\+ # Run on hotfix branch
+on: workflow_dispatch
 
 permissions:
   contents: write
@@ -16,12 +12,12 @@ env:
 
 jobs:
   build:
-    name: Build and Test
+    name: Build and Release
     env:
       # OSSRH/Maven Central credentials
       ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USER_NAME }}
       ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
-
+      
       # GPG signing credentials
       ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_IN_MEMORY_KEY }}
       ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_IN_MEMORY_KEY_PASSWORD }}
@@ -39,7 +35,7 @@ jobs:
 
       - name: Setup Java (temurin@25)
         if: matrix.java == 'temurin@25'
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 25
@@ -49,5 +45,5 @@ jobs:
           git config --global user.email "$GIT_AUTHOR_EMAIL"
           git config --global user.name "$GIT_AUTHOR_NAME"
 
-      - name: Run Test
-        run: make all
+      - name: Run Release
+        run: make release
