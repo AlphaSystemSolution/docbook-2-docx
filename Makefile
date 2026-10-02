@@ -14,5 +14,8 @@ spotless:
 
 all: clean build test
 
+publishLocal:
+	$(GRADLE) setReleaseVersion publishToMavenLocal
+	
 cli:
 	$(GRADLE) :asciidoc-docx-cli:shadowJar
