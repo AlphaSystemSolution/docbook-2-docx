@@ -82,6 +82,10 @@ subprojects {
         withJavadocJar()
         withSourcesJar()
     }
+
+    tasks.withType<org.gradle.api.publish.tasks.GenerateModuleMetadata>().configureEach {
+        dependsOn(tasks.named("plainJavadocJar"))
+    }
 }
 
 semverrelease {
