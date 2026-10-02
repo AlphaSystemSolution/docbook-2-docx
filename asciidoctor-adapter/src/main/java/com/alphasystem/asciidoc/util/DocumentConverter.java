@@ -47,15 +47,16 @@ public class DocumentConverter {
     return convert(Backend.HTML, srcPath);
   }
 
-  private static AsciiDocumentInfo convert(final Backend backend, final Path srcPath) throws SystemException {
+  private static AsciiDocumentInfo convert(final Backend backend, final Path srcPath)
+      throws SystemException {
     String content;
     final var documentInfo = new AsciiDocumentInfo(convertDocument(srcPath));
     documentInfo.setBackend(backend.getValue());
     OptionsBuilder optionsBuilder = documentInfo.getOptionsBuilder().standalone(true);
     try {
       try (Reader reader =
-                   Files.newBufferedReader(documentInfo.getDocumentInfo().getSrcFile().toPath());
-           StringWriter writer = new StringWriter()) {
+              Files.newBufferedReader(documentInfo.getDocumentInfo().getSrcFile().toPath());
+          StringWriter writer = new StringWriter()) {
         asciiDoctor.convert(reader, writer, optionsBuilder.build());
         content = writer.toString();
       }

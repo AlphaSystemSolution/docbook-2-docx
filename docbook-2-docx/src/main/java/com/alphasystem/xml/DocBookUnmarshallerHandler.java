@@ -1262,7 +1262,8 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
           obj -> {
             final var lastElementTable = isTable(obj);
             if (lastElementTable && context.isPreviousElementTable()) {
-              // if this object is a table, and the previous element was a table, then add an empty para to separate two tables
+              // if this object is a table, and the previous element was a table, then add an empty
+              // para to separate two tables
               // MS Word seems to merge two tables
               context.getMainDocumentPart().addObject(WmlAdapter.getEmptyParaNoSpacing());
             }
@@ -1270,7 +1271,6 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
             context.setPreviousElementTable(lastElementTable);
             logger.debug("Processed content: {}", obj.getClass().getName());
           });
-
     }
   }
 

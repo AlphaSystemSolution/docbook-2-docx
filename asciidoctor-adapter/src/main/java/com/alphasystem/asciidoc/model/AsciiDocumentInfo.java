@@ -4,10 +4,9 @@ import static com.alphasystem.commons.util.AppUtil.USER_HOME_DIR;
 import static org.apache.commons.lang3.StringUtils.*;
 import static org.asciidoctor.SafeMode.UNSAFE;
 
+import com.alphasystem.commons.util.AppUtil;
 import java.io.File;
 import java.util.Map;
-
-import com.alphasystem.commons.util.AppUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.asciidoctor.Attributes;
 import org.asciidoctor.Options;
@@ -352,7 +351,7 @@ public class AsciiDocumentInfo {
     documentInfo.setSrcFile(value);
     var parentFile = value.getParentFile();
     if (parentFile == null) {
-        parentFile = AppUtil.CURRENT_USER_DIR;
+      parentFile = AppUtil.CURRENT_USER_DIR;
     }
     optionsBuilder.baseDir(parentFile);
   }
