@@ -86,3 +86,9 @@ subprojects {
 semverrelease {
     addUnReleasedCommitsToTagComment.set(true)
 }
+
+tasks.named("setReleaseVersion") {
+    doLast {
+        subprojects { version = rootProject.version }
+    }
+}
