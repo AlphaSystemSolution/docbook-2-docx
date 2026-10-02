@@ -19,3 +19,7 @@ publishLocal:
 	
 cli:
 	$(GRADLE) :asciidoc-docx-cli:shadowJar
+
+release:
+	$(GRADLE) setReleaseVersion publishToMavenCentral createTag pushTag
+	
