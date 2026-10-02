@@ -17,5 +17,12 @@ publishLocal:
 
 all: clean build test
 
+publishLocal:
+	$(GRADLE) setReleaseVersion publishToMavenLocal
+	
 cli:
 	$(GRADLE) :asciidoc-docx-cli:shadowJar
+
+release:
+	$(GRADLE) setReleaseVersion publishToMavenCentral createTag pushTag
+	
