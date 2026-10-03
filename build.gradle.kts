@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.publish) apply false
-    alias(libs.plugins.semverRelease)
     alias(libs.plugins.spotless)
 }
 
@@ -81,8 +80,4 @@ subprojects {
         targetCompatibility = JavaVersion.VERSION_25
         withSourcesJar()
     }
-}
-
-semverrelease {
-    addUnReleasedCommitsToTagComment.set(true)
 }
