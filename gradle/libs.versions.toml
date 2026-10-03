@@ -10,7 +10,7 @@ guice = "7.0.0"
 jaxbImpl = "4.0.8"
 jaxbRuntime =  "4.0.8"
 logbackClassic =  "1.5.32"
-docx4jBuilder =  "0.6.0"
+docx4jBuilder =  "0.6.1"
 reportng = "1.1.4"
 slf4jApi = "2.0.18"
 testng = "7.9.0"
@@ -26,7 +26,6 @@ spotless = "8.4.0"
 shadow = "9.4.1"
 xjc = "1.9.0"
 publish = "0.36.0"
-semver-release-plugin = "0.4.0-SNAPSHOT"
 
 [libraries]
 commonsCli = { module = "commons-cli:commons-cli", version.ref = "commonsCli" }
