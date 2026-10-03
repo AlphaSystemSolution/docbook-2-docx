@@ -5,6 +5,13 @@ plugins {
     java
 }
 
+// Keep the shadowJar task available for local/CI builds, but do not add the
+// shadow JAR variant to the Maven publication. The module is published as a
+// standard Java library (thin JAR + POM dependencies).
+shadow {
+    addShadowVariantIntoJavaComponent = false
+}
+
 dependencies {
     api(project(":asciidoctor-adapter"))
     api(project(":docbook-2-docx"))
@@ -44,16 +51,9 @@ tasks.register("mergeReferenceConf") {
 }
 
 tasks.named<Jar>("jar") {
-    dependsOn(":docbook-2-docx-common:jar")
-    dependsOn(":docbook-model:jar")
-    dependsOn(":asciidoctor-adapter:jar")
-    dependsOn(":docbook-2-docx:jar")
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
     manifest {
         attributes("Main-Class" to "com.alphasystem.docx.cli.Main")
     }
-
-    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
 }
 
 tasks.named<ShadowJar>("shadowJar") {

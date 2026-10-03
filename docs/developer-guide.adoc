@@ -204,12 +204,30 @@ This will:
 ./gradlew build -x test
 ----
 
-==== Create Shadow JAR
+==== Building the CLI Fat JAR Locally
+
+The `asciidoc-docx-cli` module is published to Maven repositories as a standard thin library JAR; its dependencies are declared in the POM rather than bundled. When you need a self-contained executable JAR for local testing or distribution, build the Shadow (fat) JAR:
 
 [source,bash]
 ----
 ./gradlew :asciidoc-docx-cli:shadowJar
 ----
+
+The resulting executable JAR is written to:
+
+[source,text]
+----
+asciidoc-docx-cli/build/libs/asciidoc-docx-cli-<version>-all.jar
+----
+
+Run it directly without any additional classpath:
+
+[source,bash]
+----
+java -jar asciidoc-docx-cli-<version>-all.jar -s input.adoc -d output.docx
+----
+
+This fat JAR bundles all runtime dependencies and the merged `reference.conf` configuration, so it is suitable for standalone use or for attaching to a release.
 
 === Running Tests
 
@@ -501,7 +519,7 @@ Use the `-x` option to save intermediate DocBook XML:
 
 [source,bash]
 ----
-java -jar asciidoc-docx-cli.jar -s input.adoc -x ./debug
+java -jar asciidoc-docx-cli-<version>-all.jar -s input.adoc -x ./debug
 ----
 
 === Examining DOCX Structure
@@ -510,7 +528,7 @@ Use the `-e` option to extract the DOCX package:
 
 [source,bash]
 ----
-java -jar asciidoc-docx-cli.jar -s input.adoc -e ./extracted
+java -jar asciidoc-docx-cli-<version>-all.jar -s input.adoc -e ./extracted
 ----
 
 The extracted directory contains:
