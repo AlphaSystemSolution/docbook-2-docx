@@ -4,7 +4,7 @@ This is a simple text using default style.
 
 This is a paragraph containing styled text, for example *bold*, _italic_, and *_mixed bold + italic_*
 
-[.red]#C#[.green]#O#[.blue]#L#[.fuchsia]#O#[.maroon]#R#
+[.red]##C##[.green]##O##[.blue]##L##[.fuchsia]##O##[.maroon]##R##
 
 .Title of [.red]#formal para#
 Paragraph description is very *important*.
