@@ -18,5 +18,5 @@
         </listitem>
     </itemizedlist>
     <simpara>A simple paragraph <?asciidoc-br?>
-        <phrase role="small">with a line break</phrase></simpara>
+    <phrase role="small">with a line break and in small font size</phrase></simpara>
 </article>
