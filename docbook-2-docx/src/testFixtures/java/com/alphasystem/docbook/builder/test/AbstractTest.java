@@ -80,9 +80,7 @@ public abstract class AbstractTest {
 
   protected void processContent(Object obj) {
     try {
-      final var xml = toXml(obj);
-      System.out.println(xml);
-      unmarshallerTool.unmarshal(xml);
+      unmarshallerTool.unmarshal(toXml(obj));
     } catch (SystemException ex) {
       fail("Test failed", ex);
     }
@@ -90,7 +88,6 @@ public abstract class AbstractTest {
 
   protected void processContent(String xml) {
     try {
-      System.out.println(xml);
       unmarshallerTool.unmarshal(xml);
     } catch (SystemException ex) {
       fail("Test failed", ex);

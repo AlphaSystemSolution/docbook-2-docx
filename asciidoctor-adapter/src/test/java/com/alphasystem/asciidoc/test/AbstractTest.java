@@ -21,7 +21,6 @@ public abstract class AbstractTest extends com.alphasystem.docbook.builder.test.
     try {
       final var content =
           DocumentConverter.convertToDocBook(sourcePath).getDocumentInfo().getContent();
-      System.out.println(content);
       unmarshallerTool.unmarshal(content);
     } catch (SystemException ex) {
       fail("Test failed", ex);
