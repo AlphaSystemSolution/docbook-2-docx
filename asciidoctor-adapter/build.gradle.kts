@@ -6,6 +6,7 @@ dependencies {
     // META-INF/scripts as a directory (AppUtil.processResourceDirectory fails on jar URLs)
     testImplementation(files("${rootDir}/docbook-2-docx/build/classes/java/main"))
     testImplementation(files("${rootDir}/docbook-2-docx/build/resources/main"))
+    testImplementation(files("${rootDir}/docbook-2-docx/build/classes/java/testFixtures"))
     testImplementation(project(":docbook-model"))
     testImplementation(libs.docx4jBuilder)
     testImplementation(libs.vavr)
@@ -25,11 +26,15 @@ tasks.withType<Test>().configureEach {
     systemProperty("docbook-docx.customDirPath", "${rootDir}/custom-scripts")
     systemProperty("target.path", "build/docs")
     systemProperty("data.path", "${projectDir}/src/test/resources/data")
+    systemProperty("output.file.name", "asciidoc_to_docx.docx")
     systemProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.SimpleLog")
 }
 
+tasks.named("compileTestJava") {
+    dependsOn(":docbook-2-docx:classes", ":docbook-2-docx:testFixturesClasses")
+}
+
 tasks.named<Test>("test") {
-    dependsOn(":docbook-2-docx:classes")
     useTestNG {
         suites("testng/testng.xml")
     }

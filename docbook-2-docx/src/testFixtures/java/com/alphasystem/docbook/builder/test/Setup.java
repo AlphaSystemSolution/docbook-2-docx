@@ -22,7 +22,7 @@ public class Setup extends AbstractTest {
     final Path path = get(targetPath);
     if (!Files.exists(path)) {
       try {
-        Files.createDirectory(path);
+        Files.createDirectories(path);
       } catch (IOException e) {
         fail(e.getMessage(), e);
       }

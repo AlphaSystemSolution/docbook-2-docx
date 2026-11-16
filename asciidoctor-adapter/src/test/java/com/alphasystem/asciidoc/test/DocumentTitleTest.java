@@ -18,7 +18,7 @@ public class DocumentTitleTest extends AbstractTest {
     assertSize(2);
     assertText(content.get(content.size() - 2), "Adapter Test Document");
     assertText(
-        content.get(content.size() - 1),
+        content.getLast(),
         "A simple paragraph to verify the asciidoc to docbook to docx pipeline.");
   }
 }

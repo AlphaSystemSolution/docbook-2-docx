@@ -32,7 +32,7 @@ public abstract class AbstractTest {
   private static final String DATA_PATH = System.getProperty("data.path");
   protected static final String FILE_NAME = "docbook_to_docx.docx";
 
-  private final UnmarshallerTool unmarshallerTool = new UnmarshallerTool();
+  protected final UnmarshallerTool unmarshallerTool = new UnmarshallerTool();
   protected final String targetPath = System.getProperty("target.path");
   protected static int previousSize = 0;
   protected static MainDocumentPart mainDocumentPart;
@@ -47,6 +47,10 @@ public abstract class AbstractTest {
 
   public AbstractTest(String testTitle) {
     this.testTitle = testTitle;
+  }
+
+  protected String getFileName() {
+    return System.getProperty("output.file.name", FILE_NAME);
   }
 
   @BeforeClass
@@ -70,11 +74,11 @@ public abstract class AbstractTest {
     updateCount();
   }
 
-  void updateCount() {
+  protected void updateCount() {
     previousSize = mainDocumentPart.getContent().size();
   }
 
-  void processContent(Object obj) {
+  protected void processContent(Object obj) {
     try {
       final var xml = toXml(obj);
       System.out.println(xml);
@@ -84,7 +88,7 @@ public abstract class AbstractTest {
     }
   }
 
-  void processContent(String xml) {
+  protected void processContent(String xml) {
     try {
       System.out.println(xml);
       unmarshallerTool.unmarshal(xml);
@@ -93,18 +97,18 @@ public abstract class AbstractTest {
     }
   }
 
-  void addTestTitle(String title) {
+  protected void addTestTitle(String title) {
     final var titlePara =
         new SimplePara().withId(IdGenerator.nextId()).withRole(DEFAULT_TITLE).withContent(title);
     processContent(createArticle(titlePara));
     updateCount();
   }
 
-  void addHorizontalLine() {
+  protected void addHorizontalLine() {
     mainDocumentPart.addObject(WmlAdapter.getHorizontalLine());
   }
 
-  void assertText(Object obj, String expected) {
+  protected void assertText(Object obj, String expected) {
     assertEquals(getRawText(obj), expected);
   }
 
@@ -144,7 +148,7 @@ public abstract class AbstractTest {
         .collect(Collectors.joining());
   }
 
-  String readXml(String name) {
+  protected String readXml(String name) {
     final var sourcePath = get(DATA_PATH, format("%s.xml", name));
     try {
       return new String(Files.readAllBytes(sourcePath));
@@ -154,11 +158,11 @@ public abstract class AbstractTest {
     return null;
   }
 
-  void assertSize(int expected) {
+  protected void assertSize(int expected) {
     assertEquals(mainDocumentPart.getContent().size() - previousSize, expected);
   }
 
-  long getTableContentSize(Tbl table) {
+  protected long getTableContentSize(Tbl table) {
     return extractContent(0, io.vavr.collection.List.ofAll(table.getContent()));
   }
 

@@ -3,9 +3,9 @@
 <suite name="AsciiDoctorAdapterSuite">
     <test name="Test">
         <classes>
-            <class name="com.alphasystem.asciidoc.test.Setup"/>
+            <class name="com.alphasystem.docbook.builder.test.Setup"/>
             <class name="com.alphasystem.asciidoc.test.DocumentTitleTest"/>
-            <class name="com.alphasystem.asciidoc.test.TearDown"/>
+            <class name="com.alphasystem.docbook.builder.test.TearDown"/>
         </classes>
     </test> <!-- Test -->
 </suite> <!-- Suite -->
