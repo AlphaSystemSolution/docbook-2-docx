@@ -28,12 +28,9 @@ import org.docbook.model.Choice;
 import org.docbook.model.ColumnSpec;
 import org.docbook.model.Frame;
 import org.docbook.model.TableGroup;
-import org.docx4j.jaxb.Context;
 import org.docx4j.wml.CTBorder;
 import org.docx4j.wml.Tbl;
 import org.docx4j.wml.TblBorders;
-import org.docx4j.wml.Tc;
-import org.docx4j.wml.Tr;
 
 public abstract class AbstractTableBuilder<S> extends BlockBuilder<S> {
 
@@ -48,7 +45,6 @@ public abstract class AbstractTableBuilder<S> extends BlockBuilder<S> {
   private boolean keepTableTogether;
   private Tbl table;
   private TableGroup tableGroup;
-  private int numOfColumns;
   protected DocBookTableAdapter docBookTableAdapter;
 
   protected AbstractTableBuilder(S source, Builder<?> parent) {
@@ -116,67 +112,12 @@ public abstract class AbstractTableBuilder<S> extends BlockBuilder<S> {
   @Override
   protected List<Object> doProcess(List<Object> processedChildContent) {
     table.getContent().addAll(processedChildContent);
-    padRows();
     return Collections.singletonList(table);
-  }
-
-  // DocBook rows may omit entries covered by a vertical merge or simply end
-  // before the declared grid width. Word repairs such tables, so synthesize the
-  // missing cells: a vMerge continuation where a merge carries over, otherwise a
-  // plain empty cell.
-  private void padRows() {
-    final var factory = Context.getWmlObjectFactory();
-    final var continuing = new boolean[numOfColumns];
-    for (final var content : table.getContent()) {
-      if (!(content instanceof Tr row)) {
-        continue;
-      }
-      final var cells = new ArrayList<>();
-      var column = 0;
-      for (final var cell : row.getContent()) {
-        if (!(cell instanceof Tc tc)) {
-          cells.add(cell);
-          continue;
-        }
-        while (column < numOfColumns && continuing[column]) {
-          cells.add(emptyCell(factory, true));
-          column++;
-        }
-        cells.add(tc);
-        final var tcPr = tc.getTcPr();
-        var span = 1;
-        if (tcPr != null && tcPr.getGridSpan() != null) {
-          span = tcPr.getGridSpan().getVal().intValue();
-        }
-        final var merged = tcPr != null && tcPr.getVMerge() != null;
-        for (var c = column; c < Math.min(column + span, numOfColumns); c++) {
-          continuing[c] = merged;
-        }
-        column += span;
-      }
-      while (column < numOfColumns) {
-        cells.add(emptyCell(factory, continuing[column]));
-        column++;
-      }
-      row.getContent().clear();
-      row.getContent().addAll(cells);
-    }
-  }
-
-  private static Tc emptyCell(org.docx4j.wml.ObjectFactory factory, boolean continueMerge) {
-    final var tc = factory.createTc();
-    if (continueMerge) {
-      final var tcPr = factory.createTcPr();
-      tcPr.setVMerge(factory.createTcPrInnerVMerge());
-      tc.setTcPr(tcPr);
-    }
-    tc.getContent().add(factory.createP());
-    return tc;
   }
 
   private void initializeTable(
       TableGroup tableGroup, Frame frame, Choice rowSep, Choice colSep, String styleName) {
-    numOfColumns = Integer.parseInt(tableGroup.getCols());
+    int numOfColumns = Integer.parseInt(tableGroup.getCols());
     final List<ColumnSpec> colSpec = tableGroup.getColSpec();
     final boolean noColSpec = (colSpec == null) || colSpec.isEmpty();
     numOfColumns = noColSpec ? numOfColumns : colSpec.size();

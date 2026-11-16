@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.docbook.model.Entry;
 import org.docbook.model.ObjectFactory;
 import org.docbook.model.Row;
@@ -101,19 +102,34 @@ public abstract class TableContentBuilder<S> extends AbstractBuilder<S> {
 
     return Arrays.stream(entries)
         .map(
-            entry -> new Row().withContent(Arrays.stream(entry).filter(Objects::nonNull).toArray()))
+            entry ->
+                new Row()
+                    .withContent(
+                        IntStream.range(0, entry.length)
+                            .mapToObj(i -> Objects.requireNonNullElseGet(entry[i], () -> emptyEntry(i)))
+                            .toArray()))
         .collect(Collectors.toList());
+  }
+
+  // Columns not covered by any entry still need a cell, otherwise the row ends
+  // before the declared grid width and Word repairs the table.
+  private static Entry emptyEntry(int columnIndex) {
+    return OBJECT_FACTORY
+        .createEntry()
+        .withMoreRows(VerticalMergeType.NONE.name())
+        .withNameStart(String.valueOf(columnIndex))
+        .withNameEnd("1");
   }
 
   private int getTotalNumberOfRows(List<Row> rows) {
     var totalRows = rows.size();
 
-    for (Row row : rows) {
-      for (Object obj : row.getContent()) {
+    for (int rowIndex = 0; rowIndex < rows.size(); rowIndex++) {
+      for (Object obj : rows.get(rowIndex).getContent()) {
         if (AppUtil.isInstanceOf(Entry.class, obj)) {
           final var entry = (Entry) obj;
           // +1 since we need to add current column as well
-          final var moreRows = UnmarshallerUtils.toInt(entry.getMoreRows(), -1) + 1;
+          final var moreRows = rowIndex + UnmarshallerUtils.toInt(entry.getMoreRows(), -1) + 1;
           totalRows = Math.max(totalRows, moreRows);
         }
       }
