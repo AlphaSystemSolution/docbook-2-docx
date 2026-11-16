@@ -1,0 +1,23 @@
+// THIS FILE IS AUTO-GENERATED, DO NOT EDIT
+:encoding: utf-8
+:lang: en
+:last-update-label!:
+
+//
+
+// tag::test[]
+[cols="^.^1", align="center", halign="center", valign="center", frame="all", grid="all"]
+|===
+
+// Row 1
+|[arabicNormal]#&#1606;&#1614;&#1589;&#1614;&#1585;&#1614;&#0032;&#1610;&#1614;&#1606;&#1618;&#1614;&#1589;&#1615;&#1585;&#1615;&#0032;&#1606;&#1614;&#1589;&#1618;&#1585;&#1611;&#1575;#
+
+// Row 2
+|[arabicNormal]#&#1601;&#1607;&#1608;#
+
+// Row 3
+|[arabicNormal]#&#1606;&#1614;&#1575;&#1589;&#1616;&#1585;&#1612;#
+
+|===
+// end::test[]
+

@@ -28,9 +28,12 @@ import org.docbook.model.Choice;
 import org.docbook.model.ColumnSpec;
 import org.docbook.model.Frame;
 import org.docbook.model.TableGroup;
+import org.docx4j.jaxb.Context;
 import org.docx4j.wml.CTBorder;
 import org.docx4j.wml.Tbl;
 import org.docx4j.wml.TblBorders;
+import org.docx4j.wml.Tc;
+import org.docx4j.wml.Tr;
 
 public abstract class AbstractTableBuilder<S> extends BlockBuilder<S> {
 
@@ -112,7 +115,28 @@ public abstract class AbstractTableBuilder<S> extends BlockBuilder<S> {
   @Override
   protected List<Object> doProcess(List<Object> processedChildContent) {
     table.getContent().addAll(processedChildContent);
+    terminateNestedTables();
     return Collections.singletonList(table);
+  }
+
+  // A cell ending in a nested table needs a trailing block-level element,
+  // otherwise Word repairs the table.
+  private void terminateNestedTables() {
+    final var factory = Context.getWmlObjectFactory();
+    for (final var content : table.getContent()) {
+      if (!(content instanceof Tr row)) {
+        continue;
+      }
+      for (final var cell : row.getContent()) {
+        if (!(cell instanceof Tc tc)) {
+          continue;
+        }
+        final var tcContent = tc.getContent();
+        if (!tcContent.isEmpty() && tcContent.getLast() instanceof Tbl) {
+          tcContent.add(factory.createP());
+        }
+      }
+    }
   }
 
   private void initializeTable(

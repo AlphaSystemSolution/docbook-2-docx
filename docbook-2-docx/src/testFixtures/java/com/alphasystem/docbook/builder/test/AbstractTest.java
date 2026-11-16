@@ -64,7 +64,7 @@ public abstract class AbstractTest {
   @AfterClass
   public void afterClass() {
     if (StringUtils.isNotBlank(testTitle)) {
-      mainDocumentPart.addObject(WmlAdapter.getPageBreak());
+      mainDocumentPart.addObject(WmlAdapter.getPageBreakPara());
       updateCount();
     }
   }
