@@ -10,7 +10,7 @@
             <thead>
                 <row>
                     <entry valign="top" align="left">
-                        <simpara>Header 1</simpara>
+                        <literal>Header 1</literal>
                     </entry>
                     <entry valign="top" align="left">
                         <simpara>Header 2</simpara>

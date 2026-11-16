@@ -130,8 +130,8 @@ public class TableTest extends AbstractTest {
     processAdoc("table-with-header");
     assertSize(2);
     final var content = mainDocumentPart.getContent();
-    // header cells emitted without simpara wrapper, only body cells counted
-    assertEquals(getTableContentSize((Tbl) content.getLast()), 4);
+    // first header cell is a bare <literal> (wrapped in para), emitting an extra styled run
+    assertEquals(getTableContentSize((Tbl) content.getLast()), 9);
     addHorizontalLine();
   }
 
@@ -151,7 +151,7 @@ public class TableTest extends AbstractTest {
     processAdoc("table-with-header-footer");
     assertSize(2);
     final var content = mainDocumentPart.getContent();
-    assertEquals(getTableContentSize((Tbl) content.getLast()), 8);
+    assertEquals(getTableContentSize((Tbl) content.getLast()), 12);
     addHorizontalLine();
   }
 
