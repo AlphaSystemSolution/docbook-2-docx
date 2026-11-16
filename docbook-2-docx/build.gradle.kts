@@ -2,6 +2,12 @@ plugins {
     `java-test-fixtures`
 }
 
+// keep test fixtures local: don't publish the testFixtures variants/artifacts
+(components["java"] as AdhocComponentWithVariants).apply {
+    withVariantsFromConfiguration(configurations["testFixturesApiElements"]) { skip() }
+    withVariantsFromConfiguration(configurations["testFixturesRuntimeElements"]) { skip() }
+}
+
 dependencies {
     api(project(":docbook-model"))
     api(project(":docbook-2-docx-common"))
