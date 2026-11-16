@@ -1,0 +1,11 @@
+:notitle:
+
+[cols="2*"]
+|===
+|Table 1, Row 1, Column 1 |Table 1, Row 1, Column 2
+|===
+
+[cols="2*"]
+|===
+|Table 2, Row 1, Column 1 |Table 2, Row 1, Column 2
+|===

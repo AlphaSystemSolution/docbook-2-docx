@@ -1,0 +1,3 @@
+:notitle:
+
+TIP: A document title is an _optional_ feature of an _AsciiDoc_ document.

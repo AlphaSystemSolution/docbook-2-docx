@@ -1,0 +1,8 @@
+:notitle:
+
+[frame=none,grid=none,cols="2*"]
+|===
+|TTF |TrueType fonts.
+|PFA, PFB
+a|PostScript fonts. `PFA` files are common on `UNIX` systems, `PFB` files are more common on Windows systems.
+|===

@@ -1,0 +1,9 @@
+:notitle:
+
+Dairy::
+* Milk
+* Eggs
+Bakery::
+* Bread
+Produce::
+* Bananas

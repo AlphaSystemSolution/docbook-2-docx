@@ -1,0 +1,10 @@
+:notitle:
+
+[cols="2*"]
+|===
+a|
+!===
+!Nested 1 !Nested 2
+!===
+|Outer column 2
+|===

@@ -1,0 +1,11 @@
+:notitle:
+
+[cols="2*"]
+|===
+a|
+[NOTE]
+====
+An admonition inside a table cell.
+====
+|Plain cell
+|===

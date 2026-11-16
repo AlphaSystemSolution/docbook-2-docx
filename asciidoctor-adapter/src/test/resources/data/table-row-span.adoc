@@ -1,0 +1,8 @@
+:notitle:
+
+[cols="4*"]
+|===
+.2+|Row 1 and 2 Column1 .4+|Row 1, 2, 3, and 4 Column 2 |Row 1 Column 3 |Row1 Column 4
+.3+|Row 2 and 3 Column 3 |Row 2 Column 4
+.2+|Row 3 and 4 Column 1 .2+|Row 3 and 4 Column 4
+|===

@@ -1,0 +1,6 @@
+:notitle:
+
+TTF:: TrueType fonts.
+PFA::
+PFB::
+PostScript fonts. `PFA` files are common on `UNIX` systems, `PFB` files are more common on Windows systems.

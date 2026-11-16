@@ -5,6 +5,14 @@
         <classes>
             <class name="com.alphasystem.docbook.builder.test.Setup"/>
             <class name="com.alphasystem.asciidoc.test.DocumentTitleTest"/>
+            <class name="com.alphasystem.asciidoc.test.SectionsTest"/>
+            <class name="com.alphasystem.asciidoc.test.InlineTest"/>
+            <class name="com.alphasystem.asciidoc.test.OrderedListTest"/>
+            <class name="com.alphasystem.asciidoc.test.ItemizedListTest"/>
+            <class name="com.alphasystem.asciidoc.test.VariableListTest"/>
+            <class name="com.alphasystem.asciidoc.test.TableTest"/>
+            <class name="com.alphasystem.asciidoc.test.AdmonitionTest"/>
+            <class name="com.alphasystem.asciidoc.test.ProgramListingTest"/>
             <class name="com.alphasystem.docbook.builder.test.TearDown"/>
         </classes>
     </test> <!-- Test -->

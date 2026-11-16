@@ -1,0 +1,8 @@
+:notitle:
+
+.Result of table with footer
+[%footer,cols="4*"]
+|===
+|Row 1, Column 1 |Row 1, Column 2 |Row 1, Column 3 |Row 1, Column 4
+|Footer 1 |Footer 2 |Footer 3 |Footer 4
+|===
