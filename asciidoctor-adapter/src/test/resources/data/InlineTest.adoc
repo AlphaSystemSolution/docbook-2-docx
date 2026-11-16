@@ -17,4 +17,4 @@ List item _text 2_
 * second point
 
 A simple paragraph +
-with a line break
+ [.small]#with a line break and in small font size#
