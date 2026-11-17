@@ -26,6 +26,7 @@ spotless = "8.4.0"
 shadow = "9.4.1"
 xjc = "1.9.0"
 publish = "0.36.0"
+benManesVersions = "0.67.0"
 
 [libraries]
 commonsCli = { module = "commons-cli:commons-cli", version.ref = "commonsCli" }
@@ -60,3 +61,4 @@ spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 xjc = { id = "com.github.bjornvester.xjc", version.ref = "xjc" }
 publish = { id = "com.vanniktech.maven.publish", version.ref = "publish" }
+benManesVersions = { id = "io.github.ben-manes.versions", version.ref = "benManesVersions"}

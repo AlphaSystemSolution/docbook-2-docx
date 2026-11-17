@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.publish) apply false
     alias(libs.plugins.spotless)
+    alias(libs.plugins.benManesVersions)
 }
 
 allprojects {
