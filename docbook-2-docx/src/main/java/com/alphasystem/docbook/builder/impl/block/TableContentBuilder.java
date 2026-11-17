@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.docbook.model.Entry;
 import org.docbook.model.ObjectFactory;
 import org.docbook.model.Row;
@@ -16,6 +17,10 @@ import org.docbook.model.Row;
 public abstract class TableContentBuilder<S> extends AbstractBuilder<S> {
 
   private static final ObjectFactory OBJECT_FACTORY = new ObjectFactory();
+
+  // Marker for columns covered by a horizontal span: the cell is part of the
+  // spanning entry and must not be emitted separately.
+  private static final Entry COVERED = OBJECT_FACTORY.createEntry();
 
   protected TableContentBuilder(S source, Builder<?> parent) {
     super(null, source, parent);
@@ -79,6 +84,7 @@ public abstract class TableContentBuilder<S> extends AbstractBuilder<S> {
           entry.setNameStart(String.valueOf(columnIndex));
           entry.setNameEnd(String.valueOf(gridSpan));
           entries[rowIndex][columnIndex] = entry;
+          markCovered(entries[rowIndex], columnIndex, gridSpan);
 
           // moreRows is gt 0 then fill corresponding column for subsequent rows
           if (moreRows > 0) {
@@ -90,6 +96,7 @@ public abstract class TableContentBuilder<S> extends AbstractBuilder<S> {
                       .withNameStart(String.valueOf(columnIndex))
                       .withNameEnd(String.valueOf(gridSpan));
               entries[rowIndex + i][columnIndex] = nextEntry;
+              markCovered(entries[rowIndex + i], columnIndex, gridSpan);
             }
           }
           columnIndex += gridSpan;
@@ -101,19 +108,49 @@ public abstract class TableContentBuilder<S> extends AbstractBuilder<S> {
 
     return Arrays.stream(entries)
         .map(
-            entry -> new Row().withContent(Arrays.stream(entry).filter(Objects::nonNull).toArray()))
+            entry ->
+                new Row()
+                    .withContent(
+                        IntStream.range(0, entry.length)
+                            .mapToObj(i -> resolveEntry(entry, i))
+                            .filter(Objects::nonNull)
+                            .toArray()))
         .collect(Collectors.toList());
+  }
+
+  private static void markCovered(Object[] row, int columnIndex, int gridSpan) {
+    for (int i = 1; i < gridSpan && columnIndex + i < row.length; i++) {
+      row[columnIndex + i] = COVERED;
+    }
+  }
+
+  private static Entry resolveEntry(Object[] row, int columnIndex) {
+    final var entry = row[columnIndex];
+    if (entry == COVERED) {
+      return null;
+    }
+    return entry == null ? emptyEntry(columnIndex) : (Entry) entry;
+  }
+
+  // Columns not covered by any entry still need a cell, otherwise the row ends
+  // before the declared grid width and Word repairs the table.
+  private static Entry emptyEntry(int columnIndex) {
+    return OBJECT_FACTORY
+        .createEntry()
+        .withMoreRows(VerticalMergeType.NONE.name())
+        .withNameStart(String.valueOf(columnIndex))
+        .withNameEnd("1");
   }
 
   private int getTotalNumberOfRows(List<Row> rows) {
     var totalRows = rows.size();
 
-    for (Row row : rows) {
-      for (Object obj : row.getContent()) {
+    for (int rowIndex = 0; rowIndex < rows.size(); rowIndex++) {
+      for (Object obj : rows.get(rowIndex).getContent()) {
         if (AppUtil.isInstanceOf(Entry.class, obj)) {
           final var entry = (Entry) obj;
           // +1 since we need to add current column as well
-          final var moreRows = UnmarshallerUtils.toInt(entry.getMoreRows(), -1) + 1;
+          final var moreRows = rowIndex + UnmarshallerUtils.toInt(entry.getMoreRows(), -1) + 1;
           totalRows = Math.max(totalRows, moreRows);
         }
       }

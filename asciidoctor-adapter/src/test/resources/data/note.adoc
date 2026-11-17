@@ -1,0 +1,12 @@
+:notitle:
+
+[NOTE]
+====
+An admonition, also known as a notice, helps draw attention to content with a special label or icon.
+
+* NOTE
+* TIP
+* IMPORTANT
+* CAUTION
+* WARNING
+====

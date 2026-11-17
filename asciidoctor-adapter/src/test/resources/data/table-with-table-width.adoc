@@ -1,0 +1,9 @@
+:notitle:
+
+.Table with width
+[cols="15,15,20,25,25",options="header"]
+|===
+|Header 1 |Header 2 |Header 3 |Header 4 |Header 5
+|Row 1, Column 1 |Row 1, Column 2 |Row 1, Column 3 |Row 1, Column 4 |Row 1, Column 5
+|Row 2, Column 1 |Row 2, Column 2 |Row 2, Column 3 |Row 2, Column 4 |Row 2, Column 5
+|===

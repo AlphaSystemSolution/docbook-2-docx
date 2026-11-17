@@ -283,6 +283,14 @@ public class InlineTest extends AbstractTest {
   }
 
   @Test(dependsOnMethods = "testColorCode")
+  public void testInlineTestDocument() {
+    addTestTitle("InlineTest document");
+    processContent(readXml("InlineTest"));
+    assertSize(10);
+    addHorizontalLine();
+  }
+
+  @Test(dependsOnMethods = "testInlineTestDocument")
   public void testTextAlignment() {
     addTestTitle("Text alignment test");
 

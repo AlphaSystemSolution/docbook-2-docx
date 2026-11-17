@@ -1,0 +1,18 @@
+:notitle:
+
+This paragraph contains some *bold text*, some _italic text_, and #default highlighted text#, and few highlighted texts with custom colors: [.highlight-red]#Red#, [.highlight-cyan]#Cyan#, [.highlight-magenta]#Magenta#, [.highlight-green]#Green#.
+
+Chemical formula for water is `H~2~O`.
+
+Einstein's theory of relativity is *E = mc^2^*.
+
+This paragraph contains mixed of English and Arabic text ([.arabicNormal]#سلم#).
+
+[.literal.line-through.green]#This text has multiple roles.# (literal, line-through, and green).
+
+[[linked_section]]
+A paragraph with `xreflabel` (_Text to display_).
+
+Link to <<linked_section>>.
+
+Zayd ate [.underline]#chocolate# [.underline]#at home# [.underline]#yesterday# [.underline]#happily# [.underline]#because he was hungry#.

@@ -1,0 +1,14 @@
+:notitle:
+
+[cols="8*"]
+|===
+3+|{nbsp} .5+|{nbsp} 3.2+|{nbsp} .2+|{nbsp}
+
+|{nbsp} |{nbsp} |{nbsp}
+
+|{nbsp} |{nbsp} |{nbsp} |{nbsp} |{nbsp} |{nbsp} |{nbsp}
+
+|{nbsp} |{nbsp} |{nbsp} |{nbsp} |{nbsp} |{nbsp} |{nbsp}
+
+|{nbsp} |{nbsp} |{nbsp} |{nbsp} |{nbsp} |{nbsp} |{nbsp}
+|===

@@ -1,0 +1,3 @@
+= Adapter Test Document
+
+A simple paragraph to verify the asciidoc to docbook to docx pipeline.

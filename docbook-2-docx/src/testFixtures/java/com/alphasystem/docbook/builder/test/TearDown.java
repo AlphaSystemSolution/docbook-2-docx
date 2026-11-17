@@ -19,7 +19,7 @@ public class TearDown extends AbstractTest {
 
   @AfterSuite
   public void tearDown() {
-    final var file = get(targetPath, FILE_NAME).toFile();
+    final var file = get(targetPath, getFileName()).toFile();
     try {
       WmlAdapter.save(file, ApplicationController.getContext().getWordprocessingMLPackage());
     } catch (Exception e) {

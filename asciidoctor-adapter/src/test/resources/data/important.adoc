@@ -1,0 +1,12 @@
+:notitle:
+
+[IMPORTANT]
+====
+Admonition can contain other block elements, for example, ordered list:
+
+. First
++
+Another para
+. Second
+. Third
+====

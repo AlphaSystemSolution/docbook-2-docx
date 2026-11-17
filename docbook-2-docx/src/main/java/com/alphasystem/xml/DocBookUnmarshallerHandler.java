@@ -13,6 +13,7 @@ import static com.alphasystem.xml.UnmarshallerConstants.isImportantType;
 import static com.alphasystem.xml.UnmarshallerConstants.isInfoType;
 import static com.alphasystem.xml.UnmarshallerConstants.isInformalExampleType;
 import static com.alphasystem.xml.UnmarshallerConstants.isInformalTableType;
+import static com.alphasystem.xml.UnmarshallerConstants.isInlineType;
 import static com.alphasystem.xml.UnmarshallerConstants.isItemizedListType;
 import static com.alphasystem.xml.UnmarshallerConstants.isLinkType;
 import static com.alphasystem.xml.UnmarshallerConstants.isListItemType;
@@ -26,6 +27,7 @@ import static com.alphasystem.xml.UnmarshallerConstants.isRowType;
 import static com.alphasystem.xml.UnmarshallerConstants.isSectionType;
 import static com.alphasystem.xml.UnmarshallerConstants.isSideBarType;
 import static com.alphasystem.xml.UnmarshallerConstants.isSimpleParaType;
+import static com.alphasystem.xml.UnmarshallerConstants.isStringType;
 import static com.alphasystem.xml.UnmarshallerConstants.isSubscriptType;
 import static com.alphasystem.xml.UnmarshallerConstants.isSuperscriptType;
 import static com.alphasystem.xml.UnmarshallerConstants.isTableBodyType;
@@ -419,6 +421,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
   }
 
   private void endEntry() {
+    pushText();
     processEndElement();
   }
 
@@ -788,8 +791,30 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
   }
 
   private void handleEntry(Entry obj, Object child) {
-    obj.getContent().add(child);
+    addEntryContent(obj, child);
     docbookObjects.push(obj);
+  }
+
+  /*
+   * Asciidoctor can emit inline content (e.g. <literal>) or bare text directly under <entry>
+   * without a <simpara>/<para> wrapper. Such content must be wrapped in a Para, otherwise
+   * the builder would place runs directly inside the table cell, producing invalid output.
+   * Consecutive inline children are merged into the same trailing Para.
+   */
+  private void addEntryContent(Entry entry, Object child) {
+    if (isInlineType(child) || isStringType(child)) {
+      final var content = entry.getContent();
+      Para para;
+      if (!content.isEmpty() && isParaType(content.getLast())) {
+        para = (Para) content.getLast();
+      } else {
+        para = new Para().withId(IdGenerator.nextId());
+        content.add(para);
+      }
+      para.getContent().add(child);
+    } else {
+      entry.getContent().add(child);
+    }
   }
 
   private void handleExample(Example obj, Object child) {
@@ -1055,7 +1080,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         docbookObjects.push(obj);
       } else if (isEntryType(parent)) {
         final var obj = (Entry) parent;
-        obj.getContent().add(currentText);
+        addEntryContent(obj, currentText);
         docbookObjects.push(obj);
       } else if (isExampleType(parent)) {
         final var obj = (Example) parent;

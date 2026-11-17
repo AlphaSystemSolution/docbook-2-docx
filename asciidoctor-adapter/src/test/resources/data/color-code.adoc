@@ -1,0 +1,10 @@
+:notitle:
+
+.Result: Rendered Color Codes
+[cols="5*^"]
+|===
+|[.aqua]#Aqua# |[.black]#Black# |[.blue]#Blue# |[.cyan]#Cyan# |[.fuchsia]#Fuchsia#
+|[.gray]#Gray# |[.green]#Green# |[.lime]#Lime# |[.magenta]#Magenta# |[.maroon]#Maroon#
+|[.navy]#Navy# |[.olive]#Olive# |[.purple]#Purple# |[.red]#Red# |[.silver]#Silver#
+|[.teal]#Teal# |[.white]#White# |[.yellow]#Yellow# | {nbsp} | {nbsp}
+|===

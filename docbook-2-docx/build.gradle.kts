@@ -1,6 +1,17 @@
+plugins {
+    `java-test-fixtures`
+}
+
+// keep test fixtures local: don't publish the testFixtures variants/artifacts
+(components["java"] as AdhocComponentWithVariants).apply {
+    withVariantsFromConfiguration(configurations["testFixturesApiElements"]) { skip() }
+    withVariantsFromConfiguration(configurations["testFixturesRuntimeElements"]) { skip() }
+}
+
 dependencies {
     api(project(":docbook-model"))
     api(project(":docbook-2-docx-common"))
+    testFixturesImplementation(libs.testng)
     api(libs.docx4jBuilder)
     api(libs.vavr)
     api(libs.graalvmJs)
@@ -22,7 +33,13 @@ tasks.withType<Test>().configureEach {
     systemProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.SimpleLog")
 }
 
+// java-test-fixtures puts this project's jars on the test classpath; swap them for
+// the output dirs so ApplicationController can walk META-INF/scripts as a directory
+// (AppUtil.processResourceDirectory fails on jar URLs)
+val ownJars = fileTree(layout.buildDirectory.dir("libs"))
 tasks.named<Test>("test") {
+    classpath =
+        classpath - ownJars + sourceSets.main.get().output + sourceSets.testFixtures.get().output
     useTestNG {
         suites("testng/testng.xml")
     }

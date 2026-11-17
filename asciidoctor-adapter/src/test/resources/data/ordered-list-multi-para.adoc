@@ -1,0 +1,6 @@
+:notitle:
+
+. First paragraph of list item, this should contain numeration.
++
+Second paragraph of list item, this should not contain numeration, but should be indented properly.
+. Second bullet point.

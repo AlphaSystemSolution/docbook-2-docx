@@ -1,0 +1,9 @@
+:notitle:
+
+.Result of table with header and footer
+[%header%footer,cols="4*"]
+|===
+|Header 1 |Header 2 |Header 3 |Header 4
+|Row 1, Column 1 |Row 1, Column 2 |Row 1, Column 3 |Row 1, Column 4
+|Footer 1 |Footer 2 |Footer 3 |Footer 4
+|===

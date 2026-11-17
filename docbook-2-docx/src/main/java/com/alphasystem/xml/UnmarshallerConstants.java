@@ -213,4 +213,14 @@ public interface UnmarshallerConstants {
   static boolean isParaTypes(Object o) {
     return isSimpleParaType(o) || isParaType(o) || isFormalParaType(o);
   }
+
+  static boolean isInlineType(Object o) {
+    return isEmphasisType(o)
+        || isLinkType(o)
+        || isLiteralType(o)
+        || isPhraseType(o)
+        || isCrossReferenceType(o)
+        || isSubscriptType(o)
+        || isSuperscriptType(o);
+  }
 }

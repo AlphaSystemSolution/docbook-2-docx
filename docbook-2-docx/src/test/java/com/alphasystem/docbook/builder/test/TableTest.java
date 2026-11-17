@@ -144,7 +144,8 @@ public class TableTest extends AbstractTest {
     processContent(readXml("table-with-header"));
     assertSize(2);
     final var content = mainDocumentPart.getContent();
-    assertEquals(getTableContentSize((Tbl) content.getLast()), 8);
+    // first header cell uses a bare <literal> (wrapped in para), which emits an extra styled run
+    assertEquals(getTableContentSize((Tbl) content.getLast()), 9);
     addHorizontalLine();
   }
 

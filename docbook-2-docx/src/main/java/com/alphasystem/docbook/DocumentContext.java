@@ -67,7 +67,9 @@ public final class DocumentContext {
       final var styleDefinitionsPart = mainDocumentPart.getStyleDefinitionsPart();
       final var styles = styleDefinitionsPart.getContents();
       final var list = styles.getStyle();
-      list.forEach(style -> documentStyles.add(style.getStyleId()));
+      final var seenStyleIds = new HashSet<String>();
+      list.removeIf(style -> !seenStyleIds.add(style.getStyleId()));
+      documentStyles.addAll(seenStyleIds);
 
       if (documentInfo.isSectionNumbers()) {
         wmlPackageBuilder.multiLevelHeading();

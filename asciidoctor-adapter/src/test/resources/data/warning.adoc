@@ -1,0 +1,3 @@
+:notitle:
+
+WARNING: Use *WARNING* to inform the reader of danger, harm, or consequences that exist.
