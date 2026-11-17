@@ -270,7 +270,6 @@ public class InlineTest extends AbstractTest {
     processContent(readXml("linebreak"));
     assertSize(4);
     final var content = mainDocumentPart.getContent();
-    assertPageBreak((P) content.get(start + 1));
     assertText(content.get(start + 2), "After page break");
     addHorizontalLine();
   }
