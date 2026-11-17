@@ -7,8 +7,10 @@ import com.alphasystem.commons.util.AppUtil;
 import com.alphasystem.commons.util.ZipUtil;
 import com.alphasystem.docbook.DocumentBuilder;
 import com.alphasystem.docbook.util.FileUtil;
+import com.alphasystem.docx4j.builder.wml.WmlAdapter;
 import java.awt.*;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -68,6 +70,15 @@ public class Main {
             .get();
     options.addOption(extractPackageOpt);
 
+    final var savePdfOpt =
+        Option.builder("p")
+            .type(Boolean.class)
+            .argName("savePdf")
+            .required(false)
+            .desc("Save PDF")
+            .get();
+    options.addOption(savePdfOpt);
+
     final var saveDocBookContentOpt =
         Option.builder("x")
             .argName("saveDocBookContent")
@@ -121,9 +132,14 @@ public class Main {
       final var openDocument = cmd.hasOption(openDocumentOpt);
 
       if (backend == Backend.WORD) {
-        convertToWord(srcPath, destPath, docBookContentPath, extractPackage, openDocument);
+        destPath =
+            convertToWord(srcPath, destPath, docBookContentPath, extractPackage, openDocument);
       } else {
         convertFile(backend, srcPath, destPath);
+      }
+
+      if (cmd.hasOption(savePdfOpt) && destPath != null) {
+        WmlAdapter.saveAsPdf(destPath.toFile());
       }
 
     } catch (Exception ex) {
@@ -132,7 +148,7 @@ public class Main {
     }
   }
 
-  private static void convertToWord(
+  private static Path convertToWord(
       final Path srcPath,
       final Path docxPath,
       final String docBookContentPath,
@@ -162,6 +178,8 @@ public class Main {
     if (openDocument) {
       Desktop.getDesktop().open(destPath.toFile());
     }
+
+    return destPath;
   }
 
   private static void convertFile(final Backend backend, final Path srcPath, final Path destPath)
@@ -172,7 +190,10 @@ public class Main {
           case XHTML -> DocumentConverter.convertToXhtml(srcPath);
           default -> throw new SystemException("Unsupported backend: " + backend);
         };
-    FileUtils.write(destPath.toFile(), asciiDocumentInfo.getDocumentInfo().getContent());
+    FileUtils.write(
+        destPath.toFile(),
+        asciiDocumentInfo.getDocumentInfo().getContent(),
+        StandardCharsets.UTF_8);
   }
 
   private static Path toPath(String s) {
