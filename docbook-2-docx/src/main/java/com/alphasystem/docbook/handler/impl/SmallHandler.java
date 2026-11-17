@@ -5,8 +5,8 @@ import com.alphasystem.docx4j.builder.wml.RPrBuilder;
 
 public class SmallHandler implements InlineStyleHandler {
 
-    @Override
-    public RPrBuilder applyStyle(RPrBuilder rprBuilder) {
-        return rprBuilder.withSz(16L).withSzCs(16L);
-    }
+  @Override
+  public RPrBuilder applyStyle(RPrBuilder rprBuilder) {
+    return rprBuilder.withSz(16L).withSzCs(16L);
+  }
 }
