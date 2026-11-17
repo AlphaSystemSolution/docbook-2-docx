@@ -326,7 +326,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
       case "asciidoc-pagebreak" ->
           ApplicationController.getContext()
               .getMainDocumentPart()
-              .addObject(WmlAdapter.getPageBreak());
+              .addObject(WmlAdapter.getPageBreakPara());
       case "asciidoc-br", "linebreak" -> currentText += System.lineSeparator();
       case "dbhtml" -> {
         final var tableWidth = parseProcessingInstruction(data, "table-width");
