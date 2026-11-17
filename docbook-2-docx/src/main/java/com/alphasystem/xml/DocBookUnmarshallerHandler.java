@@ -97,6 +97,7 @@ import org.docbook.model.Title;
 import org.docbook.model.VariableList;
 import org.docbook.model.VariableListEntry;
 import org.docbook.model.Warning;
+import org.docx4j.wml.P;
 import org.docx4j.wml.Tbl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -323,10 +324,19 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         documentContext.getDocumentInfo().setSectionNumbers(true);
         ApplicationController.getContext().getWmlPackageBuilder().multiLevelHeading();
       }
-      case "asciidoc-pagebreak" ->
-          ApplicationController.getContext()
-              .getMainDocumentPart()
-              .addObject(WmlAdapter.getPageBreakPara());
+      case "asciidoc-pagebreak" -> {
+        final var mdp = ApplicationController.getContext().getMainDocumentPart();
+        // if the last object is a paragraph, add a page break without adding new paragraph
+        // otherwise add a new paragraph
+        final var content = mdp.getContent();
+        if (content != null && !content.isEmpty()) {
+          final var last = content.getLast();
+          if (AppUtil.isInstanceOf(last.getClass(), P.class)) {
+            final var p = (P) last;
+            p.getContent().add(WmlAdapter.getPageBreak());
+          }
+        } else mdp.addObject(WmlAdapter.getPageBreakPara());
+      }
       case "asciidoc-br", "linebreak" -> currentText += System.lineSeparator();
       case "dbhtml" -> {
         final var tableWidth = parseProcessingInstruction(data, "table-width");
