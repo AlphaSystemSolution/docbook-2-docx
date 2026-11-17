@@ -35,7 +35,7 @@ public class TitleTest extends AbstractTest {
     processContent(createArticle("Document title"));
     final var content = mainDocumentPart.getContent();
     assertSize(1);
-    assertText(content.get(content.size() - 1), "Document title");
+    assertText(content.getLast(), "Document title");
     addHorizontalLine();
   }
 
@@ -46,7 +46,7 @@ public class TitleTest extends AbstractTest {
     processContent(createArticle().withContent(info));
     final var content = mainDocumentPart.getContent();
     assertSize(1);
-    assertText(content.get(content.size() - 1), "Document title سلم");
+    assertText(content.getLast(), "Document title سلم");
     addHorizontalLine();
   }
 

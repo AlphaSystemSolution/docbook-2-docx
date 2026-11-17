@@ -59,7 +59,8 @@ public final class DocumentContext {
       wmlPackageBuilder = new WmlPackageBuilder(inputs).styles(styleFiles);
       final Object customStyles = applicationController.getFunction("styles");
       if (customStyles != null) {
-        wmlPackageBuilder = wmlPackageBuilder.styles(((StylesBuilder) customStyles).getObject());
+          assert wmlPackageBuilder != null;
+          wmlPackageBuilder = wmlPackageBuilder.styles(((StylesBuilder) customStyles).getObject());
       }
 
       wordprocessingMLPackage = wmlPackageBuilder.getPackage();
