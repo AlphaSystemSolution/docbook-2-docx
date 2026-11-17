@@ -1,6 +1,6 @@
 GRADLE = ./gradlew
 
-.PHONY: build, clean, test, spotless, all, publishLocal, cli, printVersion, release
+.PHONY: build clean test spotless all publishLocal cli printVersion release
 
 build:
 	$(GRADLE) build
