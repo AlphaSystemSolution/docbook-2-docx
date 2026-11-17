@@ -1,7 +1,11 @@
 package com.alphasystem.docbook.builder.test;
 
 import static com.alphasystem.docbook.builder.test.DataFactory.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
 
+import com.alphasystem.docbook.util.ConfigurationUtils;
+import java.math.BigInteger;
 import org.testng.annotations.Test;
 
 /**
@@ -11,6 +15,18 @@ public class TitleTest extends AbstractTest {
 
   public TitleTest() {
     super("Titles");
+  }
+
+  @Test
+  public void testNormalStyleFontSize() {
+    final var normalStyle = mainDocumentPart.getStyleDefinitionsPart().getStyleById("Normal");
+    final var fontSize = BigInteger.valueOf(ConfigurationUtils.getInstance().getDefaultFontSize());
+    assertNotNull(normalStyle);
+    assertNotNull(normalStyle.getRPr());
+    assertNotNull(normalStyle.getRPr().getSz());
+    assertNotNull(normalStyle.getRPr().getSzCs());
+    assertEquals(normalStyle.getRPr().getSz().getVal(), fontSize);
+    assertEquals(normalStyle.getRPr().getSzCs().getVal(), fontSize);
   }
 
   @Test

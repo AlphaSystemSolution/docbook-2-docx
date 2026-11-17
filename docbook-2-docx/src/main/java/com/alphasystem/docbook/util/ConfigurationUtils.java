@@ -89,6 +89,10 @@ public class ConfigurationUtils {
     return appConfig;
   }
 
+  public Long getDefaultFontSize() {
+    return appConfig.hasPath("default.font-size") ? appConfig.getLong("default.font-size") : 22;
+  }
+
   public String getTitleStyle(String titleKey) {
     return titlesMap.getOrDefault(titleKey, titlesMap.get("default"));
   }
