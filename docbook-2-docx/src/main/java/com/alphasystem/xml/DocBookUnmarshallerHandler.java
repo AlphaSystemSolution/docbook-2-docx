@@ -329,12 +329,8 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         // if the last object is a paragraph, add a page break without adding new paragraph
         // otherwise add a new paragraph
         final var content = mdp.getContent();
-        if (content != null && !content.isEmpty()) {
-          final var last = content.getLast();
-          if (AppUtil.isInstanceOf(last.getClass(), P.class)) {
-            final var p = (P) last;
-            p.getContent().add(WmlAdapter.getPageBreak());
-          }
+        if (content != null && !content.isEmpty() && content.getLast() instanceof P p) {
+          p.getContent().add(WmlAdapter.getPageBreakRun());
         } else mdp.addObject(WmlAdapter.getPageBreakPara());
       }
       case "asciidoc-br", "linebreak" -> currentText += System.lineSeparator();

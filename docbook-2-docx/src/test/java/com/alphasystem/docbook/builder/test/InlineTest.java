@@ -1,10 +1,18 @@
 package com.alphasystem.docbook.builder.test;
 
 import static com.alphasystem.docbook.builder.test.DataFactory.*;
+import static org.testng.Assert.*;
 
 import com.alphasystem.commons.util.IdGenerator;
+import com.alphasystem.xml.DocBookUnmarshallerHandler;
 import java.util.ArrayList;
 import org.docbook.model.SimplePara;
+import org.docx4j.XmlUtils;
+import org.docx4j.wml.Br;
+import org.docx4j.wml.P;
+import org.docx4j.wml.R;
+import org.docx4j.wml.STBrType;
+import org.docx4j.wml.Tbl;
 import org.testng.annotations.Test;
 
 public class InlineTest extends AbstractTest {
@@ -258,12 +266,58 @@ public class InlineTest extends AbstractTest {
   @Test(dependsOnMethods = "handleFormalWithDefaultTitleStylePara")
   public void lineBreakWithAsciidocBr() {
     addTestTitle("Line break test");
+    final var start = mainDocumentPart.getContent().size();
     processContent(readXml("linebreak"));
-    assertSize(4);
+    assertSize(3);
+    final var content = mainDocumentPart.getContent();
+    assertPageBreak((P) content.get(start + 1));
+    assertText(content.get(start + 2), "After page break");
     addHorizontalLine();
   }
 
   @Test(dependsOnMethods = "lineBreakWithAsciidocBr")
+  public void pageBreakFallback() {
+    final var content = mainDocumentPart.getContent();
+    final var savedContent = new ArrayList<>(content);
+    try {
+      for (boolean afterTable : new boolean[] {false, true}) {
+        content.clear();
+        final var table = new Tbl();
+        if (afterTable) {
+          content.add(table);
+        }
+        new DocBookUnmarshallerHandler().processingInstruction("asciidoc-pagebreak", "");
+        assertEquals(content.size(), afterTable ? 2 : 1);
+        if (afterTable) {
+          assertSame(content.getFirst(), table);
+        }
+        assertPageBreak((P) content.getLast());
+      }
+    } finally {
+      content.clear();
+      content.addAll(savedContent);
+    }
+  }
+
+  private void assertPageBreak(P paragraph) {
+    assertFalse(paragraph.getContent().stream().anyMatch(Br.class::isInstance));
+    assertTrue(paragraph.getContent().getLast() instanceof R);
+    final var run = (R) paragraph.getContent().getLast();
+    assertEquals(run.getContent().size(), 1);
+    assertTrue(run.getContent().getFirst() instanceof Br);
+    assertEquals(((Br) run.getContent().getFirst()).getType(), STBrType.PAGE);
+    try {
+      final var restored =
+          (P) XmlUtils.unwrap(XmlUtils.unmarshalString(XmlUtils.marshaltoString(paragraph)));
+      assertFalse(restored.getContent().stream().anyMatch(Br.class::isInstance));
+      final var restoredRun = (R) restored.getContent().getLast();
+      assertEquals(((Br) restoredRun.getContent().getFirst()).getType(), STBrType.PAGE);
+    } catch (Exception ex) {
+      fail("Page break must survive XML round trip", ex);
+    }
+  }
+
+  @Test(dependsOnMethods = "pageBreakFallback")
   public void testSingleSpace() {
     addTestTitle("Space between two elements");
     processContent(readXml("space-between-two-elements"));
