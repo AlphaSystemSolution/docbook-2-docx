@@ -1,5 +1,10 @@
 package com.alphasystem.asciidoc.test;
 
+import static org.testng.Assert.*;
+
+import org.docx4j.XmlUtils;
+import org.docx4j.wml.Br;
+import org.docx4j.wml.P;
 import org.testng.annotations.Test;
 
 public class InlineTest extends AbstractTest {
@@ -70,9 +75,28 @@ public class InlineTest extends AbstractTest {
   @Test(dependsOnMethods = "internalLinkWithHrefWithLinkContentTest")
   public void lineBreakWithAsciidocBr() {
     addTestTitle("Line break test");
+    final var start = mainDocumentPart.getContent().size();
     processAdoc("linebreak");
-    assertSize(5);
+    final var content = mainDocumentPart.getContent();
+    assertText(content.getLast(), "After page break");
+    assertPageBreak((P) content.getLast());
+    assertSize(3);
+    assertSame(content.get(start + 2), content.getLast());
     addHorizontalLine();
+  }
+
+  private void assertPageBreak(P paragraph) {
+    assertFalse(paragraph.getContent().stream().anyMatch(Br.class::isInstance));
+    assertNotNull(paragraph.getPPr());
+    assertNotNull(paragraph.getPPr().getPageBreakBefore());
+    assertTrue(paragraph.getPPr().getPageBreakBefore().isVal());
+    try {
+      final var restored =
+          (P) XmlUtils.unwrap(XmlUtils.unmarshalString(XmlUtils.marshaltoString(paragraph)));
+      assertTrue(restored.getPPr().getPageBreakBefore().isVal());
+    } catch (Exception ex) {
+      fail("Page break must survive XML round trip", ex);
+    }
   }
 
   @Test(dependsOnMethods = "lineBreakWithAsciidocBr")

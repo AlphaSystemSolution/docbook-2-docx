@@ -10,8 +10,6 @@ import org.docbook.model.SimplePara;
 import org.docx4j.XmlUtils;
 import org.docx4j.wml.Br;
 import org.docx4j.wml.P;
-import org.docx4j.wml.R;
-import org.docx4j.wml.STBrType;
 import org.docx4j.wml.Tbl;
 import org.testng.annotations.Test;
 
@@ -268,9 +266,10 @@ public class InlineTest extends AbstractTest {
     addTestTitle("Line break test");
     final var start = mainDocumentPart.getContent().size();
     processContent(readXml("linebreak"));
-    assertSize(4);
+    assertSize(3);
     final var content = mainDocumentPart.getContent();
     assertText(content.get(start + 2), "After page break");
+    assertPageBreak((P) content.get(start + 2));
     addHorizontalLine();
   }
 
@@ -285,7 +284,10 @@ public class InlineTest extends AbstractTest {
         if (afterTable) {
           content.add(table);
         }
-        new DocBookUnmarshallerHandler().processingInstruction("asciidoc-pagebreak", "");
+        final var handler = new DocBookUnmarshallerHandler();
+        handler.processingInstruction("asciidoc-pagebreak", "");
+        assertEquals(content.size(), afterTable ? 1 : 0);
+        handler.endDocument();
         assertEquals(content.size(), afterTable ? 2 : 1);
         if (afterTable) {
           assertSame(content.getFirst(), table);
@@ -300,17 +302,14 @@ public class InlineTest extends AbstractTest {
 
   private void assertPageBreak(P paragraph) {
     assertFalse(paragraph.getContent().stream().anyMatch(Br.class::isInstance));
-    assertTrue(paragraph.getContent().getLast() instanceof R);
-    final var run = (R) paragraph.getContent().getLast();
-    assertEquals(run.getContent().size(), 1);
-    assertTrue(run.getContent().getFirst() instanceof Br);
-    assertEquals(((Br) run.getContent().getFirst()).getType(), STBrType.PAGE);
+    assertNotNull(paragraph.getPPr());
+    assertNotNull(paragraph.getPPr().getPageBreakBefore());
+    assertTrue(paragraph.getPPr().getPageBreakBefore().isVal());
     try {
       final var restored =
           (P) XmlUtils.unwrap(XmlUtils.unmarshalString(XmlUtils.marshaltoString(paragraph)));
       assertFalse(restored.getContent().stream().anyMatch(Br.class::isInstance));
-      final var restoredRun = (R) restored.getContent().getLast();
-      assertEquals(((Br) restoredRun.getContent().getFirst()).getType(), STBrType.PAGE);
+      assertTrue(restored.getPPr().getPageBreakBefore().isVal());
     } catch (Exception ex) {
       fail("Page break must survive XML round trip", ex);
     }
