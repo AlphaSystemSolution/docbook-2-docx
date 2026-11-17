@@ -9,16 +9,18 @@ import com.alphasystem.docbook.DocumentBuilder;
 import com.alphasystem.docbook.util.FileUtil;
 import java.awt.*;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.apache.commons.cli.*;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public class Main {
 
-  public static void main(String[] args) {
+  static void main(String[] args) throws IOException {
     final var options = new Options();
 
     final var srcOption =
@@ -27,7 +29,7 @@ public class Main {
             .hasArg()
             .required()
             .desc("Specify source Asciidoc file path")
-            .build();
+            .get();
     options.addOption(srcOption);
 
     final var destOption =
@@ -36,7 +38,7 @@ public class Main {
             .hasArg()
             .required(false)
             .desc("Specify destination Docx file path")
-            .build();
+            .get();
     options.addOption(destOption);
 
     final var backendOpt =
@@ -46,7 +48,7 @@ public class Main {
             .hasArg()
             .required(false)
             .desc("Specify backend; allowed values: word, html, xhtml")
-            .build();
+            .get();
     options.addOption(backendOpt);
 
     final var openDocumentOpt =
@@ -55,7 +57,7 @@ public class Main {
             .argName("openDocument")
             .required(false)
             .desc("Open document")
-            .build();
+            .get();
     options.addOption(openDocumentOpt);
 
     final var extractPackageOpt =
@@ -64,7 +66,7 @@ public class Main {
             .hasArg()
             .required(false)
             .desc("Extracted document path in the given directory")
-            .build();
+            .get();
     options.addOption(extractPackageOpt);
 
     final var saveDocBookContentOpt =
@@ -73,13 +75,13 @@ public class Main {
             .hasArg()
             .required(false)
             .desc("Save DocBook content in the given directory")
-            .build();
+            .get();
     options.addOption(saveDocBookContentOpt);
 
     // define parser
     CommandLine cmd;
     CommandLineParser parser = new DefaultParser();
-    HelpFormatter helper = new HelpFormatter();
+    var helper = HelpFormatter.builder().get();
 
     Backend backend = Backend.WORD;
 
@@ -171,7 +173,10 @@ public class Main {
           case XHTML -> DocumentConverter.convertToXhtml(srcPath);
           default -> throw new SystemException("Unsupported backend: " + backend);
         };
-    FileUtils.write(destPath.toFile(), asciiDocumentInfo.getDocumentInfo().getContent());
+    FileUtils.write(
+        destPath.toFile(),
+        asciiDocumentInfo.getDocumentInfo().getContent(),
+        StandardCharsets.UTF_8);
   }
 
   private static Path toPath(String s) {
@@ -181,9 +186,10 @@ public class Main {
     return null;
   }
 
-  private static void printHelp(String s, HelpFormatter helper, Options options) {
+  private static void printHelp(String s, HelpFormatter helper, Options options)
+      throws IOException {
     System.err.println(s);
-    helper.printHelp("Usage:", options);
+    helper.printHelp("Usage:", "", options, "", true);
     System.exit(0);
   }
 

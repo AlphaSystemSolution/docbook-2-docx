@@ -54,6 +54,7 @@ import com.alphasystem.docbook.util.Utils;
 import com.alphasystem.docx4j.builder.wml.TocGenerator;
 import com.alphasystem.docx4j.builder.wml.UnorderedList;
 import com.alphasystem.docx4j.builder.wml.WmlAdapter;
+import com.alphasystem.docx4j.builder.wml.WmlBuilderFactory;
 import jakarta.xml.bind.UnmarshallerHandler;
 import java.util.Arrays;
 import java.util.Objects;
@@ -97,6 +98,7 @@ import org.docbook.model.Title;
 import org.docbook.model.VariableList;
 import org.docbook.model.VariableListEntry;
 import org.docbook.model.Warning;
+import org.docx4j.wml.P;
 import org.docx4j.wml.Tbl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,6 +115,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
   private final ConfigurationUtils configurationUtils = ConfigurationUtils.getInstance();
   private final DocumentContext documentContext;
   private String currentText = "";
+  private boolean pendingPageBreak;
   private int sectionLevel = 0;
   private String xLinkNameSpacePrefix = "xl";
   private final Stack<Object> docbookObjects = new Stack<>();
@@ -134,6 +137,9 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
 
   @Override
   public void endDocument() {
+    if (pendingPageBreak) {
+      addPageBreakFallback();
+    }
     final var documentInfo = documentContext.getDocumentInfo();
     if (documentInfo.isToc() && documentInfo.isSectionNumbers()) {
       new TocGenerator()
@@ -323,10 +329,12 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         documentContext.getDocumentInfo().setSectionNumbers(true);
         ApplicationController.getContext().getWmlPackageBuilder().multiLevelHeading();
       }
-      case "asciidoc-pagebreak" ->
-          ApplicationController.getContext()
-              .getMainDocumentPart()
-              .addObject(WmlAdapter.getPageBreak());
+      case "asciidoc-pagebreak" -> {
+        if (pendingPageBreak) {
+          addPageBreakFallback();
+        }
+        pendingPageBreak = true;
+      }
       case "asciidoc-br", "linebreak" -> currentText += System.lineSeparator();
       case "dbhtml" -> {
         final var tableWidth = parseProcessingInstruction(data, "table-width");
@@ -1280,11 +1288,32 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
 
   private void processContent(Object content) {
     logger.debug("Processing content: {}", content.getClass().getName());
+    if (pendingPageBreak
+        && ((content instanceof SimplePara simplePara && simplePara.getContent().isEmpty())
+            || (content instanceof Para para && para.getContent().isEmpty()))) {
+      return;
+    }
     final var processedContent = builderFactory.process(content, null);
     if (processedContent != null) {
       final var context = ApplicationController.getContext();
       processedContent.forEach(
           obj -> {
+            if (pendingPageBreak) {
+              if (obj instanceof P p) {
+                if (p.getPPr() == null) {
+                  p.setPPr(WmlBuilderFactory.getPPrBuilder().getObject());
+                }
+                p.getPPr()
+                    .setPageBreakBefore(
+                        WmlBuilderFactory.getPPrBuilder()
+                            .withPageBreakBefore(true)
+                            .getObject()
+                            .getPageBreakBefore());
+                pendingPageBreak = false;
+              } else {
+                addPageBreakFallback();
+              }
+            }
             final var lastElementTable = isTable(obj);
             if (lastElementTable && context.isPreviousElementTable()) {
               // if this object is a table, and the previous element was a table, then add an empty
@@ -1297,6 +1326,18 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
             logger.debug("Processed content: {}", obj.getClass().getName());
           });
     }
+  }
+
+  private void addPageBreakFallback() {
+    final var context = ApplicationController.getContext();
+    context
+        .getMainDocumentPart()
+        .addObject(
+            WmlBuilderFactory.getPBuilder()
+                .withPPr(WmlBuilderFactory.getPPrBuilder().withPageBreakBefore(true).getObject())
+                .getObject());
+    context.setPreviousElementTable(false);
+    pendingPageBreak = false;
   }
 
   private boolean isTable(Object obj) {

@@ -7,6 +7,7 @@ import com.alphasystem.docbook.util.ConfigurationUtils;
 import com.alphasystem.docx4j.builder.wml.NumberingHelper;
 import com.alphasystem.docx4j.builder.wml.StylesBuilder;
 import com.alphasystem.docx4j.builder.wml.WmlPackageBuilder;
+import java.math.BigInteger;
 import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.docx4j.jaxb.Context;
@@ -58,9 +59,11 @@ public final class DocumentContext {
       wmlPackageBuilder = new WmlPackageBuilder(inputs).styles(styleFiles);
       final Object customStyles = applicationController.getFunction("styles");
       if (customStyles != null) {
+        assert wmlPackageBuilder != null;
         wmlPackageBuilder = wmlPackageBuilder.styles(((StylesBuilder) customStyles).getObject());
       }
 
+      assert wmlPackageBuilder != null;
       wordprocessingMLPackage = wmlPackageBuilder.getPackage();
       mainDocumentPart = wordprocessingMLPackage.getMainDocumentPart();
 
@@ -70,6 +73,21 @@ public final class DocumentContext {
       final var seenStyleIds = new HashSet<String>();
       list.removeIf(style -> !seenStyleIds.add(style.getStyleId()));
       documentStyles.addAll(seenStyleIds);
+
+      final var normalStyle = styleDefinitionsPart.getStyleById("Normal");
+      if (normalStyle != null) {
+        final var factory = Context.getWmlObjectFactory();
+        if (normalStyle.getRPr() == null) {
+          normalStyle.setRPr(factory.createRPr());
+        }
+        final var fontSize = BigInteger.valueOf(configurationUtils.getDefaultFontSize());
+        final var sz = factory.createHpsMeasure();
+        sz.setVal(fontSize);
+        normalStyle.getRPr().setSz(sz);
+        final var szCs = factory.createHpsMeasure();
+        szCs.setVal(fontSize);
+        normalStyle.getRPr().setSzCs(szCs);
+      }
 
       if (documentInfo.isSectionNumbers()) {
         wmlPackageBuilder.multiLevelHeading();
