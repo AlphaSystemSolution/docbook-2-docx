@@ -268,7 +268,7 @@ public class InlineTest extends AbstractTest {
     addTestTitle("Line break test");
     final var start = mainDocumentPart.getContent().size();
     processContent(readXml("linebreak"));
-    assertSize(3);
+    assertSize(4);
     final var content = mainDocumentPart.getContent();
     assertPageBreak((P) content.get(start + 1));
     assertText(content.get(start + 2), "After page break");

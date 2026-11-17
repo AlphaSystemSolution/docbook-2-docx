@@ -54,6 +54,7 @@ import com.alphasystem.docbook.util.Utils;
 import com.alphasystem.docx4j.builder.wml.TocGenerator;
 import com.alphasystem.docx4j.builder.wml.UnorderedList;
 import com.alphasystem.docx4j.builder.wml.WmlAdapter;
+import com.alphasystem.docx4j.builder.wml.WmlBuilderFactory;
 import jakarta.xml.bind.UnmarshallerHandler;
 import java.util.Arrays;
 import java.util.Objects;
@@ -97,7 +98,6 @@ import org.docbook.model.Title;
 import org.docbook.model.VariableList;
 import org.docbook.model.VariableListEntry;
 import org.docbook.model.Warning;
-import org.docx4j.wml.P;
 import org.docx4j.wml.Tbl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -325,13 +325,11 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
         ApplicationController.getContext().getWmlPackageBuilder().multiLevelHeading();
       }
       case "asciidoc-pagebreak" -> {
-        final var mdp = ApplicationController.getContext().getMainDocumentPart();
-        // if the last object is a paragraph, add a page break without adding new paragraph
-        // otherwise add a new paragraph
-        final var content = mdp.getContent();
-        if (content != null && !content.isEmpty() && content.getLast() instanceof P p) {
-          p.getContent().add(WmlAdapter.getPageBreakRun());
-        } else mdp.addObject(WmlAdapter.getPageBreakPara());
+        final var p =
+            WmlBuilderFactory.getPBuilder()
+                .withPPr(WmlBuilderFactory.getPPrBuilder().withPageBreakBefore(true).getObject())
+                .getObject();
+        ApplicationController.getContext().getMainDocumentPart().addObject(p);
       }
       case "asciidoc-br", "linebreak" -> currentText += System.lineSeparator();
       case "dbhtml" -> {
