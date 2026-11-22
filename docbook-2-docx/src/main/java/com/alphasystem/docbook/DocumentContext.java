@@ -7,6 +7,7 @@ import com.alphasystem.docbook.util.ConfigurationUtils;
 import com.alphasystem.docx4j.builder.wml.NumberingHelper;
 import com.alphasystem.docx4j.builder.wml.StylesBuilder;
 import com.alphasystem.docx4j.builder.wml.WmlPackageBuilder;
+import com.alphasystem.xml.DocBookRenderer;
 import java.math.BigInteger;
 import java.util.*;
 import org.apache.commons.lang3.StringUtils;
@@ -36,6 +37,7 @@ public final class DocumentContext {
   private WmlPackageBuilder wmlPackageBuilder;
   private WordprocessingMLPackage wordprocessingMLPackage;
   private MainDocumentPart mainDocumentPart;
+  private DocBookRenderer docBookRenderer;
   private int tableWidth = 0;
   private boolean keepTogether = false;
   private final NumberingHelper numberingHelper = NumberingHelper.getInstance();
@@ -103,6 +105,14 @@ public final class DocumentContext {
     } catch (Docx4JException | SystemException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public DocBookRenderer getDocBookRenderer() {
+    return docBookRenderer;
+  }
+
+  public void setDocBookRenderer(DocBookRenderer renderer) {
+    this.docBookRenderer = renderer;
   }
 
   public boolean isPreviousElementTable() {
