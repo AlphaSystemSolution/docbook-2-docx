@@ -1,6 +1,7 @@
 package com.alphasystem.docbook.builder.impl;
 
 import com.alphasystem.commons.util.AppUtil;
+import com.alphasystem.docbook.ApplicationController;
 import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.builder.BuilderFactory;
 import com.alphasystem.docbook.util.ConfigurationUtils;
@@ -55,7 +56,10 @@ public abstract class AbstractBuilder<S> implements Builder<S> {
   @Override
   public List<Object> process() {
     preProcess();
-    return doProcess(processChildContent(getChildContent()));
+    final var renderer = ApplicationController.getContext().getDocBookRenderer();
+    final var content = getChildContent();
+    return doProcess(
+        processChildContent(renderer == null ? content : renderer.content(source, content)));
   }
 
   protected void preProcess() {}

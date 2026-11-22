@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 
+@Deprecated
 public class DocBookUnmarshallerHandler implements UnmarshallerHandler, UnmarshallerConstants {
 
   private static final String NEW_LINE = System.lineSeparator();

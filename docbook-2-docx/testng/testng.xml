@@ -4,6 +4,8 @@
     <test name="Test">
         <classes>
             <class name="com.alphasystem.docbook.builder.test.Setup"/>
+            <class name="com.alphasystem.docbook.builder.test.DocBookParserTest"/>
+            <class name="com.alphasystem.docbook.builder.test.DocBookRenderingTest"/>
             <class name="com.alphasystem.docbook.builder.test.TitleTest"/>
             <class name="com.alphasystem.docbook.builder.test.InlineTest"/>
             <class name="com.alphasystem.docbook.builder.test.OrderedListTest"/>
