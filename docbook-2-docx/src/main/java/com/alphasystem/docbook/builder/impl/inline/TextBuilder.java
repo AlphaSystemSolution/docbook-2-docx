@@ -16,7 +16,7 @@ public class TextBuilder extends InlineBuilder<String> {
   @Override
   protected void createRunBuilder() {
     super.createRunBuilder();
-    final var lines = source.split(System.lineSeparator());
+    final var lines = source.split("\\R", -1);
     if (lines.length == 0) {
       return;
     }
