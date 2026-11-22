@@ -56,4 +56,10 @@
             <textobject><phrase>Java Logo</phrase></textobject>
         </mediaobject>
     </informalfigure>
+    <simpara>Inline image: <inlinemediaobject>
+        <imageobject>
+            <imagedata fileref="https://www.vectorlogo.zone/logos/java/java-icon.svg"/>
+        </imageobject>
+        <textobject><phrase>java icon</phrase></textobject>
+    </inlinemediaobject></simpara>
 </article>

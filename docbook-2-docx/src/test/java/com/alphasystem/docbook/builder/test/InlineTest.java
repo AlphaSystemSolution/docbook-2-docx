@@ -304,6 +304,32 @@ public class InlineTest extends AbstractTest {
     }
   }
 
+  @Test
+  public void testInlineMediaObject() {
+    final var imageUrl = getClass().getResource("/images/test.png");
+    assertNotNull(imageUrl);
+    final var media = new org.docbook.model.Inlinemediaobject();
+    final var image = new org.docbook.model.Imageobject();
+    final var imageData = new org.docbook.model.Imagedata();
+    imageData.setFileref(imageUrl.toExternalForm());
+    image.setImagedata(imageData);
+    final var text = new org.docbook.model.TextObject();
+    text.getContent().add(createPhrase(null, "Inline image description"));
+    media.getVideoobjectOrAudioobjectOrImageobject().add(text);
+    media.getVideoobjectOrAudioobjectOrImageobject().add(image);
+
+    addTestTitle("Inline media object");
+    processContent(
+        createArticle(createSimplePara(IdGenerator.nextId(), "Before ", media, " after")));
+    assertSize(1);
+    final var paragraph = mainDocumentPart.getContent().getLast();
+    assertText(paragraph, "Before org.docx4j.wml.Drawing  after");
+    final var xml = XmlUtils.marshaltoString(paragraph);
+    assertTrue(xml.contains("<w:drawing>"));
+    assertTrue(xml.contains("descr=\"Inline image description\""), xml);
+    addHorizontalLine();
+  }
+
   private void assertPageBreak(P paragraph) {
     assertFalse(paragraph.getContent().stream().anyMatch(Br.class::isInstance));
     assertNotNull(paragraph.getPPr());
@@ -342,7 +368,7 @@ public class InlineTest extends AbstractTest {
   public void testInlineTestDocument() {
     addTestTitle("InlineTest document");
     processContent(readXml("InlineTest"));
-    assertSize(18);
+    assertSize(19);
     addHorizontalLine();
   }
 

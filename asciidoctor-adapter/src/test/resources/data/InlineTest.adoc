@@ -38,3 +38,5 @@ image::https://www.vectorlogo.zone/logos/java/java-icon.svg[Java Logo, 256]
 Figure with width (128) and height (128)
 
 image::https://www.vectorlogo.zone/logos/java/java-icon.svg[Java Logo, 128,128]
+
+Inline image: image:https://www.vectorlogo.zone/logos/java/java-icon.svg[]
