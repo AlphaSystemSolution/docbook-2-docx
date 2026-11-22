@@ -41,14 +41,15 @@ public final class DocBookModelNormalizer {
     if (object != null) {
       final var id = element.getAttributeNS("http://www.w3.org/XML/1998/namespace", "id");
       setString(object, "setId", id.isBlank() ? IdGenerator.nextId() : id);
-      if (object instanceof ItemizedList list
-          && (list.getMark() == null || list.getMark().isBlank())) {
-        list.setMark(UnorderedList.values()[0].getStyleName());
-      } else if (object instanceof OrderedList list && list.getNumeration() == null) {
-        list.setNumeration(Numeration.ARABIC);
-      } else if (object instanceof ProgramListing listing
-          && (listing.getRole() == null || listing.getRole().isBlank())) {
-        listing.setRole("ProgramListingCode");
+      switch (object) {
+        case ItemizedList list when (list.getMark() == null || list.getMark().isBlank()) ->
+            list.setMark(UnorderedList.values()[0].getStyleName());
+        case OrderedList list when list.getNumeration() == null ->
+            list.setNumeration(Numeration.ARABIC);
+        case ProgramListing listing
+            when (listing.getRole() == null || listing.getRole().isBlank()) ->
+            listing.setRole("ProgramListingCode");
+        default -> {}
       }
       if (object instanceof Title title) {
         final var parentNode = element.getParentNode();
