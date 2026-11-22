@@ -1,47 +1,6 @@
 package com.alphasystem.xml;
 
-import static com.alphasystem.xml.UnmarshallerConstants.isArticleType;
-import static com.alphasystem.xml.UnmarshallerConstants.isCaptionType;
-import static com.alphasystem.xml.UnmarshallerConstants.isCautionType;
-import static com.alphasystem.xml.UnmarshallerConstants.isColumnSpecType;
-import static com.alphasystem.xml.UnmarshallerConstants.isCrossReferenceType;
-import static com.alphasystem.xml.UnmarshallerConstants.isEmphasisType;
-import static com.alphasystem.xml.UnmarshallerConstants.isEntryType;
-import static com.alphasystem.xml.UnmarshallerConstants.isExampleType;
-import static com.alphasystem.xml.UnmarshallerConstants.isFormalParaType;
-import static com.alphasystem.xml.UnmarshallerConstants.isImportantType;
-import static com.alphasystem.xml.UnmarshallerConstants.isInfoType;
-import static com.alphasystem.xml.UnmarshallerConstants.isInformalExampleType;
-import static com.alphasystem.xml.UnmarshallerConstants.isInformalTableType;
-import static com.alphasystem.xml.UnmarshallerConstants.isInlineType;
-import static com.alphasystem.xml.UnmarshallerConstants.isItemizedListType;
-import static com.alphasystem.xml.UnmarshallerConstants.isLinkType;
-import static com.alphasystem.xml.UnmarshallerConstants.isListItemType;
-import static com.alphasystem.xml.UnmarshallerConstants.isLiteralType;
-import static com.alphasystem.xml.UnmarshallerConstants.isNoteType;
-import static com.alphasystem.xml.UnmarshallerConstants.isOrderedListType;
-import static com.alphasystem.xml.UnmarshallerConstants.isParaType;
-import static com.alphasystem.xml.UnmarshallerConstants.isPhraseType;
-import static com.alphasystem.xml.UnmarshallerConstants.isProgramListingType;
-import static com.alphasystem.xml.UnmarshallerConstants.isRowType;
-import static com.alphasystem.xml.UnmarshallerConstants.isSectionType;
-import static com.alphasystem.xml.UnmarshallerConstants.isSideBarType;
-import static com.alphasystem.xml.UnmarshallerConstants.isSimpleParaType;
-import static com.alphasystem.xml.UnmarshallerConstants.isStringType;
-import static com.alphasystem.xml.UnmarshallerConstants.isSubscriptType;
-import static com.alphasystem.xml.UnmarshallerConstants.isSuperscriptType;
-import static com.alphasystem.xml.UnmarshallerConstants.isTableBodyType;
-import static com.alphasystem.xml.UnmarshallerConstants.isTableFooterType;
-import static com.alphasystem.xml.UnmarshallerConstants.isTableGroupType;
-import static com.alphasystem.xml.UnmarshallerConstants.isTableHeaderType;
-import static com.alphasystem.xml.UnmarshallerConstants.isTableType;
-import static com.alphasystem.xml.UnmarshallerConstants.isTermType;
-import static com.alphasystem.xml.UnmarshallerConstants.isTipType;
-import static com.alphasystem.xml.UnmarshallerConstants.isTitleType;
-import static com.alphasystem.xml.UnmarshallerConstants.isTrType;
-import static com.alphasystem.xml.UnmarshallerConstants.isVariableListEntryType;
-import static com.alphasystem.xml.UnmarshallerConstants.isVariableListType;
-import static com.alphasystem.xml.UnmarshallerConstants.isWarningType;
+import static com.alphasystem.xml.UnmarshallerConstants.*;
 
 import com.alphasystem.commons.util.AppUtil;
 import com.alphasystem.commons.util.IdGenerator;
@@ -60,44 +19,7 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.Stack;
 import org.apache.commons.lang3.StringUtils;
-import org.docbook.model.Article;
-import org.docbook.model.Caution;
-import org.docbook.model.ColumnSpec;
-import org.docbook.model.CrossReference;
-import org.docbook.model.Emphasis;
-import org.docbook.model.Entry;
-import org.docbook.model.Example;
-import org.docbook.model.FormalPara;
-import org.docbook.model.Important;
-import org.docbook.model.InformalExample;
-import org.docbook.model.InformalTable;
-import org.docbook.model.ItemizedList;
-import org.docbook.model.Link;
-import org.docbook.model.ListItem;
-import org.docbook.model.Literal;
-import org.docbook.model.Note;
-import org.docbook.model.Numeration;
-import org.docbook.model.OrderedList;
-import org.docbook.model.Para;
-import org.docbook.model.Phrase;
-import org.docbook.model.ProgramListing;
-import org.docbook.model.Row;
-import org.docbook.model.Section;
-import org.docbook.model.SideBar;
-import org.docbook.model.SimplePara;
-import org.docbook.model.Subscript;
-import org.docbook.model.Superscript;
-import org.docbook.model.Table;
-import org.docbook.model.TableBody;
-import org.docbook.model.TableFooter;
-import org.docbook.model.TableGroup;
-import org.docbook.model.TableHeader;
-import org.docbook.model.Term;
-import org.docbook.model.Tip;
-import org.docbook.model.Title;
-import org.docbook.model.VariableList;
-import org.docbook.model.VariableListEntry;
-import org.docbook.model.Warning;
+import org.docbook.model.*;
 import org.docx4j.wml.P;
 import org.docx4j.wml.Tbl;
 import org.slf4j.Logger;
@@ -151,13 +73,13 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     }
     if (!docbookObjects.isEmpty()) {
       logger.warn("===================================");
-      logger.warn("Docbook objects are non empty");
+      logger.warn("DocBook objects are non empty");
       while (!docbookObjects.isEmpty()) {
         var builder = docbookObjects.pop();
         logger.warn("Object: " + builder.getClass().getName());
       }
 
-      logger.warn("===================================");
+      logger.warn("+++++++++++++++++++++++++++++++++");
     }
   }
 
@@ -199,13 +121,17 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
       case ENTRY -> startEntry(attributes);
       case EXAMPLE -> startExample(id);
       case FORMAL_PARA -> startFormalPara(id, attributes);
+      case IMAGE_DATA -> startImageData(id, attributes);
+      case IMAGE_OBJECT -> startImageObject(id);
       case IMPORTANT -> startImportant(id, attributes);
       case INFORMAL_TABLE -> startInformalTable(id, attributes);
       case INFORMAL_EXAMPLE -> startInformalExample(id);
+      case INFORMAL_FIGURE -> startInformalFigure(id);
       case ITEMIZED_LIST -> startItemizedList(id, attributes);
       case LINK -> startLink(id, attributes);
       case LIST_ITEM -> startListItem();
       case LITERAL -> startLiteral(id, attributes);
+      case MEDIA_OBJECT -> startMediaObject(id);
       case NOTE -> startNote(id, attributes);
       case ORDERED_LIST -> startOrderedList(id, attributes);
       case PARA -> startPara(id, attributes);
@@ -226,6 +152,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
       case TABLE_GROUP -> startTableGroup(attributes);
       case TABLE_HEAD -> startTableHeader(attributes);
       case TERM -> startTerm(id, attributes);
+      case TEXT_OBJECT -> startTextObject(id);
       case TIP -> startTip(id, attributes);
       case TITLE -> startTitle();
       case VARIABLE_LIST -> startVariableList();
@@ -255,13 +182,17 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
       case ENTRY -> endEntry();
       case EXAMPLE -> endExample();
       case FORMAL_PARA -> endFormalPara();
+      case IMAGE_DATA -> endImageData();
+      case IMAGE_OBJECT -> endImageObject();
       case IMPORTANT -> endImportant();
       case INFORMAL_EXAMPLE -> endInformalExample();
+      case INFORMAL_FIGURE -> endInformalFigure();
       case INFORMAL_TABLE -> endInformalTable();
       case ITEMIZED_LIST, ORDERED_LIST -> endList();
       case LINK -> endLink();
       case LIST_ITEM -> endListItem();
       case LITERAL -> endLiteral();
+      case MEDIA_OBJECT -> endMediaObject();
       case NOTE -> endNote();
       case PARA -> endPara();
       case PHRASE -> endPhrase();
@@ -277,6 +208,7 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
       case TABLE_GROUP -> endTableGroup();
       case TABLE_HEAD -> endTableHeader();
       case TERM -> endTerm();
+      case TEXT_OBJECT -> endTextObject();
       case TIP -> endTip();
       case TITLE -> endTitle();
       case VARIABLE_LIST -> endVariableList();
@@ -451,6 +383,28 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     processEndElement();
   }
 
+  private void startImageData(String id, Attributes attributes) {
+    final var imageData =
+        new Imagedata()
+            .withId(id)
+            .withRole(getRole(attributes))
+            .withFileref(getAttributeValue("fileref", attributes));
+    docbookObjects.push(imageData);
+  }
+
+  private void endImageData() {
+    processEndElement();
+  }
+
+  private void startImageObject(String id) {
+    final var imageObject = new Imageobject().withId(id);
+    docbookObjects.push(imageObject);
+  }
+
+  private void endImageObject() {
+    processEndElement();
+  }
+
   private void startImportant(String id, Attributes attributes) {
     final var important = new Important().withId(id).withRole(getRole(attributes));
     docbookObjects.push(important);
@@ -466,6 +420,14 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
   }
 
   private void endInformalExample() {
+    processEndElement();
+  }
+
+  private void startInformalFigure(String id) {
+    docbookObjects.push(new Informalfigure().withId(id));
+  }
+
+  private void endInformalFigure() {
     processEndElement();
   }
 
@@ -537,6 +499,15 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
 
   private void endLiteral() {
     endInline();
+    processEndElement();
+  }
+
+  private void startMediaObject(String id) {
+    final var mediaObject = new MediaObject().withId(id);
+    docbookObjects.push(mediaObject);
+  }
+
+  private void endMediaObject() {
     processEndElement();
   }
 
@@ -721,6 +692,16 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     processEndElement();
   }
 
+  private void startTextObject(String id) {
+    final var textObject = new TextObject().withId(id);
+    docbookObjects.push(textObject);
+  }
+
+  private void endTextObject() {
+    endInline();
+    processEndElement();
+  }
+
   private void startTip(String id, Attributes attributes) {
     final var tip = new Tip().withId(id).withRole(getRole(attributes));
     docbookObjects.push(tip);
@@ -856,11 +837,29 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
     docbookObjects.push(obj);
   }
 
+  private void handleImageObject(Imageobject obj, Object child) {
+    if (isImageDataType(child)) {
+      obj.setImagedata((Imagedata) child);
+    } else {
+      logger.warn("Unhandled child for Imageobject: {}", child.getClass().getName());
+    }
+    docbookObjects.push(obj);
+  }
+
   private void handleInformalExample(InformalExample obj, Object child) {
     if (isInfoType(child) || isCaptionType(child)) {
       logger.warn("Unhandled child for InformalExample: {}", child.getClass().getName());
     } else {
       obj.getContent().add(child);
+    }
+    docbookObjects.push(obj);
+  }
+
+  private void handleInformalFigure(Informalfigure obj, Object child) {
+    if (isMediaObjectType(child)) {
+      obj.getItemizedlistOrOrderedlistOrProcedure().add(child);
+    } else {
+      logger.warn("Unhandled child for Informalfigure: {}", child.getClass().getName());
     }
     docbookObjects.push(obj);
   }
@@ -897,6 +896,15 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
 
   private void handleLiteral(Literal obj, Object child) {
     obj.getContent().add(child);
+    docbookObjects.push(obj);
+  }
+
+  private void handleMediaObject(MediaObject obj, Object child) {
+    if (isImageObjectType(child)) {
+      obj.getContent().add(child);
+    } else {
+      logger.warn("Unhandled child for MediaObject: {}", child.getClass().getName());
+    }
     docbookObjects.push(obj);
   }
 
@@ -1020,6 +1028,11 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
   }
 
   private void handleTerm(Term obj, Object child) {
+    obj.getContent().add(child);
+    docbookObjects.push(obj);
+  }
+
+  private void handleTextObject(TextObject obj, Object child) {
     obj.getContent().add(child);
     docbookObjects.push(obj);
   }
@@ -1187,8 +1200,12 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
           || isTableFooterType(parent)
           || isTableBodyType(parent)
           || isTableType(parent)
-          || isInformalTableType(parent)) {
-        logger.trace("No applicable");
+          || isInformalTableType(parent)
+          || isInformalFigureType(parent)
+          || isMediaObjectType(parent)
+          || isImageObjectType(parent)
+          || isTextObjectType(parent)) {
+        logger.trace("Not applicable");
       } else {
         throw new IllegalArgumentException(
             "Unhandled text in endInline: " + parent.getClass().getName());
@@ -1225,8 +1242,12 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
       handleFormalPara((FormalPara) parent, child);
     } else if (isImportantType(parent)) {
       handleImportant((Important) parent, child);
+    } else if (isImageObjectType(parent)) {
+      handleImageObject((Imageobject) parent, child);
     } else if (isInformalExampleType(parent)) {
       handleInformalExample((InformalExample) parent, child);
+    } else if (isInformalFigureType(parent)) {
+      handleInformalFigure((Informalfigure) parent, child);
     } else if (isInformalTableType(parent)) {
       handleInformalTable((InformalTable) parent, child);
     } else if (isItemizedListType(parent)) {
@@ -1237,6 +1258,8 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
       handleListItem((ListItem) parent, child);
     } else if (isLiteralType(parent)) {
       handleLiteral((Literal) parent, child);
+    } else if (isMediaObjectType(parent)) {
+      handleMediaObject((MediaObject) parent, child);
     } else if (isNoteType(parent)) {
       handleNote((Note) parent, child);
     } else if (isOrderedListType(parent)) {
@@ -1271,6 +1294,8 @@ public class DocBookUnmarshallerHandler implements UnmarshallerHandler, Unmarsha
       handleTableHeader((TableHeader) parent, child);
     } else if (isTermType(parent)) {
       handleTerm((Term) parent, child);
+    } else if (isTextObjectType(parent)) {
+      handleTextObject((TextObject) parent, child);
     } else if (isTipType(parent)) {
       handleTip((Tip) parent, child);
     } else if (isTitleType(parent)) {
