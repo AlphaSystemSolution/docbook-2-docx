@@ -23,12 +23,16 @@ public class ImageDataBuilder extends BlockBuilder<Imagedata> {
       throw new IllegalArgumentException("File reference is required");
     }
 
+    final var mediaObjectBuilder = getParent(MediaObjectBuilder.class);
+    final var altText = mediaObjectBuilder == null ? null : mediaObjectBuilder.getAltText();
+
     R run = null;
     try {
       run =
           ApplicationController.getContext()
               .getImageAdapter()
               .withUrl(URI.create(fileRef).toURL())
+              .withAltText(altText)
               .insertImage();
     } catch (Exception e) {
       logger.error("Failed to insert image", e);

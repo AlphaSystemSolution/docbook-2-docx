@@ -2,9 +2,13 @@ package com.alphasystem.docbook.builder.impl.block;
 
 import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.builder.impl.BlockBuilder;
-import org.docbook.model.MediaObject;
-
+import com.alphasystem.docbook.util.Utils;
 import java.util.List;
+import java.util.stream.Collectors;
+import org.docbook.model.Imageobject;
+import org.docbook.model.Imageobjectco;
+import org.docbook.model.MediaObject;
+import org.docbook.model.TextObject;
 
 public class MediaObjectBuilder extends BlockBuilder<MediaObject> {
 
@@ -13,7 +17,18 @@ public class MediaObjectBuilder extends BlockBuilder<MediaObject> {
   }
 
   @Override
-  protected List<Object> processChildContent(List<Object> childContent) {
-    return super.processChildContent(childContent);
+  protected List<Object> getChildContent() {
+    return source.getContent().stream()
+        .filter(content -> content instanceof Imageobject || content instanceof Imageobjectco)
+        .collect(Collectors.toList());
+  }
+
+  public String getAltText() {
+    return source.getContent().stream()
+        .filter(TextObject.class::isInstance)
+        .map(TextObject.class::cast)
+        .findFirst()
+        .map(textObject -> Utils.getLinkText(textObject.getContent()))
+        .orElse(null);
   }
 }
