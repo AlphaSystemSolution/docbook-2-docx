@@ -156,6 +156,24 @@ public class DocBookRenderingTest extends AbstractTest {
   }
 
   @Test
+  public void figureRendersTitleUnderneathImage() throws Exception {
+    final var imageUrl = getClass().getResource("/images/test.png").toExternalForm();
+    convert(
+        "<figure><title>Figure caption</title><mediaobject><imageobject><imagedata fileref='"
+            + imageUrl
+            + "'/></imageobject><textobject><phrase>Java Logo</phrase></textobject></mediaobject></figure>");
+    final var content = mainDocumentPart.getContent();
+    assertEquals(content.size(), 1);
+    final var paragraph = (P) content.getFirst();
+    assertEquals(paragraph.getPPr().getPStyle().getVal(), "FigureTitle");
+    final var xml = XmlUtils.marshaltoString(paragraph);
+    assertTrue(xml.contains("descr=\"Java Logo\""), xml);
+    assertTrue(xml.contains("<w:br"), xml);
+    assertTrue(xml.indexOf("descr=\"Java Logo\"") < xml.indexOf("<w:br"), xml);
+    assertTrue(xml.indexOf("<w:br") < xml.indexOf("Figure caption"), xml);
+  }
+
+  @Test
   public void conversionFailureReleasesSession() {
     assertThrows(() -> new UnmarshallerTool().unmarshal(article("<unsupported/>")));
     assertNull(ApplicationController.getContext().getDocBookRenderer());
