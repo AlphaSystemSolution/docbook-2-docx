@@ -95,7 +95,18 @@ public final class DataFactory {
     final var r = (XmlRootElement) clazz.getAnnotation(XmlRootElement.class);
     try {
       return jaxbTool.marshall(
-          clazz.getPackageName(), new JAXBElement(new QName(r.namespace(), r.name()), clazz, obj));
+          clazz.getPackageName(),
+          new JAXBElement(
+              new QName(
+                  "##default".equals(r.namespace())
+                      ? clazz
+                          .getPackage()
+                          .getAnnotation(jakarta.xml.bind.annotation.XmlSchema.class)
+                          .namespace()
+                      : r.namespace(),
+                  r.name()),
+              clazz,
+              obj));
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

@@ -115,9 +115,17 @@ Path buildDocument(DocumentInfo documentInfo)
 Path buildDocument(DocumentInfo documentInfo, Path docxPath)
 ----
 
+==== DocBook Parsing and Processing Instructions
+
+`UnmarshallerTool` parses DocBook XML through `DocBookParser`, normalizes the bound model with `DocBookModelNormalizer`, and renders it with `DocBookRenderer`.
+JAXB Binder creates typed objects while a retained DOM preserves processing instructions and their source positions.
+The deprecated SAX handler is not used by the normal conversion path.
+
+See the link:unmarshalling-guide.adoc[DocBook Unmarshalling Guide] for the pipeline, instruction semantics, lifecycle, and builder-extension workflow.
+
 ==== Builder Pattern
 
-Each DocBook element has a corresponding builder:
+Each supported rendered DocBook element has a corresponding builder:
 
 * *Block Builders*: Para, List, Table, Admonition, etc.
 * *Inline Builders*: Emphasis, Link, Literal, etc.
