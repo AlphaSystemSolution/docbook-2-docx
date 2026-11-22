@@ -23,6 +23,9 @@ public class ImageDataBuilder extends BlockBuilder<Imagedata> {
       throw new IllegalArgumentException("File reference is required");
     }
 
+    final var contentWidth = parseSize(source.getContentwidth());
+    final var contentHeight = parseSize(source.getContentdepth());
+
     final var mediaObjectBuilder = getParent(MediaObjectBuilder.class);
     final var altText = mediaObjectBuilder == null ? null : mediaObjectBuilder.getAltText();
 
@@ -33,10 +36,23 @@ public class ImageDataBuilder extends BlockBuilder<Imagedata> {
               .getImageAdapter()
               .withUrl(URI.create(fileRef).toURL())
               .withAltText(altText)
+                  .withWidth(contentWidth)
+                  .withHeight(contentHeight)
               .insertImage();
     } catch (Exception e) {
       logger.error("Failed to insert image", e);
     }
     return Collections.singletonList(run);
+  }
+
+  private Double parseSize(String size) {
+    if (StringUtils.isBlank(size)) {
+      return null;
+    }
+    try {
+      return Double.parseDouble(size);
+    } catch (NumberFormatException e) {
+      return null;
+    }
   }
 }
