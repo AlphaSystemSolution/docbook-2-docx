@@ -1,0 +1,397 @@
+= DocBook Unmarshalling and Processing Instructions
+:toc: left
+:toclevels: 3
+:sectnums:
+:icons: font
+:source-highlighter: rouge
+
+== Purpose
+
+The converter reads DocBook XML into the existing `org.docbook.model` Java classes without manually constructing each element in SAX callbacks.
+It also retains XML processing instructions (PIs), including their target, data, parent, and position relative to other XML nodes.
+
+The implementation uses two complementary representations:
+
+* *JAXB objects* provide typed attributes and child properties for builders.
+* *A DOM document* retains XML nodes that ordinary JAXB properties do not represent, especially processing instructions.
+
+Jakarta XML Binding's `Binder<Node>` associates the DOM elements with their Java objects.
+`ParsedDocBook` captures those associations in identity-based indexes.
+The DOM, rather than a reconstructed JAXB content list, is the authority for PI positions.
+
+IMPORTANT: Preserving a PI does not automatically give it a DOCX rendering effect.
+Known instructions have explicit conversion behavior; unknown instructions remain in the parsed document and produce a warning during renderer initialization.
+
+== Conversion Pipeline
+
+[source,text]
+----
+AsciiDoc
+    |
+    v
+Asciidoctor -> DocBook XML
+                  |
+                  v
+             UnmarshallerTool
+                  |
+                  +-- DocBookParser
+                  |       DOM + JAXB Binder -> ParsedDocBook
+                  |
+                  +-- DocBookModelNormalizer
+                  |       Defaults, IDs, titles, mixed content, table-entry paragraphs
+                  |
+                  +-- DocBookRenderer
+                          PI policy, scoped table options, ordered child traversal
+                                  |
+                                  v
+                             BuilderFactory
+                                  |
+                                  v
+                         Typed DocBook builders
+                                  |
+                                  v
+                        WordprocessingMLPackage
+----
+
+`DocumentBuilder.buildDocument(...)` manages the application context and saves the resulting DOCX package.
+`UnmarshallerTool.unmarshal(String)` keeps its existing public return type, `WordprocessingMLPackage`.
+It performs parsing, normalization, rendering, and cleanup, wrapping conversion failures in `SystemException`.
+
+The deprecated `DocBookUnmarshallerHandler` remains for callers of the old SAX callback API.
+The normal conversion pipeline no longer uses it, so new builders do not need changes to that handler.
+
+== Responsibilities
+
+[cols="1,3",options="header"]
+|===
+|Class |Responsibility
+
+|`DocBookParser`
+|Parse a namespace-aware DOM, create a per-parse JAXB Binder, and bind the document to generated DocBook classes.
+It does not generate Word content or require an active conversion context.
+
+|`ParsedDocBook`
+|Hold the original DOM, the unwrapped typed root, element/object lookup indexes, and PIs in document order.
+
+|`DocBookModelNormalizer`
+|Prepare bound objects for rendering while leaving the original DOM unchanged.
+It requires the active application context for labels and configured styles.
+
+|`DocBookRenderer`
+|Apply supported PI behavior, resolve table settings by ownership, traverse structural containers, coordinate builders, and append Word content.
+
+|`BuilderFactory`
+|Select a builder using the Java model class and the `docbook-docx.builders` configuration.
+It unwraps `JAXBElement` values and delegates through the active renderer.
+
+|`AbstractBuilder`
+|Provide the shared child-processing path.
+During XML conversion, it asks the renderer to interleave relevant PIs with its child content.
+
+|`DocumentContext`
+|Hold the DOCX package and active renderer during conversion, alongside existing document configuration and rendering state.
+|===
+
+The XML-related classes are in `docbook-2-docx/src/main/java/com/alphasystem/xml/`.
+Generated model definitions come from `docbook-model/src/main/resources/docbook.xsd` and `docbook.xjb`.
+Do not edit generated Java sources to add PI support.
+
+== Reading Typed Objects and Inspecting Instructions
+
+The parser can be used independently of DOCX rendering:
+
+[source,java]
+----
+import com.alphasystem.xml.DocBookParser;
+import com.alphasystem.xml.ParsedDocBook;
+import org.docbook.model.Article;
+
+public class InspectDocBook {
+  public ParsedDocBook parse(String source) throws Exception {
+    ParsedDocBook parsed = new DocBookParser().parse(source);
+    Article article = (Article) parsed.getRoot();
+    org.w3c.dom.Node articleNode = parsed.getNode(article);
+    Object sameArticle = parsed.getObject(articleNode);
+
+    if (sameArticle != article) {
+      throw new IllegalStateException("Missing element/object association");
+    }
+    return parsed;
+  }
+}
+----
+
+This example assumes an `<article>` root in the `http://docbook.org/ns/docbook` namespace.
+`getRoot()` returns an `Object`, so check the root type when accepting other document shapes.
+Binding an element does not by itself guarantee that a DOCX builder exists for it.
+
+Use `parsed.getInstructions()` to inspect PIs.
+Each entry is a DOM `ProcessingInstruction`, exposing:
+
+* `getTarget()` and `getData()` for instruction contents.
+* `getParentNode()` for structural ownership.
+* `getPreviousSibling()` and `getNextSibling()` for its position among neighboring nodes.
+
+The returned list is an immutable snapshot of the instruction references, not a deep copy of the DOM.
+The DOM itself is mutable; callers should treat it as read-only after parsing because the association indexes are not automatically rebuilt after edits.
+Not every XML node has a bound Java object: text and PI nodes, for example, are not element/object associations.
+Synthetic paragraphs created during normalization also have no original DOM element.
+
+== Normalization and Mixed Content
+
+For example:
+
+[source,xml]
+----
+<article xmlns="http://docbook.org/ns/docbook">
+  <simpara>before<?linebreak?>after <emphasis>styled</emphasis></simpara>
+</article>
+----
+
+Ordinary JAXB unmarshalling does not place `<?linebreak?>` in a generated `getContent()` property.
+It can also coalesce text on either side of an ignored PI.
+Simply examining JAXB's text-list indexes is therefore insufficient to recover the instruction's original position.
+
+The normalizer inspects fields annotated with `@XmlMixed` and rebuilds their content from the DOM's child order:
+
+. Text and CDATA nodes supply text content.
+. Child elements supply their already-bound typed Java objects.
+. `asciidoc-br` and `linebreak` PIs become newline strings for text rendering.
+. Other PIs remain instruction objects in the mixed-content list.
+
+The example's effective paragraph content becomes:
+
+[source,text]
+----
+"before", newline, "after ", Emphasis("styled")
+----
+
+The original PI node still exists in `ParsedDocBook`, even when its rendering representation is a newline string.
+`TextBuilder` preserves standalone and trailing newlines when splitting text into Word text and break nodes.
+
+The normalizer also:
+
+* Preserves explicit `xml:id` values and supplies missing IDs on objects with an ID setter.
+* Supplies default list marks, ordered-list numeration, and the `ProgramListingCode` role.
+* Applies configured title styles using section depth and the parent model class, and associates titles with their parent IDs.
+* Registers explicit `xreflabel` values; the renderer registers title-derived labels as titles are processed.
+* Keeps program-listing whitespace and meaningful ordinary mixed-content text, while filtering formatting whitespace according to the current normalization rules.
+* Wraps consecutive bare text, PIs, and registered inline elements inside a table `<entry>` in a synthetic `Para`.
+Block children terminate that inline group.
+
+The entry rule is important because Word table cells need block content rather than runs placed directly inside the cell.
+Inline classification comes from registered `InlineBuilder` subclasses, not a parser switch listing every supported inline element.
+
+== Processing-Instruction Behavior
+
+[cols="1,2,3",options="header"]
+|===
+|Target |Example |Conversion behavior
+
+|`asciidoc-toc`
+|`<?asciidoc-toc?>`
+|Enable the document TOC flag.
+TOC generation runs after rendering when both TOC and section-numbering flags are enabled.
+
+|`asciidoc-numbered`
+|`<?asciidoc-numbered?>`
+|Enable section numbering and initialize multilevel headings before rendering.
+
+|`asciidoc-br`, `linebreak`
+|`<?linebreak?>`
+|Become newline content in mixed-content elements and render as Word line-break nodes.
+
+|`asciidoc-pagebreak`
+|`<?asciidoc-pagebreak?>`
+|Record a pending page break and apply it at a block-content boundary.
+
+|`dbhtml`
+|`<?dbhtml table-width="60%"?>`
+|Supply `table-width` to the owning table.
+
+|`dbfo`
+|`<?dbfo keep-together="always"?>`
+|Supply `keep-together` to the owning table.
+`dbfo table-width` is not interpreted as a width setting.
+
+|`dblatex`
+|`<?dblatex table-width="60%"?>`
+|Retain the instruction without applying a rendering effect.
+
+|Other targets
+|`<?custom value="example"?>`
+|Retain the instruction and warn during renderer initialization; do not invent a rendering effect.
+|===
+
+Document-wide flags and table layout settings are examined during renderer initialization.
+Page breaks are consumed during rendering, with an identity-based consumed set preventing the same PI from taking effect twice.
+Source preservation includes PIs in metadata or otherwise unrendered content; it does not mean every instruction location is a meaningful rendering location.
+
+=== Page Breaks and Empty Paragraphs
+
+Asciidoctor can emit a page break inside an otherwise empty paragraph:
+
+[source,xml]
+----
+<simpara>Before</simpara>
+<simpara><?asciidoc-pagebreak?></simpara>
+<simpara>After</simpara>
+----
+
+The middle paragraph must not consume the break by producing an empty Word paragraph.
+The renderer recognizes PI-only paragraphs, processes their instructions, and leaves the page break pending for the next real content.
+The `After` paragraph receives the Word paragraph property `pageBreakBefore`.
+
+A break before a table is kept outside its cells by inserting a fallback paragraph when needed.
+Consecutive breaks and breaks remaining at the end of the document also use fallback paragraphs.
+The output appender retains the separator paragraph between adjacent Word tables so Word does not merge them.
+
+=== Table Ownership
+
+Table directives are indexed before a table builder initializes its layout.
+This is necessary because a directive may be physically inside the table even though the builder needs the setting before processing rows.
+
+[source,xml]
+----
+<informaltable>
+  <?dbhtml table-width="60%"?>
+  <?dbfo keep-together="always"?>
+  <tgroup cols="1">
+    <colspec colname="col_1" colwidth="100*"/>
+    <tbody>
+      <row><entry>Cell content</entry></row>
+    </tbody>
+  </tgroup>
+</informaltable>
+----
+
+Ownership follows these rules:
+
+. A PI inside a table belongs to its nearest ancestor `<table>` or `<informaltable>`.
+An inner table's directives therefore do not overwrite the outer table's settings.
+. If there is no ancestor table, the renderer searches later siblings for the next table element.
+It does not recursively search unrelated containers.
+. If neither exists, no table setting is applied.
+
+Pseudo-attribute parsing accepts single or double quotes and whitespace around `=`.
+The scoped settings are loaded into the existing context immediately before building their table; existing table initialization reads and resets them.
+
+== Builder Dispatch and Specialized Traversal
+
+`BuilderFactory` looks up the unwrapped model class in `docbook-docx.builders`.
+A missing registration produces an error naming that class.
+
+Ordinary builders inherit child traversal from `AbstractBuilder`.
+The active renderer's `content(source, fallback)` method supplements the builder's selected child list with source-positioned PIs where needed.
+Without an active renderer, builders continue to use their ordinary child lists.
+
+Specialized builders still control semantic transformations, such as selecting table rows, rendering a title separately, or combining variable-list terms.
+A custom builder that bypasses the shared traversal must account for PIs itself.
+`LinkSupportBuilder` is an example: it builds a hyperlink label rather than recursively rendering every child, so it explicitly calls `consumeInstructions(source)` and handles line breaks in label text.
+
+Reference attributes need similar care.
+The schema declares attributes such as `linkend` and `endterm` as `xs:IDREF`; JAXB may represent a reference as an object rather than its original string.
+`DocBookRenderer.attribute(...)` reads the lexical XML value from the associated element when available.
+`LinkSupportBuilder` uses it to retain anchor values, including unresolved references, instead of assuming JAXB returned a string.
+
+== Adding an Element Builder
+
+For an element already represented in the supplied DocBook schema:
+
+. Implement a builder using the appropriate generated model class and existing base class.
+. Register the model-to-builder mapping in `docbook-docx.builders`.
+. Add rendering and PI-ordering tests, including nested or table-entry usage where relevant.
+
+The existing `CodeBuilder` demonstrates the complete inline builder:
+
+[source,java]
+----
+include::../docbook-2-docx/src/main/java/com/alphasystem/docbook/builder/impl/inline/CodeBuilder.java[]
+----
+
+Its registration is:
+
+[source,hocon]
+----
+docbook-docx.builders {
+  org.docbook.model.Code = com.alphasystem.docbook.builder.impl.inline.CodeBuilder
+}
+----
+
+It supports input such as:
+
+[source,xml]
+----
+<simpara xmlns="http://docbook.org/ns/docbook">
+  Before <code>first<?linebreak?>second</code> after.
+</simpara>
+----
+
+No element-specific start, end, or child-attachment branches are needed in the parser or deprecated SAX handler.
+The `schemaBoundExtensionNeedsOnlyBuilderRegistration` regression test exercises `<code>` both in a paragraph and as inline table-entry content.
+
+NOTE: This does not make arbitrary XML renderable.
+An element absent from the schema still needs schema/binding support and regenerated models.
+An element with novel layout or traversal semantics may need specialized builder logic.
+
+== Lifecycle, Security, and Limitations
+
+* `JAXBContext` is cached; each parse gets a new DOM and Binder.
+`ParsedDocBook` stores the resulting lookup indexes, not a shared Binder instance.
+* Normalization and rendering use the active `DocumentContext`.
+`UnmarshallerTool` clears its renderer reference and resets transient table options in a `finally` block, including after failures.
+* Parsing uses a `StringReader`, avoiding platform-default byte conversion for Java strings.
+* XML parsing is namespace-aware and uses secure processing.
+DOCTYPE declarations, external entities, external DTD/schema access, and XInclude are disabled.
+Documents requiring a DOCTYPE declaration are rejected rather than resolved over the network.
+* Both the DOM and typed graph are held in memory.
+This is not a bounded-memory streaming parser.
+* Preservation is structural, not byte-for-byte source preservation: XML parser normalization still applies, and no original source line/column index is provided.
+* Generated model classes have no new PI-specific fields.
+Before normalization, use the retained DOM and instruction index rather than expecting ordinary JAXB getters to expose PIs.
+* Normalization changes the Java graph for rendering but does not update the DOM.
+Do not assume ordinary JAXB marshalling of the normalized graph will recreate the input XML or preserve PIs.
+XML editing and lossless XML round-tripping are not part of this pipeline.
+
+Keep the existing JAXB Reference Implementation provider.
+Do not add MOXy or introduce a provider override to obtain PI support; PI preservation here comes from retaining the DOM.
+
+== Verification and Troubleshooting
+
+Run from the repository root:
+
+[source,bash]
+----
+./gradlew :docbook-2-docx:test :asciidoctor-adapter:test
+./gradlew check
+----
+
+The converter suite explicitly lists its test classes in `docbook-2-docx/testng/testng.xml`.
+Register additional test classes there so the suite executes them.
+
+[cols="1,3",options="header"]
+|===
+|Test |Coverage
+
+|`DocBookParserTest`
+|DOM/object associations, PI ordering, Unicode/CDATA, references and table structures, and external-entity rejection.
+
+|`DocBookRenderingTest`
+|Mixed-content instructions, page-break placement and PI-only paragraphs, scoped table widths, lexical references, session cleanup, and builder-only extension.
+
+|Converter `InlineTest`
+|Existing inline behavior, actual Word line-break nodes, and page-break fallback/round-trip checks on generated Word paragraphs.
+
+|Asciidoctor adapter `InlineTest`
+|The real AsciiDoc-to-DocBook-to-DOCX path, including Asciidoctor's page-break representation.
+|===
+
+If a PI appears to be missing, first inspect `ParsedDocBook.getInstructions()` to distinguish parsing/storage from rendering behavior.
+If it is present but has no output effect, check its target, location, owning table if relevant, and whether a specialized builder bypasses the shared child path.
+For a missing page break after `<<<`, check that a PI-only `<simpara>` is not being rendered as an empty paragraph.
+
+== Related Documentation
+
+* link:developer-guide.adoc[Developer Guide]
+* link:api-reference.adoc[API Reference]
+* link:elements-reference.adoc[Supported Elements Reference]

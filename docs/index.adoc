@@ -86,6 +86,7 @@ This creates `input.docx` in the same directory as the source file.
 === Developer Documentation
 
 * link:developer-guide.adoc[Developer Guide] - Architecture, modules, and contribution guidelines
+* link:unmarshalling-guide.adoc[DocBook Unmarshalling Guide] - Typed XML parsing, processing instructions, and builder extension
 * link:api-reference.adoc[API Reference] - Programmatic usage and library integration
 
 == Project Modules

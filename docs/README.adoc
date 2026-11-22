@@ -17,6 +17,7 @@ This directory contains comprehensive documentation for the AsciiDoc to Word Con
 === Developer Documentation
 
 * link:developer-guide.adoc[*Developer Guide*] - Architecture, modules, building, and contributing
+* link:unmarshalling-guide.adoc[*DocBook Unmarshalling Guide*] - JAXB Binder, processing-instruction preservation, and adding element builders
 * link:api-reference.adoc[*API Reference*] - Programmatic usage and library integration
 
 == Example Documents
