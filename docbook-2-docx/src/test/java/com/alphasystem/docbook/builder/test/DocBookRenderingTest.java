@@ -142,6 +142,20 @@ public class DocBookRenderingTest extends AbstractTest {
   }
 
   @Test
+  public void informalFigureUsesTextObjectPhraseAsImageAltText() throws Exception {
+    final var imageUrl = getClass().getResource("/images/test.png").toExternalForm();
+    convert(
+        "<informalfigure><mediaobject><imageobject><imagedata fileref='"
+            + imageUrl
+            + "'/></imageobject><textobject><phrase>Java Logo</phrase></textobject></mediaobject></informalfigure>");
+    final var content = mainDocumentPart.getContent();
+    assertEquals(content.size(), 1);
+    final var xml = XmlUtils.marshaltoString(content.getFirst());
+    assertTrue(xml.contains("descr=\"Java Logo\""), xml);
+    assertFalse(xml.contains(">Java Logo<"), xml);
+  }
+
+  @Test
   public void conversionFailureReleasesSession() {
     assertThrows(() -> new UnmarshallerTool().unmarshal(article("<unsupported/>")));
     assertNull(ApplicationController.getContext().getDocBookRenderer());
