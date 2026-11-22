@@ -96,6 +96,241 @@ The XML-related classes are in `docbook-2-docx/src/main/java/com/alphasystem/xml
 Generated model definitions come from `docbook-model/src/main/resources/docbook.xsd` and `docbook.xjb`.
 Do not edit generated Java sources to add PI support.
 
+== Internal Walkthrough of the Three Stages
+
+These classes divide the work into binding, rendering preparation, and Word generation.
+They do not each parse the XML independently: all three stages share one `ParsedDocBook`, and the normalizer and builders work with the same bound Java object instances.
+
+=== DocBookParser: Build the Two Representations
+
+Source: link:../docbook-2-docx/src/main/java/com/alphasystem/xml/DocBookParser.java[DocBookParser.java].
+
+==== Lazy JAXB Context Initialization
+
+The nested `ContextHolder` initializes its static `CONTEXT` when first accessed.
+`createContext()` calls `JAXBContext.newInstance("org.docbook.model")`, allowing JAXB to discover the generated model package.
+The context caches binding metadata; it is not a parsed document or a reusable Binder containing previous input.
+If context creation raises `JAXBException`, this helper wraps it in `IllegalStateException`.
+
+==== parse(String source)
+
+The method performs these steps in order:
+
+. Create a new `DocumentBuilderFactory` and enable namespace awareness.
+This lets XML names be interpreted by namespace URI and local name rather than by a particular prefix spelling.
+. Enable secure processing, reject DOCTYPE declarations, disable external entity processing and XInclude, and prohibit external DTD/schema access.
+. Parse the Java string through `StringReader` and `InputSource` into a DOM `Document`.
+PIs remain DOM nodes between their original siblings; this stage does not execute them.
+. Obtain a new Binder from the cached JAXB context and call `binder.unmarshal(document)`.
+JAXB constructs and attaches the generated model objects according to the schema-derived mappings.
+. Construct `ParsedDocBook(document, binder, root)` and return it.
+
+The `ParsedDocBook` constructor unwraps any root `JAXBElement`, then recursively indexes the DOM.
+For each element with a Binder association, it records both `Node -> Object` and `Object -> Node` identity mappings.
+It also collects PI nodes in document order, including those outside the root element.
+The Binder is used to build these indexes and is not retained as a field in `ParsedDocBook`.
+
+The parser does not assign rendering defaults, register cross-reference labels, select builders, or create a Word package.
+It also does not attach a runtime XSD validator; JAXB binding should not be confused with complete validation of every allowed input structure.
+Parsing and binding exceptions propagate to the caller; `UnmarshallerTool` wraps ordinary conversion exceptions in `SystemException`.
+
+=== DocBookModelNormalizer: Prepare Bound Objects In Place
+
+Source: link:../docbook-2-docx/src/main/java/com/alphasystem/xml/DocBookModelNormalizer.java[DocBookModelNormalizer.java].
+
+The constructor stores the parsed representation.
+`normalize()` starts at the DOM document element with section level zero.
+Unlike parsing, normalization uses the active application context for label registration and configured title styles.
+It changes the bound Java graph, not the original DOM.
+
+==== normalize(Element element, int level)
+
+This recursive method has a before-children phase and an after-children phase:
+
+. Increment the local depth if the element is a `<section>`.
+Passing depth as a method argument means returning from a nested section naturally restores the caller's level.
+. Look up the bound Java object for the DOM element.
+When one exists, read namespace-qualified `xml:id` and use the existing value or generate a replacement through `setString(..., "setId", ...)`.
+. Apply model-specific defaults using the guarded type switch: a missing itemized-list mark, missing ordered-list numeration, or blank program-listing role.
+Explicit nonblank values are not replaced by those defaults.
+. For a `Title`, find the effective parent object.
+A title immediately inside `<info>` uses that element's parent instead of the `Info` object.
+Set the title ID from the effective parent and choose its role through `ConfigurationUtils.getTitleStyle(level, parentClass)`.
+. Register a nonblank `xreflabel` in the document context.
+. Recurse into child elements, whether or not this element itself has a bound object.
+. After children have been normalized, rebuild this object's mixed content.
+If the object is an `Entry`, wrap its consecutive inline content in paragraphs.
+
+This ordering makes parent IDs available when titles are prepared and makes normalized child objects available when parent mixed-content lists are rebuilt.
+The normalizer does not reconstruct ordinary element-only relationships: JAXB already attached those children.
+
+==== normalizeMixedContent(Element element, Object object)
+
+The method examines the model class's declared fields and acts only on fields annotated with `@XmlMixed`.
+Using reflection avoids a separate paragraph/emphasis/phrase parser branch for every generated mixed-content type.
+
+For each matching field, it obtains or creates the list, clears its existing contents, and rebuilds it by visiting the element's direct DOM children:
+
+* `asciidoc-br` and `linebreak` PI nodes contribute `System.lineSeparator()` strings.
+* Other PI nodes contribute the actual `ProcessingInstruction` objects.
+* Text and CDATA contribute their string value when it is nonblank, exactly one ordinary space, or inside a `ProgramListing`.
+Thus program listings keep all such whitespace, while other formatting-only whitespace is filtered by this specific rule.
+* Child elements contribute their already-bound, unwrapped Java objects when an association exists.
+* Other DOM node types, such as comments, do not become rendering-list entries.
+
+The DOM text is the source of the rebuilt list, so text coalescing performed by JAXB cannot shift a PI to the wrong position.
+The method does not duplicate DOM text by appending it to the old JAXB list.
+If reflective field access fails, it raises an `IllegalStateException` naming the model class.
+
+==== wrapEntryContent(Entry entry)
+
+The method copies the existing entry list, clears it, and walks the copy with a current-paragraph variable.
+A string, PI, or object recognized by `BuilderFactory.isInline(...)` joins the current synthetic `Para`; the first such item starts a paragraph with a generated ID.
+A non-inline child is added directly and clears the current-paragraph variable.
+Subsequent inline content therefore starts a new paragraph rather than being merged across a block element.
+
+These synthetic paragraph objects belong to the rendering graph only.
+They have no original DOM element, so code using source associations must tolerate a missing lookup.
+
+==== isLineBreak(...) and setString(...)
+
+`isLineBreak(...)` centralizes recognition of the two supported inline-break targets.
+The renderer uses this same predicate when supplementing child lists, preventing those instructions from being inserted again after normalization has turned them into newline strings.
+
+`setString(...)` invokes an optional public setter accepting a `String`.
+A missing setter is ignored, allowing models without an ID property to pass through normalization.
+Other reflective invocation failures are surfaced as `IllegalStateException` rather than silently ignored.
+
+=== DocBookRenderer: Coordinate Builders and Word Output
+
+Source: link:../docbook-2-docx/src/main/java/com/alphasystem/xml/DocBookRenderer.java[DocBookRenderer.java].
+
+The renderer uses the existing `DocumentContext` and Word package; it does not construct a second package.
+Its main per-conversion state is:
+
+[cols="1,3",options="header"]
+|===
+|Field |Purpose
+
+|`parsed`
+|The shared parsed representation, including the original DOM and source associations.
+
+|`context`
+|The active document context containing the Word package, labels, and document settings.
+
+|`tableOptions`
+|An identity-keyed map from owning table DOM nodes to recognized layout values.
+
+|`consumed`
+|An identity-based set of PI nodes already visited by traversal-time instruction handling.
+
+|`pendingPageBreaks`
+|A count of requested breaks not yet applied to Word block output.
+|===
+
+==== Constructor and indexTableOptions(...)
+
+The constructor scans every retained PI once to prepare document-wide and layout state.
+It enables TOC/numbering flags, initializes multilevel headings when requested, indexes recognized table directives, and warns for unknown targets.
+It recognizes line/page-break targets without executing their positional effects during this initial scan.
+
+`indexTableOptions(...)` walks ancestors to find the nearest table; without one, it searches later siblings for a table.
+It selects the supported pseudo-attribute for the PI target, extracts quoted values with the `ATTRIBUTE` pattern, removes percent signs, and stores the value under that table node.
+Later matching values for the same table and option overwrite earlier values.
+A directive with no matching owner or supported pseudo-attribute adds no option.
+
+==== render(), renderContainer(...), and append(...)
+
+`render()` begins traversal at the DOM `Document`, flushes any remaining pending breaks as fallback paragraphs, and finally generates a TOC when both TOC and section numbering are enabled.
+
+`renderContainer(...)` handles structural routing:
+
+* Direct PI children go to `instruction(...)`.
+* `<article>` and `<section>` recurse into their contents rather than needing a rendering builder of their own.
+* `<info>` contributes its direct `<title>` elements through the builder factory; other metadata is not generally rendered by this branch.
+* `<date>` is ignored here.
+* Other elements are looked up as typed objects, passed to `BuilderFactory.process(...)`, and their returned Word objects are appended.
+An element without a bound object raises an error instead of being sent to a builder as a DOM element.
+
+`append(...)` inserts a separator paragraph between adjacent top-level Word tables, adds the object to the main document part, and updates the previous-element-table flag.
+It is an output-list operation, not another XML traversal.
+
+==== process(...): Wrap One Builder Invocation
+
+The factory calls this method with a source object and a deferred builder invocation.
+This allows the renderer to do work before builder construction/processing and to inspect the resulting Word objects afterward.
+
+. If the source is a PI, consume its supported traversal-time effect and return an empty output list; no normal model builder is instantiated for it.
+. For `Para` and `SimplePara` containing only PI objects, including an empty list, process those instructions first.
+If a page break is now pending, skip that empty paragraph so it does not consume the break.
+. For a `Title`, derive display text and register its label if nonblank.
+Existing context label-registration rules retain earlier labels such as explicit `xreflabel` values.
+. If the source is associated with a table element, load that table's indexed options into the context before the table builder initializes.
+. Temporarily set aside breaks already pending before a table's builder runs.
+This prevents the table's nested cell paragraphs from consuming a break intended to precede the table itself.
+. Invoke the supplied builder operation and restore the set-aside break count.
+If there is no returned content or no pending break, return the builder output unchanged.
+. Otherwise, inspect returned Word objects.
+For paragraph output, set `pageBreakBefore` for a pending break.
+Extra consecutive breaks, or breaks before table output, become fallback paragraphs created by `pageBreak()`.
+Other output types pass through without consuming a pending block break.
+
+The builders remain responsible for constructing their Word structures.
+The renderer coordinates instruction state around them instead of duplicating paragraph, list, or table rendering implementations.
+
+==== content(...), consumeInstructions(...), and attribute(...)
+
+`content(source, fallback)` adapts a builder's selected child list:
+
+. A null list becomes an empty list.
+. If there is no source DOM association, return the supplied list unchanged, supporting synthetic or programmatically created objects.
+If the list already contains a PI object, also return it unchanged rather than interleaving instructions a second time.
+. Otherwise, copy the list and inspect the source element's direct DOM children.
+Match bound child objects by identity to advance an insertion cursor; insert non-line-break PI nodes at that cursor.
+Line-break PIs are excluded because mixed-content normalization handles their newline representation.
+
+This is a supplement to the builder's content selection, not a universal replacement for it.
+Specialized builders still determine which title, row group, term, or other semantic child collections they render.
+
+`consumeInstructions(object)` resolves its source DOM node and recursively visits descendant PIs.
+Specialized builders can call it when their normal processing bypasses shared child traversal.
+It delegates to `instruction(...)`, which adds each PI node to `consumed` and increments the pending-break count only for a previously unconsumed `asciidoc-pagebreak` node.
+This method does not itself emit inline Word content.
+
+`attribute(object, name, fallback)` prefers the literal attribute string on the source element.
+Without such an attribute, it returns a string fallback directly, an ID derived from an object fallback, or null.
+This is used where JAXB's IDREF object representation would otherwise hide the original reference string.
+
+=== How Control Moves Between the Stages
+
+The central call sequence is:
+
+[source,text]
+----
+UnmarshallerTool.unmarshal(source)
+  DocBookParser.parse(source) -> ParsedDocBook
+  DocBookModelNormalizer.normalize()
+  new DocBookRenderer(parsed)
+  context.setDocBookRenderer(renderer)
+  renderer.render()
+    renderContainer(node)
+      BuilderFactory.process(model, parent)
+        renderer.process(model, parent, deferredBuilder)
+          builder.process()
+            preProcess()
+            getChildContent()
+            renderer.content(source, selectedChildren)
+            processChildContent(children)
+              BuilderFactory.process(child, this)
+            doProcess(processedChildren)
+      append(wordObject)
+  finally: clear renderer and reset transient table options
+----
+
+The builder subtree repeats the factory/renderer cycle for nested content; specialized builder overrides can alter their part of this sequence.
+The same DOM and bound model objects remain in use throughout, while Word objects are created separately and added to the existing package.
+Clearing the renderer reference in `UnmarshallerTool` releases the conversion context's link to the parsed representation after success or failure.
+
 == Reading Typed Objects and Inspecting Instructions
 
 The parser can be used independently of DOCX rendering:
