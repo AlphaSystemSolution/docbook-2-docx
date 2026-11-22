@@ -334,6 +334,159 @@ NOTE: This does not make arbitrary XML renderable.
 An element absent from the schema still needs schema/binding support and regenerated models.
 An element with novel layout or traversal semantics may need specialized builder logic.
 
+== Adding a New Model
+
+Use this workflow when the required element is not already represented in `docbook-model/src/main/resources/docbook.xsd`.
+If the schema already defines the element, first check its JAXB name in `docbook.xjb`; you may only need a builder, as described above.
+Do not create a handwritten class in `org.docbook.model` alongside generated classes or edit Java files under `build/`.
+
+=== Define the XML Contract
+
+Decide the element's XML name, namespace, attributes, allowed children, and valid parent elements before changing the schema.
+Distinguish an inline element containing mixed text from a block element containing paragraphs or other blocks.
+
+The example below introduces a hypothetical `<custominline>` element, mapped to `CustomInline`.
+It is a project-specific extension for illustration, not a standard DocBook element and not an element currently supplied by this project.
+Adding it to the DocBook namespace changes the local schema; XML using it will not necessarily validate against an unmodified official DocBook schema.
+If interoperability requires a separate extension namespace, design and bind that schema explicitly rather than merely changing the XML prefix.
+
+=== Add the Element to the Schema
+
+Add this declaration inside the existing `<xs:schema>` in `docbook-model/src/main/resources/docbook.xsd`:
+
+[source,xml]
+----
+<xs:element name="custominline">
+    <xs:complexType mixed="true">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element ref="docbook:emphasis"/>
+            <xs:element ref="docbook:literal"/>
+        </xs:choice>
+        <xs:attribute name="role"/>
+        <xs:attributeGroup ref="docbook:db.common.attributes"/>
+    </xs:complexType>
+</xs:element>
+----
+
+`mixed="true"` permits text before, between, and after child elements and allows XJC to generate mixed-content metadata used by the normalizer.
+The common attribute group supplies attributes such as `xml:id` and `xreflabel`; `role` is declared separately, following existing inline elements.
+Add linking attributes or other properties only if the new element needs them.
+For a block model, follow a comparable existing block declaration instead of copying this inline content model.
+
+Defining a global element is not enough to make it a valid child of existing models.
+For every intended parent, add a reference to the appropriate existing content choice:
+
+[source,xml]
+----
+<xs:element ref="docbook:custominline"/>
+----
+
+For example, add that reference inside the existing `<xs:choice>` of `<simpara>` to allow inline paragraph usage.
+Also update the relevant choices for `<para>`, `<title>`, or `<entry>` if those placements are required.
+Do not replace their existing children or add references to every container indiscriminately.
+The example's own child choice permits emphasis and literal content, not arbitrary elements or recursive `<custominline>` nesting.
+
+IMPORTANT: A global element can bind successfully on its own while being omitted from a parent's generated child mapping.
+The parser does not install the XSD as a runtime validation schema, so nested binding tests are essential; the absence of a validation error is not proof that the new child was retained.
+
+=== Customize the Generated Java Name
+
+Inside the existing `<jaxb:bindings schemaLocation="docbook.xsd">` block in `docbook-model/src/main/resources/docbook.xjb`, add:
+
+[source,xml]
+----
+<jaxb:bindings node="xs:element[@name='custominline']">
+    <jaxb:class name="CustomInline"/>
+</jaxb:bindings>
+----
+
+The surrounding binding file already declares the JAXB and XML Schema namespaces and selects the `org.docbook.model` package.
+The snippet is a child of that existing schema binding, not a complete standalone binding file.
+
+Class renaming is optional when XJC's default name is already suitable.
+Use binding customizations for stable class, property, and enum names rather than renaming generated Java files.
+For element-only child collections, follow existing `jaxb:property` customizations if a predictable getter such as `getContent()` is needed by a builder.
+Inspect the generated API before choosing a builder's child getter; not every content model produces the same properties.
+
+=== Regenerate and Compile
+
+Run from the repository root:
+
+[source,bash]
+----
+./gradlew :docbook-model:xjc :docbook-model:compileJava :docbook-2-docx:compileJava
+----
+
+The XJC plugin reads the model resources and configured binding file.
+`docbook-model/build.gradle.kts` enables the fluent API and default-value options and adds `docbook-model/build/generated/sources/xjc/java` to the main source set.
+The normal build invokes the required generation task as part of compilation as well.
+
+Inspect the generated `CustomInline` class, its attributes and child properties, and the generated `ObjectFactory`.
+For mixed content, verify the expected `@XmlMixed` list and its accessor, typically `getContent()`.
+Resolve generation collisions or unexpected names in the XSD/XJB, not in generated sources.
+Commit the schema and binding changes, not ignored generated build output.
+
+The parser discovers models through `JAXBContext.newInstance("org.docbook.model")` and the generated package metadata.
+For an element generated into this existing package, no parser element switch or manual context class list is needed.
+Rebuild and restart a running application after adding generated classes because the JAXB context is cached.
+
+=== Connect the Model to Rendering
+
+Once `CustomInline` has been generated, create a builder using the same pattern as `CodeBuilder`:
+
+[source,java]
+----
+package com.alphasystem.docbook.builder.impl.inline;
+
+import static com.alphasystem.docbook.handler.InlineHandlerFactory.LITERAL;
+
+import com.alphasystem.docbook.builder.Builder;
+import com.alphasystem.docbook.builder.impl.InlineBuilder;
+import org.docbook.model.CustomInline;
+
+public class CustomInlineBuilder extends InlineBuilder<CustomInline> {
+
+  public CustomInlineBuilder(CustomInline source, Builder<?> parent) {
+    super(LITERAL, source, parent);
+  }
+}
+----
+
+This illustrative builder applies the existing literal style; select the appropriate rendering behavior for the real element.
+Register it in `docbook-2-docx/src/main/resources/reference.conf`, inside `docbook-docx.builders`, or in the corresponding application configuration:
+
+[source,hocon]
+----
+org.docbook.model.CustomInline = com.alphasystem.docbook.builder.impl.inline.CustomInlineBuilder
+----
+
+The constructor must accept the exact generated model class and a `Builder<?>` parent because the factory instantiates builders reflectively.
+Inheriting from `InlineBuilder` also lets table-entry normalization recognize the new element as inline content.
+Ordinary model construction, child attachment, and PI preservation remain shared; do not add start/end branches to the deprecated handler.
+
+=== Test the Full Path
+
+After applying the illustrative schema, binding, and builder changes, use a nested fixture such as:
+
+[source,xml]
+----
+<article xmlns="http://docbook.org/ns/docbook">
+  <simpara>Before <custominline xml:id="custom-1">first<?linebreak?><emphasis>second</emphasis></custominline> after.</simpara>
+</article>
+----
+
+Verify all of the following:
+
+* Parsing produces a `CustomInline` instance associated with the `<custominline>` DOM element, and the parent model actually contains that instance.
+* Attributes, text order, nested elements, and surrounding spaces survive binding and normalization.
+* The PI is still present at its original DOM position, and DOCX output contains the intended Word break node.
+* Every supported placement is covered, including table-entry wrapping if `<entry>` was extended.
+* Builder registration is exercised through `UnmarshallerTool`, not only by directly constructing the builder.
+* New test classes are registered in `docbook-2-docx/testng/testng.xml`.
+
+Run the converter and adapter suites and `./gradlew check` using the commands in the verification section below.
+If input originates in AsciiDoc, also arrange for the producer to emit the new element and add an adapter integration test; adding a model does not change Asciidoctor's output automatically.
+
 == Lifecycle, Security, and Limitations
 
 * `JAXBContext` is cached; each parse gets a new DOM and Binder.
