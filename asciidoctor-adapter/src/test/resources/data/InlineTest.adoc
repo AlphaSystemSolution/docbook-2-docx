@@ -30,3 +30,11 @@ Figure with caption
 
 .Java Logo
 image::https://www.vectorlogo.zone/logos/java/java-icon.svg[Java Logo]
+
+Figure with width (256) only
+
+image::https://www.vectorlogo.zone/logos/java/java-icon.svg[Java Logo, 256]
+
+Figure with width (128) and height (128)
+
+image::https://www.vectorlogo.zone/logos/java/java-icon.svg[Java Logo, 128,128]
