@@ -276,6 +276,143 @@ It does not recursively search unrelated containers.
 Pseudo-attribute parsing accepts single or double quotes and whitespace around `=`.
 The scoped settings are loaded into the existing context immediately before building their table; existing table initialization reads and resets them.
 
+== Adding a Processing Instruction
+
+A new PI does not normally require an XSD change, a generated model class, or a SAX callback.
+`DocBookParser` and `ParsedDocBook` already retain its target, data, and DOM position.
+What you add is its interpretation and rendering behavior.
+There is currently no configuration-based PI handler registry: supported targets are handled explicitly by the normalizer and renderer.
+
+=== Define Scope and Timing First
+
+Specify the target name, accepted data, valid placement, effect, and behavior for missing or invalid values.
+Also decide whether repeated instructions replace a setting, accumulate effects, or are ignored.
+Choose the processing point based on those semantics:
+
+[cols="1,2,3",options="header"]
+|===
+|Instruction kind |Implementation point |Guidance
+
+|Document-wide setting
+|`DocBookRenderer` constructor
+|Follow `asciidoc-toc` or `asciidoc-numbered`.
+The constructor scans all retained PIs before rendering, regardless of their source position.
+Use this only when the setting genuinely applies to the whole conversion.
+
+|Positional block effect
+|`DocBookRenderer.instruction(...)`, `process(...)`, and possibly `render()`
+|Follow the pending-page-break pattern.
+Record state as traversal encounters the PI and apply it at the appropriate Word block boundary.
+Define end-of-document behavior for any unconsumed state.
+
+|Inline content effect
+|`DocBookModelNormalizer.normalizeMixedContent(...)` and the rendering path for that content
+|A line-break alias can reuse `isLineBreak(...)`.
+A different inline effect needs an explicit representation and emission logic; recognizing its name alone will not produce Word content.
+
+|Element-scoped layout setting
+|Renderer initialization, an ownership index, and the owning builder
+|Follow `indexTableOptions(...)`.
+Determine ownership before the builder initializes layout and prevent nested elements from sharing or overwriting one another's settings.
+|===
+
+Do not apply a positional instruction in the constructor merely because that is the first place it is visible.
+Doing so would execute it before the content that precedes it in the XML.
+Conversely, a table layout directive discovered only while rendering rows may be too late for table initialization.
+
+=== Example: Add a Page-Break Alias
+
+Suppose a producer needs a hypothetical `custom-pagebreak` target with exactly the existing page-break semantics:
+
+[source,xml]
+----
+<article xmlns="http://docbook.org/ns/docbook">
+  <simpara>Before</simpara>
+  <?custom-pagebreak?>
+  <simpara>After</simpara>
+</article>
+----
+
+This target is an illustrative extension, not one currently implemented by the project.
+To implement it:
+
+. Add `custom-pagebreak` to the recognized, deferred targets in the renderer constructor's switch, alongside `asciidoc-pagebreak`.
+This avoids an unknown-target warning without executing the break during initialization.
+. Extend `instruction(...)` to treat both targets identically, retaining the identity-based consumed guard.
+For example, the method could become:
+
+[source,java]
+----
+private void instruction(ProcessingInstruction instruction) {
+  if (!consumed.add(instruction)) {
+    return;
+  }
+  switch (instruction.getTarget()) {
+    case "asciidoc-pagebreak", "custom-pagebreak" -> pendingPageBreaks++;
+    default -> {}
+  }
+}
+----
+
+No change to `isLineBreak(...)` is needed for this alias: page breaks must remain instruction objects, not become inline newline strings.
+The existing `process(...)` and `render()` logic then supplies paragraph properties, table-boundary fallback, consecutive breaks, and end-of-document fallback.
+The PI-only paragraph handling also delegates to `instruction(...)`, so the alias can reuse that behavior.
+
+=== Inline and Scoped Extensions
+
+For a hypothetical new line-break alias, add its target to `DocBookModelNormalizer.isLineBreak(...)` and recognize it in the renderer constructor without executing it there.
+The existing mixed-content normalizer will convert it to a newline string while leaving the source PI node intact.
+`DocBookRenderer.content(...)` uses the same predicate to avoid reinserting that PI as a second rendering entry.
+
+For an inline effect other than a line break, design its output path explicitly.
+The current renderer branch for a `ProcessingInstruction` calls `instruction(...)` and returns an empty content list; the handler itself returns `void`.
+An instruction that emits a run, tab, field, or other Word content therefore needs changes to that emission path or a dedicated rendering token and builder.
+Review PI-only paragraph handling too: a paragraph containing an instruction that emits visible content is not semantically empty and must not be skipped.
+Do not insert block-level Word objects into an inline builder's run list.
+
+For a new table setting:
+
+* Resolve the owning table using the DOM, following the nearest-ancestor or documented next-sibling policy.
+* Add dedicated parsing and validation for the new value and store it by the owning table node.
+The existing table-option code explicitly selects `table-width` for `dbhtml` and `keep-together` for `dbfo`; it is not a generic handler for arbitrary new properties.
+* Apply the setting before the owning table builder initializes its layout.
+* Define defaults and reset behavior so the setting does not leak into nested tables, following tables, or later conversions.
+* If a builder must read new state from `DocumentContext`, add the corresponding cleanup to the conversion lifecycle.
+Prefer renderer-local state or per-element indexes when shared context state is unnecessary.
+
+PI data is a raw string, not an XML attribute object.
+If the instruction uses pseudo-attributes, support the documented quote and whitespace rules, validate allowed values, and handle malformed input without unsafe substring operations.
+Do not reuse the existing percent-removal behavior for values that are not percentages.
+Unknown or invalid values should have an explicit diagnostic/default policy rather than silently changing an unrelated setting.
+
+=== Preserve Source Nodes and Avoid Duplicate Effects
+
+Keep the original DOM read-only and do not remove a PI after applying it.
+Source preservation and effect consumption are separate concerns.
+Use the renderer's identity-based consumed set for traversal-time effects that could be encountered more than once.
+Two distinct PI nodes with identical target and data must remain distinguishable; deduplicating by string value would incorrectly collapse repeated instructions.
+
+Check specialized builders that bypass ordinary child traversal.
+`LinkSupportBuilder`, for example, invokes `consumeInstructions(source)` explicitly.
+A new positional or content-emitting instruction may need a deliberate integration there; its presence in `getInstructions()` alone does not guarantee a rendering effect in every context.
+
+=== Test the New Instruction
+
+Add focused cases to `DocBookParserTest` and `DocBookRenderingTest`, or register a new test class in `docbook-2-docx/testng/testng.xml`.
+Cover the applicable cases:
+
+* Target, raw data, parent, and neighboring DOM nodes remain intact after parsing and normalization.
+* The generated Word structure has the intended effect at the intended position, not just the expected text or paragraph count.
+* Repeated distinct PIs follow the chosen accumulation/override policy, while revisiting the same DOM node does not apply its effect twice.
+* Leading, trailing, consecutive, and PI-only-paragraph placements behave correctly for block effects.
+* Nested inline elements, hyperlinks, variable-list terms, and table cells work where the instruction is supported.
+* Element-scoped settings remain isolated across nested and consecutive tables.
+* Malformed, missing, unsupported, and quoted data follow the documented policy.
+* Reusing `UnmarshallerTool`, including after a failure, does not retain instruction state.
+
+If the instruction originates in AsciiDoc, add an adapter test that verifies the actual DocBook emitted by the producer as well as the final DOCX behavior.
+Update the processing-instruction table in this guide when the target is implemented, and run both module suites and `./gradlew check` as described below.
+
 == Builder Dispatch and Specialized Traversal
 
 `BuilderFactory` looks up the unwrapped model class in `docbook-docx.builders`.
