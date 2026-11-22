@@ -3,6 +3,7 @@ package com.alphasystem.docbook.builder.impl.block;
 import com.alphasystem.docbook.ApplicationController;
 import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docbook.builder.impl.BlockBuilder;
+import com.alphasystem.docbook.builder.impl.inline.InlineMediaObjectBuilder;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
@@ -26,8 +27,12 @@ public class ImageDataBuilder extends BlockBuilder<Imagedata> {
     final var contentWidth = parseSize(source.getContentwidth());
     final var contentHeight = parseSize(source.getContentdepth());
 
+    final var inlineMediaObjectBuilder = getParent(InlineMediaObjectBuilder.class);
     final var mediaObjectBuilder = getParent(MediaObjectBuilder.class);
-    final var altText = mediaObjectBuilder == null ? null : mediaObjectBuilder.getAltText();
+    final var altText =
+        inlineMediaObjectBuilder != null
+            ? inlineMediaObjectBuilder.getAltText()
+            : mediaObjectBuilder == null ? null : mediaObjectBuilder.getAltText();
 
     R run = null;
     try {
@@ -36,8 +41,8 @@ public class ImageDataBuilder extends BlockBuilder<Imagedata> {
               .getImageAdapter()
               .withUrl(URI.create(fileRef).toURL())
               .withAltText(altText)
-                  .withWidth(contentWidth)
-                  .withHeight(contentHeight)
+              .withWidth(contentWidth)
+              .withHeight(contentHeight)
               .insertImage();
     } catch (Exception e) {
       logger.error("Failed to insert image", e);
