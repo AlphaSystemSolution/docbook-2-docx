@@ -1,0 +1,38 @@
+package com.alphasystem.docbook.builder.impl.block;
+
+import com.alphasystem.docbook.ApplicationController;
+import com.alphasystem.docbook.builder.Builder;
+import com.alphasystem.docbook.builder.impl.BlockBuilder;
+import java.net.URI;
+import java.util.Collections;
+import java.util.List;
+import org.apache.commons.lang3.StringUtils;
+import org.docbook.model.Imagedata;
+import org.docx4j.wml.R;
+
+public class ImageDataBuilder extends BlockBuilder<Imagedata> {
+
+  public ImageDataBuilder(Imagedata source, Builder<?> parent) {
+    super(source, parent);
+  }
+
+  @Override
+  protected List<Object> processChildContent(List<Object> childContent) {
+    final var fileRef = source.getFileref();
+    if (StringUtils.isBlank(fileRef)) {
+      throw new IllegalArgumentException("File reference is required");
+    }
+
+    R run = null;
+    try {
+      run =
+          ApplicationController.getContext()
+              .getImageAdapter()
+              .withUrl(URI.create(fileRef).toURL())
+              .insertImage();
+    } catch (Exception e) {
+      logger.error("Failed to insert image", e);
+    }
+    return Collections.singletonList(run);
+  }
+}
