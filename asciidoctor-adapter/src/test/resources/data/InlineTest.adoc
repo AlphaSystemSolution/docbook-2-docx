@@ -22,4 +22,6 @@ List item _text 2_
 A simple paragraph +
  [.small]#with a line break and in small font size#
 
+Informal figure
+
 image::https://www.vectorlogo.zone/logos/java/java-icon.svg[Java Logo]

@@ -342,7 +342,7 @@ public class InlineTest extends AbstractTest {
   public void testInlineTestDocument() {
     addTestTitle("InlineTest document");
     processContent(readXml("InlineTest"));
-    assertSize(10);
+    assertSize(12);
     addHorizontalLine();
   }
 

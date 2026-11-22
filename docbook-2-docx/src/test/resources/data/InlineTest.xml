@@ -19,4 +19,13 @@
     </itemizedlist>
     <simpara>A simple paragraph <?asciidoc-br?>
     <phrase role="small">with a line break and in small font size</phrase></simpara>
+    <simpara>Informal figure</simpara>
+    <informalfigure>
+        <mediaobject>
+            <imageobject>
+                <imagedata fileref="https://www.vectorlogo.zone/logos/java/java-icon.svg"/>
+            </imageobject>
+            <textobject><phrase>Java Logo</phrase></textobject>
+        </mediaobject>
+    </informalfigure>
 </article>
