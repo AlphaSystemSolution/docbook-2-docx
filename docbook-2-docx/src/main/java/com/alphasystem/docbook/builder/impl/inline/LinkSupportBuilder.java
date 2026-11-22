@@ -24,7 +24,9 @@ public abstract class LinkSupportBuilder<S> extends InlineBuilder<S> {
   }
 
   protected void initHref() {
-    href = (String) AppUtil.invokeMethod(source, "getLinkend");
+    final var renderer = ApplicationController.getContext().getDocBookRenderer();
+    final var linkend = AppUtil.invokeMethod(source, "getLinkend");
+    href = renderer == null ? (String) linkend : renderer.attribute(source, "linkend", linkend);
     if (StringUtils.isBlank(href)) {
       href = (String) AppUtil.invokeMethod(source, "getHref");
       external = StringUtils.isNotBlank(href) && !href.startsWith("#");
@@ -47,7 +49,9 @@ public abstract class LinkSupportBuilder<S> extends InlineBuilder<S> {
     var text = Utils.getLinkText(childContent);
 
     if (StringUtils.isBlank(text)) {
-      text = (String) AppUtil.invokeMethod(source, "getEndterm");
+      final var renderer = ApplicationController.getContext().getDocBookRenderer();
+      final var endterm = AppUtil.invokeMethod(source, "getEndterm");
+      text = renderer == null ? (String) endterm : renderer.attribute(source, "endterm", endterm);
     }
     if (StringUtils.isBlank(text)) {
       if (external) text = href;
@@ -56,7 +60,12 @@ public abstract class LinkSupportBuilder<S> extends InlineBuilder<S> {
     if (StringUtils.isBlank(text)) {
       text = "here";
     }
-    runBuilder.addContent(WmlAdapter.getText(text));
+    final var lines = text.split("\\R", -1);
+    runBuilder.addContent(WmlAdapter.getText(lines[0]));
+    for (int i = 1; i < lines.length; i++) {
+      runBuilder.addContent(WmlBuilderFactory.getBrBuilder().getObject());
+      runBuilder.addContent(WmlAdapter.getText(lines[i]));
+    }
     return runBuilder.getObject();
   }
 
@@ -68,6 +77,10 @@ public abstract class LinkSupportBuilder<S> extends InlineBuilder<S> {
 
   @Override
   protected List<Object> processChildContent(List<Object> childContent) {
+    final var renderer = ApplicationController.getContext().getDocBookRenderer();
+    if (renderer != null) {
+      renderer.consumeInstructions(source);
+    }
     return Collections.singletonList(getLinkLabel(childContent));
   }
 
