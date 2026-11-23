@@ -175,6 +175,135 @@ public class DocBookRenderingTest extends AbstractTest {
   }
 
   @Test
+  public void figureCaptionsUseInlineSequenceAndPreserveTitle() throws Exception {
+    final var info = ApplicationController.getContext().getDocumentInfo();
+    final var previousCaption = info.getFigureCaption();
+    try {
+      info.setFigureCaption("Illustration");
+      final var imageUrl = getClass().getResource("/images/test.png").toExternalForm();
+      final var figure =
+          "<figure><title>Original <emphasis>title</emphasis></title>"
+              + "<mediaobject><imageobject><imagedata fileref='"
+              + imageUrl
+              + "' align='center'/></imageobject></mediaobject></figure>";
+      convert(figure + figure);
+      assertEquals(mainDocumentPart.getContent().size(), 2);
+      final var values = new ArrayList<Integer>();
+      for (var object : mainDocumentPart.getContent()) {
+        final var paragraph = (P) object;
+        assertEquals(paragraph.getPPr().getPStyle().getVal(), "FigureTitle");
+        assertEquals(paragraph.getPPr().getJc().getVal(), JcEnumeration.CENTER);
+        final var xml = XmlUtils.marshaltoString(paragraph);
+        assertTrue(xml.indexOf("<w:drawing") < xml.indexOf("<w:br"), xml);
+        assertTrue(xml.indexOf("<w:br") < xml.indexOf("Illustration"), xml);
+        assertTrue(xml.indexOf("SEQ Figure") < xml.indexOf("Original"), xml);
+        assertTrue(xml.contains("Original "), xml);
+        assertTrue(xml.contains(">title</w:t>"), xml);
+        assertTrue(xml.contains("<w:i"), xml);
+        assertTrue(xml.contains("fldCharType=\"begin\""), xml);
+        assertTrue(xml.contains("fldCharType=\"end\""), xml);
+        final var matcher =
+            java.util.regex.Pattern.compile(
+                    "fldCharType=\"separate\".*?<w:t[^>]*>([0-9]+)</w:t>",
+                    java.util.regex.Pattern.DOTALL)
+                .matcher(xml);
+        assertTrue(matcher.find(), xml);
+        values.add(Integer.parseInt(matcher.group(1)));
+      }
+      assertEquals(values.get(1).intValue(), values.getFirst() + 1);
+      assertNull(
+          mainDocumentPart
+              .getStyleDefinitionsPart()
+              .getStyleById("FigureTitle")
+              .getPPr()
+              .getNumPr());
+    } finally {
+      info.setFigureCaption(previousCaption);
+    }
+  }
+
+  @Test
+  public void figureCounterIsDocumentScopedAndIndependentOfExampleNumbering() {
+    final var info = new com.alphasystem.asciidoc.model.DocumentInfo();
+    info.setFigureCaption("Figure");
+    info.setExampleCaption("Example");
+    final var first = new com.alphasystem.docbook.DocumentContext(info);
+    assertEquals(first.nextFigureNumber(), 1);
+    assertEquals(first.nextFigureNumber(), 2);
+    final var styles = first.getMainDocumentPart().getStyleDefinitionsPart();
+    assertNotNull(styles.getStyleById("ExampleTitle").getPPr().getNumPr());
+    assertNull(styles.getStyleById("FigureTitle").getPPr().getNumPr());
+    final var second = new com.alphasystem.docbook.DocumentContext(info);
+    assertEquals(second.nextFigureNumber(), 1);
+  }
+
+  @Test
+  public void untitledFiguresDoNotConsumeCaptionNumbers() throws Exception {
+    final var context = ApplicationController.getContext();
+    final var info = context.getDocumentInfo();
+    final var previousCaption = info.getFigureCaption();
+    try {
+      info.setFigureCaption("Figure");
+      final var before = context.nextFigureNumber();
+      final var imageUrl = getClass().getResource("/images/test.png").toExternalForm();
+      final var media =
+          "<mediaobject><imageobject><imagedata fileref='"
+              + imageUrl
+              + "'/></imageobject></mediaobject>";
+      convert("<figure>" + media + "</figure><informalfigure>" + media + "</informalfigure>");
+      assertEquals(context.nextFigureNumber(), before + 1);
+      for (var object : mainDocumentPart.getContent()) {
+        assertFalse(XmlUtils.marshaltoString(object).contains("SEQ Figure"));
+      }
+    } finally {
+      info.setFigureCaption(previousCaption);
+    }
+  }
+
+  @Test
+  public void defaultFigureCaptionUsesConfiguredLabel() throws Exception {
+    final var info = ApplicationController.getContext().getDocumentInfo();
+    final var previousCaption = info.getFigureCaption();
+    try {
+      info.setFigureCaption(null);
+      final var imageUrl = getClass().getResource("/images/test.png").toExternalForm();
+      convert(
+          "<figure><title>Java Logo</title><mediaobject><imageobject><imagedata fileref='"
+              + imageUrl
+              + "'/></imageobject></mediaobject></figure>");
+      assertEquals(mainDocumentPart.getContent().size(), 1);
+      final var xml = XmlUtils.marshaltoString(mainDocumentPart.getContent().getFirst());
+      final var label =
+          com.alphasystem.docbook.util.ConfigurationUtils.getInstance().getFigureCaption();
+      assertTrue(xml.contains(label + " "), xml);
+      assertTrue(xml.contains("SEQ Figure"), xml);
+      assertTrue(xml.contains("Java Logo"), xml);
+    } finally {
+      info.setFigureCaption(previousCaption);
+    }
+  }
+
+  @Test
+  public void disabledFigureCaptionsPreserveUnnumberedTitle() throws Exception {
+    final var info = ApplicationController.getContext().getDocumentInfo();
+    final var previousCaption = info.getFigureCaption();
+    try {
+      info.setFigureCaption("");
+      final var imageUrl = getClass().getResource("/images/test.png").toExternalForm();
+      convert(
+          "<figure><title>Unnumbered</title><mediaobject><imageobject><imagedata fileref='"
+              + imageUrl
+              + "'/></imageobject></mediaobject></figure>");
+      assertEquals(mainDocumentPart.getContent().size(), 1);
+      final var xml = XmlUtils.marshaltoString(mainDocumentPart.getContent().getFirst());
+      assertTrue(xml.contains("Unnumbered"), xml);
+      assertFalse(xml.contains("SEQ Figure"), xml);
+    } finally {
+      info.setFigureCaption(previousCaption);
+    }
+  }
+
+  @Test
   public void imageDataAlignJustifiesParagraph() throws Exception {
     final var imageUrl = getClass().getResource("/images/test.png").toExternalForm();
     convert(

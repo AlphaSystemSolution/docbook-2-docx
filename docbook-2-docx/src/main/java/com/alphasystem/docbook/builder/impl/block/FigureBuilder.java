@@ -1,5 +1,6 @@
 package com.alphasystem.docbook.builder.impl.block;
 
+import com.alphasystem.docbook.ApplicationController;
 import com.alphasystem.docbook.builder.Builder;
 import com.alphasystem.docx4j.builder.wml.PPrBuilder;
 import com.alphasystem.docx4j.builder.wml.WmlAdapter;
@@ -8,9 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import org.docbook.model.Figure;
+import org.docx4j.jaxb.Context;
 import org.docx4j.wml.P;
 import org.docx4j.wml.PPr;
 import org.docx4j.wml.R;
+import org.docx4j.wml.STFldCharType;
 
 public class FigureBuilder extends AbstractParaBuilder<Figure> {
 
@@ -28,11 +31,35 @@ public class FigureBuilder extends AbstractParaBuilder<Figure> {
 
   @Override
   protected List<Object> doProcess(List<Object> processedChildContent) {
+    if (!source.getTitleOrTitleabbrev().isEmpty() && !processedChildContent.isEmpty()) {
+      final var last = processedChildContent.getLast();
+      final var context = ApplicationController.getContext();
+      final var documentCaption = context.getDocumentInfo().getFigureCaption();
+      final var caption =
+          documentCaption == null ? configurationUtils.getFigureCaption() : documentCaption;
+      if (last instanceof P title && caption != null && !caption.isBlank()) {
+        final var prefix = new ArrayList<Object>();
+        prefix.add(textRun(caption + " "));
+        prefix.add(fieldRun(STFldCharType.BEGIN));
+        final var instruction = Context.getWmlObjectFactory().createText();
+        instruction.setValue(" SEQ Figure \\* ARABIC ");
+        instruction.setSpace("preserve");
+        prefix.add(
+            WmlBuilderFactory.getRBuilder()
+                .addContent(Context.getWmlObjectFactory().createRInstrText(instruction))
+                .getObject());
+        prefix.add(fieldRun(STFldCharType.SEPARATE));
+        prefix.add(textRun(Integer.toString(context.nextFigureNumber())));
+        prefix.add(fieldRun(STFldCharType.END));
+        prefix.add(textRun(". "));
+        title.getContent().addAll(0, prefix);
+      }
+    }
     // merge figure content and its title into a single paragraph separated by a line break
     final var allParas =
         !processedChildContent.isEmpty()
             && processedChildContent.stream().allMatch(P.class::isInstance);
-    if (processedChildContent.size() < 2 || !allParas) {
+    if (source.getTitleOrTitleabbrev().isEmpty() || processedChildContent.size() < 2 || !allParas) {
       // createPara would nest paragraph children inside a new paragraph, so only delegate for
       // run content; pass block content through unchanged
       if (processedChildContent.stream().allMatch(R.class::isInstance)) {
@@ -67,5 +94,25 @@ public class FigureBuilder extends AbstractParaBuilder<Figure> {
     final var merged =
         WmlBuilderFactory.getPBuilder().withPPr(pPr).addContent(content.toArray()).getObject();
     return List.of(merged);
+  }
+
+  private static R textRun(String value) {
+    final var text = Context.getWmlObjectFactory().createText();
+    text.setValue(value);
+    text.setSpace("preserve");
+    return WmlBuilderFactory.getRBuilder()
+        .addContent(Context.getWmlObjectFactory().createRT(text))
+        .getObject();
+  }
+
+  private static R fieldRun(STFldCharType type) {
+    final var field = Context.getWmlObjectFactory().createFldChar();
+    field.setFldCharType(type);
+    if (type == STFldCharType.BEGIN) {
+      field.setDirty(true);
+    }
+    return WmlBuilderFactory.getRBuilder()
+        .addContent(WmlAdapter.getWrappedFldChar(field))
+        .getObject();
   }
 }
