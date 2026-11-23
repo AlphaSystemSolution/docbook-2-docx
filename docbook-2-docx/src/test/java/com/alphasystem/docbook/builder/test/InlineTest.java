@@ -4,7 +4,6 @@ import static com.alphasystem.docbook.builder.test.DataFactory.*;
 import static org.testng.Assert.*;
 
 import com.alphasystem.commons.util.IdGenerator;
-import com.alphasystem.xml.DocBookUnmarshallerHandler;
 import java.util.ArrayList;
 import org.docbook.model.SimplePara;
 import org.docx4j.XmlUtils;
@@ -284,17 +283,16 @@ public class InlineTest extends AbstractTest {
     try {
       for (boolean afterTable : new boolean[] {false, true}) {
         content.clear();
-        final var table = new Tbl();
-        if (afterTable) {
-          content.add(table);
-        }
-        final var handler = new DocBookUnmarshallerHandler();
-        handler.processingInstruction("asciidoc-pagebreak", "");
-        assertEquals(content.size(), afterTable ? 1 : 0);
-        handler.endDocument();
+        final var tableXml =
+            "<informaltable><tgroup cols='1'><colspec colname='col_1' colwidth='100*'/>"
+                + "<tbody><row><entry>cell</entry></row></tbody></tgroup></informaltable>";
+        processContent(
+            "<article xmlns='http://docbook.org/ns/docbook'>"
+                + (afterTable ? tableXml : "")
+                + "<?asciidoc-pagebreak?></article>");
         assertEquals(content.size(), afterTable ? 2 : 1);
         if (afterTable) {
-          assertSame(content.getFirst(), table);
+          assertTrue(content.getFirst() instanceof Tbl);
         }
         assertPageBreak((P) content.getLast());
       }
