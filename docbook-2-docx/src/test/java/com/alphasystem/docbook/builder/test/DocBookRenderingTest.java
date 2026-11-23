@@ -11,6 +11,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import org.docx4j.XmlUtils;
+import org.docx4j.wml.JcEnumeration;
 import org.docx4j.wml.P;
 import org.docx4j.wml.Tbl;
 import org.testng.annotations.AfterMethod;
@@ -171,6 +172,46 @@ public class DocBookRenderingTest extends AbstractTest {
     assertTrue(xml.contains("<w:br"), xml);
     assertTrue(xml.indexOf("descr=\"Java Logo\"") < xml.indexOf("<w:br"), xml);
     assertTrue(xml.indexOf("<w:br") < xml.indexOf("Figure caption"), xml);
+  }
+
+  @Test
+  public void imageDataAlignJustifiesParagraph() throws Exception {
+    final var imageUrl = getClass().getResource("/images/test.png").toExternalForm();
+    convert(
+        "<informalfigure><mediaobject><imageobject><imagedata fileref='"
+            + imageUrl
+            + "' align='center'/></imageobject></mediaobject></informalfigure>");
+    final var content = mainDocumentPart.getContent();
+    assertEquals(content.size(), 1);
+    final var paragraph = (P) content.getFirst();
+    assertEquals(paragraph.getPPr().getJc().getVal(), JcEnumeration.CENTER);
+  }
+
+  @Test
+  public void figureImageDataAlignSurvivesTitleMerge() throws Exception {
+    final var imageUrl = getClass().getResource("/images/test.png").toExternalForm();
+    convert(
+        "<figure><title>Cap</title><mediaobject><imageobject><imagedata fileref='"
+            + imageUrl
+            + "' align='center'/></imageobject></mediaobject></figure>");
+    final var content = mainDocumentPart.getContent();
+    assertEquals(content.size(), 1);
+    assertEquals(((P) content.getFirst()).getPPr().getJc().getVal(), JcEnumeration.CENTER);
+  }
+
+  @Test
+  public void imageDataValignAnchorsImageToLine() throws Exception {
+    final var imageUrl = getClass().getResource("/images/test.png").toExternalForm();
+    convert(
+        "<simpara>before <inlinemediaobject><imageobject><imagedata fileref='"
+            + imageUrl
+            + "' valign='middle'/></imageobject></inlinemediaobject> after</simpara>");
+    final var xml = XmlUtils.marshaltoString(mainDocumentPart.getContent().getFirst());
+    assertTrue(xml.contains("<wp:anchor"), xml);
+    assertTrue(xml.contains("<wp:positionV relativeFrom=\"line\">"), xml);
+    assertTrue(xml.contains("<wp:align>center</wp:align>"), xml);
+    assertTrue(xml.indexOf("before") < xml.indexOf("<wp:anchor"), xml);
+    assertTrue(xml.indexOf("<wp:anchor") < xml.indexOf("after"), xml);
   }
 
   @Test

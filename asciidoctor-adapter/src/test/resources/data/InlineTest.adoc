@@ -28,12 +28,13 @@ image::https://www.vectorlogo.zone/logos/java/java-icon.svg[Java Logo]
 
 Figure with caption
 
+[.right]
 .Java Logo
 image::https://www.vectorlogo.zone/logos/java/java-icon.svg[Java Logo]
 
 Figure with width (256) only
 
-image::https://www.vectorlogo.zone/logos/java/java-icon.svg[Java Logo, 256]
+image::https://www.vectorlogo.zone/logos/java/java-icon.svg[Java Logo, 256, align=center]
 
 Figure with width (128) and height (128)
 
