@@ -4,7 +4,6 @@ import static com.alphasystem.docbook.builder.test.DataFactory.*;
 import static org.testng.Assert.*;
 
 import com.alphasystem.commons.util.IdGenerator;
-import com.alphasystem.xml.DocBookUnmarshallerHandler;
 import java.util.ArrayList;
 import org.docbook.model.SimplePara;
 import org.docx4j.XmlUtils;
@@ -284,17 +283,16 @@ public class InlineTest extends AbstractTest {
     try {
       for (boolean afterTable : new boolean[] {false, true}) {
         content.clear();
-        final var table = new Tbl();
-        if (afterTable) {
-          content.add(table);
-        }
-        final var handler = new DocBookUnmarshallerHandler();
-        handler.processingInstruction("asciidoc-pagebreak", "");
-        assertEquals(content.size(), afterTable ? 1 : 0);
-        handler.endDocument();
+        final var tableXml =
+            "<informaltable><tgroup cols='1'><colspec colname='col_1' colwidth='100*'/>"
+                + "<tbody><row><entry>cell</entry></row></tbody></tgroup></informaltable>";
+        processContent(
+            "<article xmlns='http://docbook.org/ns/docbook'>"
+                + (afterTable ? tableXml : "")
+                + "<?asciidoc-pagebreak?></article>");
         assertEquals(content.size(), afterTable ? 2 : 1);
         if (afterTable) {
-          assertSame(content.getFirst(), table);
+          assertTrue(content.getFirst() instanceof Tbl);
         }
         assertPageBreak((P) content.getLast());
       }
@@ -302,6 +300,32 @@ public class InlineTest extends AbstractTest {
       content.clear();
       content.addAll(savedContent);
     }
+  }
+
+  @Test
+  public void testInlineMediaObject() {
+    final var imageUrl = getClass().getResource("/images/test.png");
+    assertNotNull(imageUrl);
+    final var media = new org.docbook.model.Inlinemediaobject();
+    final var image = new org.docbook.model.Imageobject();
+    final var imageData = new org.docbook.model.Imagedata();
+    imageData.setFileref(imageUrl.toExternalForm());
+    image.setImagedata(imageData);
+    final var text = new org.docbook.model.TextObject();
+    text.getContent().add(createPhrase(null, "Inline image description"));
+    media.getVideoobjectOrAudioobjectOrImageobject().add(text);
+    media.getVideoobjectOrAudioobjectOrImageobject().add(image);
+
+    addTestTitle("Inline media object");
+    processContent(
+        createArticle(createSimplePara(IdGenerator.nextId(), "Before ", media, " after")));
+    assertSize(1);
+    final var paragraph = mainDocumentPart.getContent().getLast();
+    assertText(paragraph, "Before org.docx4j.wml.Drawing  after");
+    final var xml = XmlUtils.marshaltoString(paragraph);
+    assertTrue(xml.contains("<w:drawing>"));
+    assertTrue(xml.contains("descr=\"Inline image description\""), xml);
+    addHorizontalLine();
   }
 
   private void assertPageBreak(P paragraph) {
@@ -342,7 +366,7 @@ public class InlineTest extends AbstractTest {
   public void testInlineTestDocument() {
     addTestTitle("InlineTest document");
     processContent(readXml("InlineTest"));
-    assertSize(10);
+    assertSize(19);
     addHorizontalLine();
   }
 

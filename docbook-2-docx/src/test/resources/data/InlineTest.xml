@@ -19,4 +19,47 @@
     </itemizedlist>
     <simpara>A simple paragraph <?asciidoc-br?>
     <phrase role="small">with a line break and in small font size</phrase></simpara>
+    <simpara>Informal figure</simpara>
+    <informalfigure>
+        <mediaobject>
+            <imageobject>
+                <imagedata fileref="https://www.vectorlogo.zone/logos/java/java-icon.svg"/>
+            </imageobject>
+            <textobject><phrase>Java Logo</phrase></textobject>
+        </mediaobject>
+    </informalfigure>
+    <simpara>Figure with caption</simpara>
+    <figure>
+        <title>Java Logo</title>
+        <mediaobject>
+            <imageobject>
+                <imagedata fileref="https://www.vectorlogo.zone/logos/java/java-icon.svg"/>
+            </imageobject>
+            <textobject><phrase>Java Logo</phrase></textobject>
+        </mediaobject>
+    </figure>
+    <simpara>Figure with width (256) only</simpara>
+    <informalfigure>
+        <mediaobject>
+            <imageobject>
+                <imagedata fileref="https://www.vectorlogo.zone/logos/java/java-icon.svg" contentwidth="256"/>
+            </imageobject>
+            <textobject><phrase>Java Logo</phrase></textobject>
+        </mediaobject>
+    </informalfigure>
+    <simpara>Figure with width (128) and height (128)</simpara>
+    <informalfigure>
+        <mediaobject>
+            <imageobject>
+                <imagedata fileref="https://www.vectorlogo.zone/logos/java/java-icon.svg" contentwidth="128" contentdepth="128"/>
+            </imageobject>
+            <textobject><phrase>Java Logo</phrase></textobject>
+        </mediaobject>
+    </informalfigure>
+    <simpara>Inline image: <inlinemediaobject>
+        <imageobject>
+            <imagedata fileref="https://www.vectorlogo.zone/logos/java/java-icon.svg"/>
+        </imageobject>
+        <textobject><phrase>java icon</phrase></textobject>
+    </inlinemediaobject></simpara>
 </article>

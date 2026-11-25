@@ -4,6 +4,7 @@ import com.alphasystem.asciidoc.model.DocumentInfo;
 import com.alphasystem.commons.SystemException;
 import com.alphasystem.docbook.model.DocumentCaption;
 import com.alphasystem.docbook.util.ConfigurationUtils;
+import com.alphasystem.docx4j.builder.wml.ImageAdapter;
 import com.alphasystem.docx4j.builder.wml.NumberingHelper;
 import com.alphasystem.docx4j.builder.wml.StylesBuilder;
 import com.alphasystem.docx4j.builder.wml.WmlPackageBuilder;
@@ -37,7 +38,9 @@ public final class DocumentContext {
   private WmlPackageBuilder wmlPackageBuilder;
   private WordprocessingMLPackage wordprocessingMLPackage;
   private MainDocumentPart mainDocumentPart;
+  private ImageAdapter imageAdapter;
   private DocBookRenderer docBookRenderer;
+  private int figureNumber;
   private int tableWidth = 0;
   private boolean keepTogether = false;
   private final NumberingHelper numberingHelper = NumberingHelper.getInstance();
@@ -68,6 +71,7 @@ public final class DocumentContext {
       assert wmlPackageBuilder != null;
       wordprocessingMLPackage = wmlPackageBuilder.getPackage();
       mainDocumentPart = wordprocessingMLPackage.getMainDocumentPart();
+      imageAdapter = new ImageAdapter(wordprocessingMLPackage);
 
       final var styleDefinitionsPart = mainDocumentPart.getStyleDefinitionsPart();
       final var styles = styleDefinitionsPart.getContents();
@@ -105,6 +109,10 @@ public final class DocumentContext {
     } catch (Docx4JException | SystemException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public int nextFigureNumber() {
+    return ++figureNumber;
   }
 
   public DocBookRenderer getDocBookRenderer() {
@@ -145,6 +153,10 @@ public final class DocumentContext {
 
   public MainDocumentPart getMainDocumentPart() {
     return mainDocumentPart;
+  }
+
+  public ImageAdapter getImageAdapter() {
+    return imageAdapter;
   }
 
   public long getListNumber(String styleName, long level) {

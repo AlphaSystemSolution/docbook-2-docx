@@ -40,6 +40,7 @@ public class ConfigurationUtils {
   private String tocCaption;
   private String tableCaption;
   private String exampleCaption;
+  private String figureCaption;
   private String varTermStyle;
 
   /** Do not let anyone instantiate this class. */
@@ -140,6 +141,13 @@ public class ConfigurationUtils {
       exampleCaption = appConfig.getString("captions.example");
     }
     return exampleCaption;
+  }
+
+  public String getFigureCaption() {
+    if (Objects.isNull(figureCaption)) {
+      figureCaption = appConfig.getString("captions.figure");
+    }
+    return figureCaption;
   }
 
   public String getTableCaption() {

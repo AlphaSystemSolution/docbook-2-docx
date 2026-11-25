@@ -15,14 +15,18 @@ public interface UnmarshallerConstants {
   String ENTRY = "entry";
   String EXAMPLE = "example";
   String FORMAL_PARA = "formalpara";
+  String IMAGE_DATA = "imagedata";
+  String IMAGE_OBJECT = "imageobject";
   String IMPORTANT = "important";
   String INFO = "info";
   String INFORMAL_EXAMPLE = "informalexample";
+  String INFORMAL_FIGURE = "informalfigure";
   String INFORMAL_TABLE = "informaltable";
   String ITEMIZED_LIST = "itemizedlist";
   String LINK = "link";
   String LIST_ITEM = "listitem";
   String LITERAL = "literal";
+  String MEDIA_OBJECT = "mediaobject";
   String NOTE = "note";
   String ORDERED_LIST = "orderedlist";
   String PARA = "para";
@@ -40,6 +44,7 @@ public interface UnmarshallerConstants {
   String TABLE_GROUP = "tgroup";
   String TABLE_HEAD = "thead";
   String TERM = "term";
+  String TEXT_OBJECT = "textobject";
   String TIP = "tip";
   String TITLE = "title";
   String VARIABLE_LIST = "variablelist";
@@ -82,6 +87,14 @@ public interface UnmarshallerConstants {
     return isInstanceOf(FormalPara.class, o);
   }
 
+  static boolean isImageDataType(Object o) {
+    return isInstanceOf(Imagedata.class, o);
+  }
+
+  static boolean isImageObjectType(Object o) {
+    return isInstanceOf(Imageobject.class, o);
+  }
+
   static boolean isImportantType(Object o) {
     return isInstanceOf(Important.class, o);
   }
@@ -98,6 +111,10 @@ public interface UnmarshallerConstants {
     return isInstanceOf(InformalExample.class, o);
   }
 
+  static boolean isInformalFigureType(Object o) {
+    return isInstanceOf(Informalfigure.class, o);
+  }
+
   static boolean isItemizedListType(Object o) {
     return isInstanceOf(ItemizedList.class, o);
   }
@@ -112,6 +129,10 @@ public interface UnmarshallerConstants {
 
   static boolean isLiteralType(Object o) {
     return isInstanceOf(Literal.class, o);
+  }
+
+  static boolean isMediaObjectType(Object o) {
+    return isInstanceOf(MediaObject.class, o);
   }
 
   static boolean isNoteType(Object o) {
@@ -184,6 +205,10 @@ public interface UnmarshallerConstants {
 
   static boolean isTermType(Object o) {
     return isInstanceOf(Term.class, o);
+  }
+
+  static boolean isTextObjectType(Object o) {
+    return isInstanceOf(TextObject.class, o);
   }
 
   static boolean isTipType(Object o) {

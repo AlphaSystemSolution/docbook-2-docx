@@ -114,6 +114,39 @@
             <w:szCs w:val="24"/>
         </w:rPr>
     </w:style>
+    <w:style w:type="paragraph" w:customStyle="true" w:styleId="FigureTitle">
+        <w:name w:val="Figure Title"/>
+        <w:basedOn w:val="Normal"/>
+        <w:next w:val="Normal"/>
+        <w:link w:val="FigureTitleChar"/>
+        <w:uiPriority w:val="9"/>
+        <w:unhideWhenUsed/>
+        <w:qFormat/>
+        <w:rsid w:val="00BC0CAB"/>
+        <w:pPr>
+            <w:keepLines/>
+        </w:pPr>
+        <w:rPr>
+            <w:i/>
+            <w:iCs/>
+            <w:color w:val="7A2518"/>
+            <w:sz w:val="24"/>
+            <w:szCs w:val="24"/>
+        </w:rPr>
+    </w:style>
+    <w:style w:type="character" w:customStyle="true" w:styleId="FigureTitleChar">
+        <w:name w:val="Figure Title Char"/>
+        <w:basedOn w:val="DefaultParagraphFont"/>
+        <w:link w:val="FigureTitle"/>
+        <w:rsid w:val="00BC0CAB"/>
+        <w:rPr>
+            <w:i/>
+            <w:iCs/>
+            <w:color w:val="7A2518"/>
+            <w:sz w:val="24"/>
+            <w:szCs w:val="24"/>
+        </w:rPr>
+    </w:style>
     <w:style w:type="table" w:styleId="HorizontalList" w:customStyle="true">
         <w:name w:val="Horizontal List"/>
         <w:basedOn w:val="TableNormal"/>

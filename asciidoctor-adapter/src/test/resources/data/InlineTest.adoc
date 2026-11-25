@@ -2,14 +2,17 @@
 
 This is a simple text using default style.
 
-This is a paragraph containing styled text, for example *bold*, _italic_, and *_mixed bold + italic_*
+This is a paragraph containing styled text, for example *bold*, _italic_, and **{nbsp}_mixed bold + italic_{nbsp}**
 
 [.red]##C##[.green]##O##[.blue]##L##[.fuchsia]##O##[.maroon]##R##
 
+[#id1]
 .Title of [.red]#formal para#
 Paragraph description is very *important*.
 
-Link to <<_id1>>
+Link to <<id1>>.
+
+Link to <<id1, test>> with custom ref text.
 
 * List *item* text 1
 +
@@ -18,3 +21,23 @@ List item _text 2_
 
 A simple paragraph +
  [.small]#with a line break and in small font size#
+
+Informal figure
+
+image::https://www.vectorlogo.zone/logos/java/java-icon.svg[Java Logo]
+
+Figure with caption
+
+[.right]
+.Java Logo
+image::https://www.vectorlogo.zone/logos/java/java-icon.svg[Java Logo]
+
+Figure with width (256) only
+
+image::https://www.vectorlogo.zone/logos/java/java-icon.svg[Java Logo, 256, align=center]
+
+Figure with width (128) and height (128)
+
+image::https://www.vectorlogo.zone/logos/java/java-icon.svg[Java Logo, 128,128]
+
+Inline image: image:https://www.vectorlogo.zone/logos/java/java-icon.svg[]

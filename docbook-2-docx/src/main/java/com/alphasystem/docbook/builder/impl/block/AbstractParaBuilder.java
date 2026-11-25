@@ -101,7 +101,10 @@ public abstract class AbstractParaBuilder<S> extends BlockBuilder<S> {
   }
 
   private static JcEnumeration getJc(String role) {
-    if (role != null && role.startsWith(JUSTIFICATION_STYLE_PREFIX)) {
+    if (role == null) {
+      return null;
+    }
+    if (role.startsWith(JUSTIFICATION_STYLE_PREFIX)) {
       var justificationType = role.substring(JUSTIFICATION_STYLE_PREFIX.length());
       return switch (justificationType) {
         case "center" -> JcEnumeration.CENTER;
@@ -109,7 +112,13 @@ public abstract class AbstractParaBuilder<S> extends BlockBuilder<S> {
         case "justify" -> JcEnumeration.BOTH;
         default -> JcEnumeration.LEFT;
       };
+    } else {
+      return switch (role) {
+        case "left" -> JcEnumeration.LEFT;
+        case "center" -> JcEnumeration.CENTER;
+        case "right" -> JcEnumeration.RIGHT;
+        default -> null;
+      };
     }
-    return null;
   }
 }
